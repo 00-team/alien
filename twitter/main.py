@@ -26,6 +26,8 @@ SDB_PATH = DATA_DIR / (BOT_INFO['username'] + '.sdb.json')
 
 if SDB_PATH.is_file():
     SDB = load_json(SDB_PATH)
+else:
+    save_json(SDB, SDB_PATH)
 
 
 logger = get_logger(BOT_INFO['username'])
