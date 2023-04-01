@@ -5,18 +5,19 @@ import time
 from itertools import cycle
 
 import httpx
-from utils import SECRETS_DIR, get_config, get_logger, last_retweet, load_json
+from utils import CONF, SECRETS_DIR, get_logger, last_retweet, load_json
 from utils import save_json
-
-logger = None
 
 TOKEN_URL = 'https://api.twitter.com/2/oauth2/token'
 SEARCH_URL = 'https://api.twitter.com/2/tweets/search/recent'
 TWEET_DELAY = 5 * 60
 
 
-BOT_INFO = None
+BOT_INFO = load_json(CONF['auth_path'])
 KEYS = load_json(SECRETS_DIR / 'keys.json')
+
+
+logger = get_logger(BOT_INFO['username'])
 
 
 def refresh_token():
@@ -95,13 +96,7 @@ def retweet(hashtag, tweet_id):
 
 
 def main(args: list[str]):
-    global BOT_INFO, logger
-
-    conf = get_config(args[1])
-    BOT_INFO = load_json(conf['auth_path'])
-    logger = get_logger(BOT_INFO['username'])
-
-    for hashtag in cycle(conf['HASHTAGS']):
+    for hashtag in cycle(CONF['hashtags']):
         try:
             if time.time() + 30 > BOT_INFO['expires_in']:
                 refresh_token()

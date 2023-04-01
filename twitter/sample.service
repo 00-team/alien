@@ -4,7 +4,7 @@ Description=Gort Bot
 [Service]
 Type=simple
 User=root
-ExecStart=/alien/.env/bin/python /alien/twitter/main.py
+ExecStart=/alien/.env/bin/python /alien/twitter/main.py /alien/twitter/fxhash.config.json
 Environment=PYTHONUNBUFFERED=1
 Restart=always
 

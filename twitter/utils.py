@@ -1,11 +1,15 @@
 import json
 import logging
+import sys
 from logging import FileHandler, Formatter
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent
 SECRETS_DIR = BASE_DIR / 'secrets'
 DATA_DIR = BASE_DIR / 'data'
+
+with open(sys.argv[1], 'r') as f:
+    CONF = json.load(f)
 
 SECRETS_DIR.mkdir(exist_ok=True)
 DATA_DIR.mkdir(exist_ok=True)
@@ -59,8 +63,3 @@ def last_retweet(name: str, hashtag: str, tweet_id: str | None = None):
                 last_hashtag_rt = f.read()
 
         return last_rt, last_hashtag_rt
-
-
-def get_config(path: str):
-    with open(path, 'r') as f:
-        return json.load(f)

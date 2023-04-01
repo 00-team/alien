@@ -130,6 +130,7 @@ dmypy.json
 
 # alien ignores
 config.json
+*.config.json
 data/
 secrets/
 keys.json
