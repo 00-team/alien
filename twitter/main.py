@@ -22,7 +22,7 @@ SDB = {
     'shilled': [],
     'total_search': 0
 }
-SDB_PATH = DATA_DIR / BOT_INFO['username'] + '.sdb.json'
+SDB_PATH = DATA_DIR / (BOT_INFO['username'] + '.sdb.json')
 
 if SDB_PATH.is_file():
     SDB = load_json(SDB_PATH)
