@@ -43,6 +43,13 @@ if check_diff "athena/*"; then
     echo $SPACER
 fi
 
+if check_diff "twitter/*"; then
+    echo "$EG restart twitter bots"
+    systemctl restart fxhash.twt
+    systemctl restart xix.twt
+    echo $SPACER
+fi
+
 
 echo "Deploy is Done! ✅"
 
