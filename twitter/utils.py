@@ -3,6 +3,7 @@ import logging
 import sys
 from logging import FileHandler, Formatter, StreamHandler
 from pathlib import Path
+from random import choices
 
 BASE_DIR = Path(__file__).parent
 SECRETS_DIR = BASE_DIR / 'secrets'
@@ -46,9 +47,9 @@ def get_logger(name: str):
     return logger
 
 
-def last_retweet(name: str, hashtag: str, tweet_id: str | None = None):
-    hashtag_path = DATA_DIR / f'{name}_{hashtag}_last_retweet'
-    path = DATA_DIR / f'{name}_last_retweet'
+def last_retweet(name: str, hashtag: str, tweet_id: str = None):
+    hashtag_path = DATA_DIR / f'{name}_{hashtag}_LR'
+    path = DATA_DIR / f'{name}_LR'
 
     if tweet_id:
         with open(path, 'w') as f:
@@ -68,3 +69,18 @@ def last_retweet(name: str, hashtag: str, tweet_id: str | None = None):
                 last_hashtag_rt = f.read()
 
         return last_rt, last_hashtag_rt
+
+
+def read_shared_db(name: str):
+    with open(DATA_DIR / f'{name}.shared.json', 'r') as f:
+        return json.load(f)
+
+
+EMOJI_SET = [
+    '💥', '💸', '💵', '💴', '💶', '💷', '🪙', '💰', '💎',
+    '🎨', '🔥', '❤', '🧡', '💛', '💚', '💙', '💜', '🤍', '💗'
+]
+
+
+def format_with_emojis(text: str) -> str:
+    return text.format(*choices(EMOJI_SET, k=10))

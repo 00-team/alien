@@ -7,10 +7,10 @@ from .settings import BASE_DIR
 
 
 class DailyRotating(FileHandler):
-    def __init__(self, dirname: str):
+    def __init__(self):
         now = datetime.now()
         self.day = now.day
-        self.path = BASE_DIR / f'logs/{dirname}'
+        self.path = BASE_DIR / 'logs'
 
         self.path.mkdir(parents=True, exist_ok=True)
         filename = str(self.path / (now.strftime('%m-%d') + '.log'))
@@ -63,14 +63,13 @@ logging.config.dictConfig({
             'class': 'logging.StreamHandler',
             'formatter': 'term'
         },
-        'root_file': {
+        'file': {
             '()': DailyRotating,
             'formatter': 'file',
-            'dirname': 'root'
         },
     },
     'root': {
-        'handlers': ['term', 'root_file'],
+        'handlers': ['term', 'file'],
         'level': 'INFO'
     },
 })

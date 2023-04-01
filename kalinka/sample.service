@@ -4,7 +4,7 @@ Description=Kalinka Bot
 [Service]
 Type=simple
 User=root
-ExecStart=/bots/kalinka/.env/bin/python /bots/kalinka/main.py
+ExecStart=/alien/.env/bin/python /alien/kalinka/main.py /alien/kalinka/config.json
 Environment=PYTHONUNBUFFERED=1
 Restart=always
 
