@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Gort and Quandale Dingle ???</title>
+        <link rel="stylesheet" href="/static/style.css" />
+    </head>
+    <body>
+        <div class="main">
+            {% if error %}
+            <div class="error">{{ error.message }}</div>
+            {% endif %}
+
+            <!-- <input
+                type="text"
+                id="file_name"
+                placeholder="Enter the File Name!"
+            /> -->
+            <button onclick="update_bot()">Update Bot</button>
+        </div>
+
+        <script>
+            function update_bot() {
+                open('/update_bot', '_self')
+            }
+        </script>
+    </body>
+</html>

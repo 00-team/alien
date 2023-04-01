@@ -1,0 +1,12 @@
+[Unit]
+Description=Kalinka Bot
+
+[Service]
+Type=simple
+User=root
+ExecStart=/bots/kalinka/.env/bin/python /bots/kalinka/main.py
+Environment=PYTHONUNBUFFERED=1
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
