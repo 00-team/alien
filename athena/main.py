@@ -28,7 +28,7 @@ STATE = {
 @require_joined
 async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
-    if user.id in SECRETS['ADMINS']:
+    if user.id in CONF['ADMINS']:
         await update.message.reply_text(
             'list of all channels',
             reply_markup=await get_keyboard_chats(ctx.bot)

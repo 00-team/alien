@@ -7,6 +7,7 @@ from io import StringIO
 
 from shared.database import get_users
 from shared.dependencies import require_admin
+from shared.settings import CONF
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.error import NetworkError
@@ -84,13 +85,15 @@ async def error_handler(update: object, ctx: ContextTypes.DEFAULT_TYPE):
         message = (
             f'An exception was raised while handling an update\n\n'
             f'<pre>{html.escape(update_str)}</pre>\n\n'
-            f'<pre>context.chat_data = {html.escape(str(ctx.chat_data))}</pre>\n\n'
-            f'<pre>context.user_data = {html.escape(str(ctx.user_data))}</pre>\n\n'
+            f'<pre>ctx.chat_data = {html.escape(str(ctx.chat_data))}</pre>\n\n'
+            f'<pre>ctx.user_data = {html.escape(str(ctx.user_data))}</pre>\n\n'
             f'<pre>{html.escape(tb_string)}</pre>'
         )
 
+        DEV = CONF['ADMINS'][0]
+
         await ctx.bot.send_message(
-            chat_id=ADMINS[0], text=message, parse_mode=ParseMode.HTML
+            chat_id=DEV, text=message, parse_mode=ParseMode.HTML
         )
     except Exception as e:
         logging.exception(e)
