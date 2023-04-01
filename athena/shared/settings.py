@@ -1,4 +1,6 @@
 
+import json
+import sys
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent.parent
@@ -14,3 +16,7 @@ GENERAL_DB_PATH = DATA_DIR / 'generals.json'
 
 EXPIRE_TIME = 15 * 60
 FORWARD_DELAY = 10 * 60
+
+
+with open(sys.argv[1], 'r') as f:
+    CONF = json.load(f)

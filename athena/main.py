@@ -12,14 +12,13 @@ from shared.database import check_user, get_keyboard_chats, get_users
 from shared.database import is_forwards_enable, setup_databases
 from shared.database import toggle_forwards, user_remove
 from shared.dependencies import require_admin, require_joined
-from shared.settings import FORWARD_DELAY
-from shared.tools import get_config
+from shared.settings import CONF, FORWARD_DELAY
 from telegram import Update
 from telegram.error import Forbidden, NetworkError, RetryAfter, TelegramError
 from telegram.ext import Application, CallbackQueryHandler, ChatMemberHandler
 from telegram.ext import CommandHandler, ContextTypes, MessageHandler, filters
 
-MAIN_CHANNEL = None
+MAIN_CHANNEL = CONF['CHANNEL']
 STATE = {
     'FA': {},
     'SCL': {}
@@ -201,16 +200,10 @@ async def query_update(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 
 def main(args: list[str]):
-    global MAIN_CHANNEL
-
     logging.info('Starting Athena')
-    conf = get_config(args[1])
-
-    MAIN_CHANNEL = conf['MAIN_CHANNEL']
-
     setup_databases()
 
-    application = Application.builder().token(conf['TOKEN']).build()
+    application = Application.builder().token(CONF['TOKEN']).build()
     application.add_error_handler(error_handler)
 
     application.add_handler(CommandHandler('start', start))

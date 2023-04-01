@@ -1,10 +1,12 @@
 
+import logging
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.error import NetworkError, TelegramError
 from telegram.ext import ContextTypes
 
 from .database import get_channels, user_add
-from .settings import SECRETS
+from .settings import CONF
 
 
 def require_admin(func):
@@ -13,7 +15,7 @@ def require_admin(func):
             return
 
         user = update.message.from_user
-        if user.id in SECRETS['ADMINS']:
+        if user.id in CONF['ADMINS']:
             return await func(update, ctx)
 
     return decorator
@@ -32,7 +34,7 @@ def require_joined(func):
 
         user_add(user)
 
-        if user.id in SECRETS['ADMINS']:
+        if user.id in CONF['ADMINS']:
             await func(update, ctx)
             return
 
@@ -57,7 +59,7 @@ def require_joined(func):
             except NetworkError:
                 continue
             except TelegramError as e:
-                logger.exception(e)
+                logging.exception(e)
                 # channel_remove(chat_id)
                 continue
 

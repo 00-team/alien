@@ -7,7 +7,6 @@ from io import StringIO
 
 from shared.database import get_users
 from shared.dependencies import require_admin
-from shared.settings import SECRETS
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.error import NetworkError
