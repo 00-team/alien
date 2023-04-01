@@ -16,4 +16,4 @@ with open(sys.argv[1], 'r') as f:
 ADMINS = CONF['admins']
 
 DB_PATH = BASE_DIR.parent / f'twitter/data/{CONF["name"]}.shared.json'
-BOT_DATA_PATH = DATA_DIR / f'twitter/data/{CONF["name"]}.sdb.json'
+BOT_DATA_PATH = BASE_DIR.parent / f'twitter/data/{CONF["name"]}.sdb.json'
