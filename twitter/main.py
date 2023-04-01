@@ -134,7 +134,7 @@ def shill(tweets: list[str], text: str):
 def main(args: list[str]):
     htags = CONF['hashtags']
 
-    for hashtag in cycle(htags + [12]):
+    for hashtag in cycle([12] + htags):
         try:
             if time.time() + 30 > BOT_INFO['expires_in']:
                 logger.info('refreshing...')
@@ -150,10 +150,13 @@ def main(args: list[str]):
                     # ignore the sleep
                     continue
 
-                data = search(db['search'] + ' -is:reply')
+                query = db['search'] + ' -is:reply'
+                data = search(query)
 
                 SDB['total_search'] += 1
                 tweets = [d['id'] for d in data]
+
+                logger.info(f'search query: {query}')
                 logger.info(f'search len: {len(tweets)}')
 
                 text = format_with_emojis(random.choice(db['reply_tweets']))
