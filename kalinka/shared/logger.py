@@ -3,14 +3,14 @@ import logging.config
 from datetime import datetime
 from logging import FileHandler
 
-from .settings import BASE_DIR
+from .settings import BASE_DIR, CONF
 
 
 class DailyRotating(FileHandler):
     def __init__(self):
         now = datetime.now()
         self.day = now.day
-        self.path = BASE_DIR / 'logs'
+        self.path = BASE_DIR / f'logs/{CONF["name"]}'
 
         self.path.mkdir(parents=True, exist_ok=True)
         filename = str(self.path / (now.strftime('%m-%d') + '.log'))
