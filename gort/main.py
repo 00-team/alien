@@ -92,3 +92,7 @@ def callback():
         return error('Faild to Save the Info!')
 
     return redirect('/')
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=80)
