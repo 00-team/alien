@@ -50,6 +50,14 @@ if check_diff "twitter/*"; then
     echo $SPACER
 fi
 
+if check_diff "kalinka/*"; then
+    echo "$EG restart kalinka bots"
+    systemctl restart fxhash.tel
+    systemctl restart xix.tel
+    echo $SPACER
+fi
+
+
 
 echo "Deploy is Done! ✅"
 
