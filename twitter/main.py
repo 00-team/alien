@@ -115,7 +115,7 @@ def shill(tweets: list[str], text: str):
                 continue
 
             response = httpx.post(url, headers=headers, json={
-                'text': text,
+                'text': format_with_emojis(random.choice(text)),
                 'reply': {
                     'in_reply_to_tweet_id': i
                 }
@@ -159,8 +159,7 @@ def main(args: list[str]):
                 logger.info(f'search query: {query}')
                 logger.info(f'search len: {len(tweets)}')
 
-                text = format_with_emojis(random.choice(db['reply_tweets']))
-                shill(tweets, text)
+                shill(tweets, db['reply_tweets'])
 
                 save_json(SDB, SDB_PATH)
             else:
