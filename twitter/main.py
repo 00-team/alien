@@ -76,7 +76,7 @@ def search(hashtag: str) -> str | None:
 
 
 def retweet(hashtag, tweet_id):
-    last_rt, last_h_rt = last_retweet(hashtag)
+    last_rt, last_h_rt = last_retweet(BOT_INFO['username'], hashtag)
 
     if (last_h_rt == tweet_id) or (last_rt == tweet_id):
         return
@@ -99,6 +99,7 @@ def main(args: list[str]):
     for hashtag in cycle(CONF['hashtags']):
         try:
             if time.time() + 30 > BOT_INFO['expires_in']:
+                logger.info('refreshing...')
                 refresh_token()
 
             tweet_id = search(hashtag)

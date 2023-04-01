@@ -1,7 +1,7 @@
 import json
 import logging
 import sys
-from logging import FileHandler, Formatter
+from logging import FileHandler, Formatter, StreamHandler
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent
@@ -34,9 +34,14 @@ def get_logger(name: str):
     handler = FileHandler(BASE_DIR / f'{name}.log', encoding='utf-8')
     handler.setFormatter(formatter)
 
+    term = StreamHandler()
+    term.setFormatter(formatter)
+
     logger = logging.getLogger('bot')
     logger.setLevel(logging.DEBUG)
+
     logger.addHandler(handler)
+    logger.addHandler(term)
 
     return logger
 
