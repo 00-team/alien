@@ -134,3 +134,7 @@ config.json
 data/
 secrets/
 keys.json
+
+
+node_modules/
+admin/src/
