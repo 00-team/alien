@@ -7,6 +7,7 @@
         "build:watch": "webpack --config webpack/build.ts --watch"
     },
     "dependencies": {
+        "@00-team/utils": "^1.1.0",
         "@loadable/component": "^5.15.3",
         "@mantine/core": "^6.0.7",
         "@mantine/hooks": "^6.0.7",

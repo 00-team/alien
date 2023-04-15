@@ -1,19 +1,16 @@
 import React, { FC } from 'react'
 
+import { Routes, Route } from 'react-router-dom'
+
+import { Dashboard } from 'pages/Dashboard'
+import { Login } from 'pages/Login'
+
 const App: FC = () => {
     return (
-        <div className='container'>
-            <div className='sidebar'>
-                <ul>
-                    <li>Dashboard</li>
-                    <li>Users</li>
-                    <li>Settings</li>
-                </ul>
-            </div>
-            <div className='main'>
-                <h1>Welcome to the Dark Admin Panel</h1>
-            </div>
-        </div>
+        <Routes>
+            <Route path='login' element={<Login />} />
+            <Route path='/' element={<Dashboard />} />
+        </Routes>
     )
 }
 
