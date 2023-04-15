@@ -10,7 +10,7 @@ from shared.dependencies import require_admin
 from shared.settings import CONF
 from telegram import Update
 from telegram.constants import ParseMode
-from telegram.error import NetworkError
+from telegram.error import Forbidden, NetworkError
 from telegram.ext import ContextTypes
 
 
@@ -64,6 +64,10 @@ async def error_handler(update: object, ctx: ContextTypes.DEFAULT_TYPE):
                 'a network error has occurred.\n' +
                 ctx.error.message
             ))
+            return
+
+        if isinstance(ctx.error, Forbidden):
+            logging.warn(('a Forbidden has happened.\n' + ctx.error.message))
             return
 
         logging.error(
