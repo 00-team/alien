@@ -1,0 +1,82 @@
+POST https://hasura2.foundation.app/v1/graphql
+
+
+
+
+query UserArtworksCollected($publicKey: String!, $limit: Int) {
+  artworks: artwork(
+    where: {
+      ownerPublicKey: { _eq: $publicKey }
+      publicKey: { _neq: $publicKey }
+      tokenId: { _is_null: false }
+      deletedAt: { _is_null: true }
+      hiddenAt: { _is_null: true }
+      duration: { _is_null: false }
+    }
+    order_by: { latestTxDate: desc_nulls_last }
+    limit: $limit
+  ) {
+    name
+    assetScheme
+    assetHost
+    assetPath
+    duration
+    mimeType
+    tokenId
+    status
+    moderationStatus
+    publicKey
+    lastSalePriceInETH
+    creator: user {
+      name
+      publicKey
+      username
+      links
+      twitter: socialVerifications(
+        where: { isValid: { _eq: true }, service: { _eq: "TWITTER" } }
+        limit: 1
+      ) {
+        username
+      }
+    }
+    collection {
+      slug
+      name
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+query TrendingCollectors @cached(ttl: 300) {
+  items: trending_collector(
+    order_by: [{oneDaySpent: desc}]
+    limit: 20
+    where: { user: { moderationStatus: { _eq: "ACTIVE" } } }
+  ) {
+    total_bought: oneDayNumBought
+    spent: oneDaySpent
+    user {
+      name
+      links
+      twitter: socialVerifications(
+        where: { isValid: { _eq: true }, service: { _eq: "TWITTER" } }
+        limit: 1
+      ) {
+        username
+      }
+      publicKey
+      username
+    }
+  }
+}
+
