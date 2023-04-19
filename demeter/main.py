@@ -1,5 +1,6 @@
 
 import json
+from datetime import datetime, timedelta
 
 from httpx import Client
 from pydantic import BaseModel
@@ -38,7 +39,12 @@ query TrendingCollectors {
 
 
 ART_Q = '''
-query UserArtworksCollected($public_key: String!, $limit: Int) {
+query UserArtworksCollected(
+    $public_key: String!,
+    $date: timestamp!,
+    $min_price: numeric!,
+    $limit: Int
+) {
   artworks: artwork(
     where: {
       ownerPublicKey: { _eq: $public_key }
@@ -46,10 +52,17 @@ query UserArtworksCollected($public_key: String!, $limit: Int) {
       tokenId: { _is_null: false }
       deletedAt: { _is_null: true }
       hiddenAt: { _is_null: true }
+      lastSalePriceInETH: { _is_null: false, _gte: $min_price }
+      latestTxDate: { _gte: $date }
     }
     order_by: { latestTxDate: desc_nulls_last }
     limit: $limit
   ) {
+    tags
+    activeSalePriceInETH
+    lastSalePriceInETH
+    id
+    latestTxDate
     name
     assetScheme
     assetHost
@@ -59,8 +72,6 @@ query UserArtworksCollected($public_key: String!, $limit: Int) {
     tokenId
     status
     moderationStatus
-    publicKey
-    lastSalePriceInETH
     collection {
       slug
       name
@@ -104,6 +115,8 @@ class User(BaseModel):
 
 
 def main():
+    yesterday = (datetime.now() - timedelta(days=1)).isoformat()
+
     result = qlient.post('', json={'query': TREND_Q})
     if result.status_code != 200:
         print('Error ', result.status_code)
@@ -117,7 +130,9 @@ def main():
             'query': ART_Q,
             'variables': {
                 'public_key': buyer.public_key,
-                'limit': i['total_bought']
+                'limit': i['total_bought'],
+                'date': yesterday,
+                'min_price': 0.5
             }
         })
 
@@ -125,7 +140,12 @@ def main():
             print('Error Artworks', result.status_code)
             continue
 
+        print(json.dumps(result.json(), indent=2))
         artworks = result.json()['data']['artworks']
+
+        if not artworks:
+            continue
+
         for a in artworks:
             seller = User.from_data(a['creator'])
 
