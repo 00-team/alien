@@ -111,11 +111,11 @@ def oauth1():
         timestamp = int(time.time())
         sign = [
             f'oauth_callback={cb}',
-            f'oauth_consumer_key={KEYS["API_KEY"]}',
-            f'oauth_nonce={nonce}',
-            'oauth_signature_method=HMAC-SHA1',
-            f'oauth_timestamp={timestamp}',
-            'oauth_version=1.0'
+            f'oauth_consumer_key="{KEYS["API_KEY"]}"',
+            f'oauth_nonce="{nonce}"',
+            'oauth_signature_method="HMAC-SHA1"',
+            f'oauth_timestamp="{timestamp}"',
+            'oauth_version="1.0"'
         ]
         sign.sort()
         sign = '&'.join(sign)
@@ -132,7 +132,7 @@ def oauth1():
 
         headers = {'Authorization': (
             f'OAuth oauth_consumer_key="{KEYS["API_KEY"]}", '
-            f'oauth_nonce="{nonce}", oauth_signature="{sout}sd", '
+            f'oauth_nonce="{nonce}", oauth_signature="{sout}", '
             f'oauth_signature_method="HMAC-SHA1", '
             f'oauth_timestamp="{timestamp}", '
             'oauth_version="1.0"'
@@ -149,6 +149,8 @@ def oauth1():
         print(response.json())
     except Exception as e:
         logger.exception(e)
+
+    return 'G'
 
 
 if __name__ == '__main__':
