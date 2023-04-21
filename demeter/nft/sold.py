@@ -78,3 +78,4 @@ def get_sales(date, min_price=1) -> list[Sale]:
         )
 
         logging.info(f'sale: {sale.token}/{sale.token_id} - {sale.price}')
+        yield sale
