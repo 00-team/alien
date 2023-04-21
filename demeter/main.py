@@ -1,7 +1,7 @@
 
 import time
 
-from data import get_artwork, get_sales
+from nft import get_artwork, get_sales
 from shared import HOME_DIR, DbDict
 
 from twitter import tweet

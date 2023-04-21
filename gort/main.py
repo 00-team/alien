@@ -27,7 +27,7 @@ with open(BASE_DIR / 'keys.json') as f:
 
 oclient = O1Client(
     KEYS['API_KEY'], KEYS['API_KEY_SECRET'],
-    callable_uri='http://136.243.198.57/cb1/'
+    callback_uri='http://136.243.198.57/cb1/'
 )
 
 app = Flask(__name__, static_folder='static')
