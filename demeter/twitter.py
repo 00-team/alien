@@ -64,6 +64,6 @@ def tweet(text: str, reply: str = None) -> str:
     if twt_id is None:
         logging.warn(json.dumps(response, indent=2))
 
-    logging.info(f'tweeted: {twt_id}')
+    logging.info(f'tweeted: {twt_id} reply: {reply}')
 
     return twt_id
