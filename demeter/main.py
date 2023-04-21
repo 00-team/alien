@@ -31,7 +31,7 @@ db = DbDict(
 def eth_to_usd(eth: float) -> float:
     p = db['eth_price']['usd'] * eth
 
-    if db['eth_price']['usd_ts'] < now() + 10800 and db['escn_token']:
+    if db['eth_price']['usd_ts'] + 10800 < now() and db['escn_token']:
         res = httpx.get(ESCN, params={
             'module': 'stats',
             'action': 'ethprice',
@@ -51,9 +51,9 @@ def eth_to_usd(eth: float) -> float:
             return p
 
         db['eth_price'] = {
-            'btc': int(res['ethbtc']),
+            'btc': float(res['ethbtc']),
             'btc_ts': int(res['ethbtc_timestamp']),
-            'usd': int(res['ethusd']),
+            'usd': float(res['ethusd']),
             'usd_ts': int(res['ethusd_timestamp'])
         }
         p = db['eth_price']['usd'] * eth
