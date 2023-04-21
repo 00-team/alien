@@ -43,17 +43,35 @@ if check_diff "athena/*"; then
     echo $SPACER
 fi
 
+
+### demeter ###
+
+if check_diff "demeter/demeter.service"; then
+    echo "$EG update demeter service"
+    cp demeter/demeter.service /etc/systemd/system/ --force
+    systemctl daemon-reload
+    echo $SPACER
+fi
+
+if check_diff "demeter/*"; then
+    echo "$EG restart demeter service"
+    systemctl restart demeter
+    echo $SPACER
+fi
+
+### twiiter ###
+
 if check_diff "twitter/*"; then
     echo "$EG restart twitter bots"
-    systemctl restart fxhash.twt
-    systemctl restart xix.twt
+    # systemctl restart fxhash.twt
+    # systemctl restart xix.twt
     echo $SPACER
 fi
 
 if check_diff "kalinka/*"; then
     echo "$EG restart kalinka bots"
-    systemctl restart fxhash.tel
-    systemctl restart xix.tel
+    # systemctl restart fxhash.tel
+    # systemctl restart xix.tel
     echo $SPACER
 fi
 

@@ -1,0 +1,12 @@
+[Unit]
+Description=Demeter Bot
+
+[Service]
+Type=simple
+User=root
+ExecStart=/alien/.env/bin/python /alien/demeter/main.py
+Environment=PYTHONUNBUFFERED=1
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
