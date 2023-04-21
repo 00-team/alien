@@ -9,7 +9,7 @@ from shared import HOME_DIR, DbDict, now
 from twitter import tweet
 
 ART_DELAY = 60 * 60  # 1h
-TWT_DELAY = 30 * 60  # 30m
+TWT_DELAY = 10 * 60  # 10m
 ESCN = 'https://api.etherscan.io/api'
 
 db = DbDict(
