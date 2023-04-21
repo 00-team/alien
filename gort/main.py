@@ -114,7 +114,7 @@ def oauth1():
             ['oauth_consumer_key', KEYS["API_KEY"]],
             ['oauth_nonce', nonce],
             ['oauth_signature_method', 'HMAC-SHA1'],
-            ['oauth_timestamp', timestamp],
+            ['oauth_timestamp', str(timestamp)],
             ['oauth_version', '1.0'],
         ]
         sign = [quote(k, safe='') + '=' + quote(v, safe='') for k, v in sign]

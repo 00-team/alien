@@ -64,7 +64,7 @@ def get_logger(name: str):
         datefmt='%H:%M:%S'
     )
 
-    handler = logging.FileHandler(BASE_DIR / 'server.log', encoding='utf-8')
+    handler = logging.StreamHandler()
     handler.setFormatter(formatter)
 
     logger = logging.getLogger(name)
