@@ -120,7 +120,8 @@ def oauth1():
         sign = [quote(k, safe='') + '=' + quote(v, safe='') for k, v in sign]
         sign.sort()
         sign = '&'.join(sign)
-        sign = sign.replace('%', '%25')
+        print(sign, '\n')
+        # sign = sign.replace('%', '%25')
         sign = quote(sign, safe='')
         print(sign, '\n')
 
