@@ -134,7 +134,7 @@ def get_artwork(addr: str, token_id: int) -> Artwork:
     host = a['assetHost'].rstrip('/')
     path = a['assetPath'].lstrip('/')
 
-    return Artwork(
+    art = Artwork(
         name=a['name'],
         id=a['id'],
         addr=a['contractAddress'],
@@ -149,3 +149,6 @@ def get_artwork(addr: str, token_id: int) -> Artwork:
         creator=User.from_data(a['creator']),
         owner=User.from_data(a['owner']),
     )
+
+    logging.info(f'art: {art.mime_type} {art.addr}')
+    return art

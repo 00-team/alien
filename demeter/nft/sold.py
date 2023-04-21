@@ -67,7 +67,7 @@ def get_sales(date, min_price=1) -> list[Sale]:
 
     for i in result.json()['data']['items']:
         n = i['nft']
-        yield Sale(
+        sale = Sale(
             uid=i['id'],
             datetime=datetime.fromtimestamp(int(i['dateTransferred'])),
             token=n['id'].split('-')[0],
@@ -76,3 +76,5 @@ def get_sales(date, min_price=1) -> list[Sale]:
             owner=n['owner']['id'],
             creator=n['creator']['id']
         )
+
+        logging.info(f'sale: {sale.token}/{sale.token_id} - {sale.price}')

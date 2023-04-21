@@ -60,4 +60,8 @@ def tweet(text: str, reply: str = None) -> str:
         data['reply'] = {'in_reply_to_tweet_id': reply}
 
     response = post(TWEET_URL, headers=headers, json=data).json()
-    return response.get('data', {}).get('id')
+    twt_id = response.get('data', {}).get('id')
+
+    logging.info(f'tweeted: {twt_id}')
+
+    return twt_id
