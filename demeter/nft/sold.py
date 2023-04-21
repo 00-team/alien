@@ -4,6 +4,7 @@ from datetime import datetime
 
 from httpx import post
 from pydantic import BaseModel
+from shared import now
 
 URL = 'https://api.thegraph.com/subgraphs/name/f8n/fnd'
 
@@ -66,7 +67,11 @@ def get_sales(date, min_price=1) -> list[Sold]:
         ))
         return []
 
-    for i in result.json()['data']['items']:
+    items = result.json().get('data', {}).get('items')
+    if not items:
+        logging.info(f'[sold] nothing new was found {now() - int(date)}')
+
+    for i in items:
         n = i['nft']
         h = i['highestBid']
 
