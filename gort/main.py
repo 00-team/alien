@@ -120,9 +120,12 @@ def oauth1():
         sign = [quote(k, safe='') + '=' + quote(v, safe='') for k, v in sign]
         sign.sort()
         sign = '&'.join(sign)
+        sign = quote(sign, safe='')
+        sign = sign.replace('%', '%25')
         print(sign, '\n')
+
         sign = (
-            f'POST&{quote(O1_REQ_TOKEN, safe="")}&{quote(sign, safe="")}'
+            f'POST&{quote(O1_REQ_TOKEN, safe="")}&{sign}'
         ).encode()
         print(sign, '\n')
         sign_key = (KEYS['API_KEY_SECRET'] + '&').encode()
