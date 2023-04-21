@@ -97,7 +97,7 @@ class Artwork(BaseModel):
     price: float
 
     asset: str
-    duration: str
+    duration: str | None
     mime_type: str
 
     collection_name: str
