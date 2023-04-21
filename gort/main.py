@@ -105,22 +105,25 @@ def callback():
 @app.get('/1')
 def oauth1():
     try:
-        cb = quote('http://136.243.198.57/cb1/')
+        cb = 'http://136.243.198.57/cb1/'
 
         nonce = random_string()
         timestamp = int(time.time())
         sign = [
-            f'oauth_callback={cb}',
-            f'oauth_consumer_key="{KEYS["API_KEY"]}"',
-            f'oauth_nonce="{nonce}"',
-            'oauth_signature_method="HMAC-SHA1"',
-            f'oauth_timestamp="{timestamp}"',
-            'oauth_version="1.0"'
+            ['oauth_callback', cb],
+            ['oauth_consumer_key', KEYS["API_KEY"]],
+            ['oauth_nonce', nonce],
+            ['oauth_signature_method', 'HMAC-SHA1'],
+            ['oauth_timestamp', timestamp],
+            ['oauth_version', '1.0'],
         ]
+        sign = [quote(k, safe='') + '=' + quote(v, safe='') for k, v in sign]
         sign.sort()
         sign = '&'.join(sign)
         print(sign, '\n')
-        sign = f'POST&{quote(O1_REQ_TOKEN)}&{quote(sign)}'.encode()
+        sign = (
+            f'POST&{quote(O1_REQ_TOKEN, safe="")}&{quote(sign, safe="")}'
+        ).encode()
         print(sign, '\n')
         sign_key = (KEYS['API_KEY_SECRET'] + '&').encode()
         print(sign_key, '\n')
@@ -142,7 +145,7 @@ def oauth1():
 
         response = httpx.post(
             O1_REQ_TOKEN,
-            params={'oauth_callback': cb},
+            params={'oauth_callback': quote(cb, safe='')},
             headers=headers
         )
         print(response.status_code)
