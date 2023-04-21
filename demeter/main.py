@@ -16,7 +16,7 @@ db = DbDict(
     path=HOME_DIR / 'db.json',
     defaults={
         'T': [],  # Tweeted Already
-        'last_date': int(time.time()) - 24 * 3600,
+        'last_date': now() - 24 * 3600,
         'eth_price': {
             'btc': 0.06793,
             'btc_ts': 1682085083,

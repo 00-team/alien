@@ -24,7 +24,7 @@ class DbDict(dict):
             if not isinstance(data, dict):
                 raise ValueError(f'invalid database file {self.__path__}')
 
-            super().__init__(**defaults, **data)
+            super().__init__({**defaults, **data})
 
     def __setitem__(self, key, value):
         super().__setitem__(key, value)
