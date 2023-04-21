@@ -58,7 +58,7 @@ def eth_to_usd(eth: float) -> float:
         }
         p = db['eth_price']['usd'] * eth
 
-    return p
+    return round(p, 2)
 
 
 def main():
