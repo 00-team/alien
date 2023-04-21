@@ -1,4 +1,6 @@
 import json
+import time
+from urllib.parse import quote
 
 import httpx
 from flask import Flask, redirect, render_template, request, session
@@ -8,8 +10,11 @@ from utils import save_bot_token
 logger = get_logger('main')
 
 
-AUTH_BASE_URL = 'https://twitter.com/i/oauth2/authorize'
-ACCESS_TOKEN_URL = 'https://api.twitter.com/2/oauth2/token'
+AUTH2_URL = 'https://twitter.com/i/oauth2/authorize'
+ACCESS_TOKEN_URL2 = 'https://api.twitter.com/2/oauth2/token'
+
+
+O1_REQ_TOKEN = 'https://api.twitter.com/oauth/request_token'
 
 
 with open(BASE_DIR / 'keys.json') as f:
@@ -50,7 +55,7 @@ def update_bot():
         'code_challenge_method': 'plain',
     }
 
-    url = merge_params(AUTH_BASE_URL, params)
+    url = merge_params(AUTH2_URL, params)
 
     return redirect(url)
 
@@ -80,7 +85,7 @@ def callback():
         'redirect_uri': redirect_uri
     }
 
-    response = httpx.post(ACCESS_TOKEN_URL, params=params, headers=headers)
+    response = httpx.post(ACCESS_TOKEN_URL2, params=params, headers=headers)
 
     if response.status_code != 200:
         logger.error(json.dumps(response.json(), indent=2))
@@ -92,6 +97,29 @@ def callback():
         return error('Faild to Save the Info!')
 
     return redirect('/')
+
+
+@app.get('/1')
+def oauth1():
+    cb = quote('http://136.243.198.57/cb1/')
+
+    nonce = random_string()
+    timestamp = int(time.time())
+
+    headers = {'Authorization': (
+        f'OAuth oauth_consumer_key="{KEYS["API_KEY"]}", '
+        f'oauth_nonce="{nonce}", oauth_signature="oauth_signature", '
+        f'oauth_signature_method="HMAC-SHA1", oauth_timestamp="{timestamp}", '
+        'oauth_version="1.0"'
+    )}
+
+    response = httpx.post(
+        O1_REQ_TOKEN,
+        params={'oauth_callback': cb},
+        headers=headers
+    )
+    print(response.status_code)
+    print(response.json())
 
 
 if __name__ == '__main__':
