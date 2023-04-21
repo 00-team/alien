@@ -119,8 +119,11 @@ def oauth1():
         ]
         sign.sort()
         sign = '&'.join(sign)
+        print(sign, '\n')
         sign = f'POST&{quote(O1_REQ_TOKEN)}&{quote(sign)}'.encode()
+        print(sign, '\n')
         sign_key = (KEYS['API_KEY_SECRET'] + '&').encode()
+        print(sign_key, '\n')
 
         sout = base64.b64encode(
             hmac.new(sign_key, sign, sha1).digest()
