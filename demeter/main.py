@@ -79,7 +79,7 @@ def main():
                 f'🖼️ {art.name}\n\n'
                 f'🎨 Artist {art.creator.in_twt}\n'
                 f'🍾 Collector {art.owner.in_twt}\n'
-                f'💰 Sold for {art.price}#eth '
+                f'💰 Sold for {art.price} #eth '
                 f'(${eth_to_usd(art.price)} USD) '
                 'on the #foundation marketplace'
                 '\n\n🔗 Link👇👇👇'
