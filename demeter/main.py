@@ -67,11 +67,11 @@ def main():
         new_last_date = now()
         d = 0
 
-        for sale in get_sales(db['last_date'], min_price=1):
-            if sale.uid in db['T']:
+        for sold in get_sales(db['last_date'], min_price=1):
+            if sold.uid in db['T']:
                 continue
 
-            art = get_artwork(sale.token, sale.token_id)
+            art = get_artwork(sold.token, sold.token_id)
             if art is None:
                 continue
 
@@ -79,8 +79,8 @@ def main():
                 f'🖼️ {art.name}\n\n'
                 f'🎨 Artist {art.creator.in_twt}\n'
                 f'🍾 Collector {art.owner.in_twt}\n'
-                f'💰 Sold for {art.price} #eth '
-                f'(${eth_to_usd(art.price)} USD) '
+                f'💰 Sold for {sold.price} # eth '
+                f'(${eth_to_usd(sold.price)} USD) '
                 'on the #foundation marketplace'
                 '\n\n🔗 Link👇👇👇'
             ))
@@ -88,11 +88,11 @@ def main():
             if twt_id:
                 tweet(
                     ('https://foundation.app/collection/'
-                     f'{art.collection_slug}/{sale.token_id}'),
+                     f'{art.collection_slug}/{sold.token_id}'),
                     twt_id
                 )
 
-            db['T'].append(sale.uid)
+            db['T'].append(sold.uid)
             db.save()
 
             time.sleep(TWT_DELAY)

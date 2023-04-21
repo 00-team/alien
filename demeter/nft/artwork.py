@@ -20,7 +20,6 @@ query ArtworkActivity($addr: String!, $token_id: numeric!) {
     id
     tags
     name
-    lastSalePriceInETH
 
     assetScheme
     assetHost
@@ -91,10 +90,8 @@ class User(BaseModel):
 
 class Artwork(BaseModel):
     name: str
-    addr: str
     id: str
     tags: list[str]
-    price: float
 
     asset: str
     duration: str | None
@@ -138,9 +135,7 @@ def get_artwork(addr: str, token_id: int) -> Artwork:
     art = Artwork(
         name=a['name'],
         id=a['id'],
-        addr=a['contractAddress'],
         tags=a['tags'],
-        price=a['lastSalePriceInETH'],
         asset=f'{scheme}{host}/{path}',
         duration=a['duration'],
         mime_type=a['mimeType'],
@@ -151,5 +146,5 @@ def get_artwork(addr: str, token_id: int) -> Artwork:
         owner=User.from_data(a['owner']),
     )
 
-    logging.info(f'art: {art.mime_type} {art.addr}')
+    logging.info(f'art: {art.mime_type} {addr}')
     return art
