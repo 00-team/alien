@@ -7,6 +7,7 @@ from urllib.parse import quote
 
 import httpx
 from flask import Flask, redirect, render_template, request, session
+from oauthlib.oauth1 import Client as O1Client
 from utils import BASE_DIR, error, get_logger, merge_params, random_string
 from utils import save_bot_token
 
@@ -23,6 +24,11 @@ O1_REQ_TOKEN = 'https://api.twitter.com/oauth/request_token'
 with open(BASE_DIR / 'keys.json') as f:
     KEYS = json.load(f)
 
+
+oclient = O1Client(
+    KEYS['API_KEY'], KEYS['API_KEY_SECRET'],
+    callable_uri='http://136.243.198.57/cb1/'
+)
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = KEYS['SECRET_KEY']
@@ -102,12 +108,30 @@ def callback():
     return redirect('/')
 
 
+def escape(s: str) -> str:
+    s = quote(s.encode('utf-8'), safe=b'~')
+
+    if isinstance(s, bytes):
+        s = s.decode('utf-8')
+
+    return s
+
+
 @app.get('/1')
 def oauth1():
     try:
+        uri, headers, _ = oclient.sign(O1_REQ_TOKEN)
+        response = httpx.post(uri, headers=headers)
+        print(response.status_code)
+        print(response.json())
+        return '[]'
+
+        base_string = 'POST&'
+        base_string += escape(O1_REQ_TOKEN) + '&'
+
         cb = 'http://136.243.198.57/cb1/'
 
-        nonce = random_string()
+        nonce = random_string(15)
         timestamp = int(time.time())
         sign = [
             ['oauth_callback', cb],
@@ -160,6 +184,11 @@ def oauth1():
         logger.exception(e)
 
     return 'G'
+
+
+@app.get('/cb1/')
+def cb1():
+    return 'Cool'
 
 
 if __name__ == '__main__':
