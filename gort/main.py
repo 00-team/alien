@@ -128,12 +128,14 @@ def oauth1():
         print(sout)
 
         headers = {'Authorization': (
-            f'OAuth oauth_consumer_key="{KEYS["API_KEY"]}", '
-            f'oauth_nonce="{nonce}", oauth_signature="{sout}", '
-            f'oauth_signature_method="HMAC-SHA1", '
-            f'oauth_timestamp="{timestamp}", '
-            'oauth_version="1.0"'
+            f'OAuth oauth_consumer_key={KEYS["API_KEY"]}, '
+            f'oauth_nonce={nonce}, oauth_signature={sout}, '
+            f'oauth_signature_method=HMAC-SHA1, '
+            f'oauth_timestamp={timestamp}, '
+            'oauth_version=1.0'
         )}
+        print(headers)
+        print(cb)
 
         response = httpx.post(
             O1_REQ_TOKEN,
