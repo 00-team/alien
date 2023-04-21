@@ -120,16 +120,18 @@ def escape(s: str) -> str:
 @app.get('/1')
 def oauth1():
     try:
-        uri, headers, _ = oclient.sign(O1_REQ_TOKEN)
+
+        cb = 'http://136.243.198.57/cb1/'
+        cb = escape(cb)
+
+        uri, headers, _ = oclient.sign(O1_REQ_TOKEN + f'?oauth_callback={cb}')
         response = httpx.post(uri, headers=headers)
         print(response.status_code)
         print(response.json())
-        return '[]'
+        return '{}'
 
         base_string = 'POST&'
         base_string += escape(O1_REQ_TOKEN) + '&'
-
-        cb = 'http://136.243.198.57/cb1/'
 
         nonce = random_string(15)
         timestamp = int(time.time())
