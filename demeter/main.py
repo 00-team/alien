@@ -64,11 +64,10 @@ def eth_to_usd(eth: float) -> float:
 def main():
 
     while True:
-        lt = db['last_date']
-        db['last_date'] = int(time.time())
+        new_last_date = now()
         d = 0
 
-        for sale in get_sales(lt, min_price=1):
+        for sale in get_sales(db['last_date'], min_price=1):
             if sale.uid in db['T']:
                 continue
 
@@ -103,6 +102,7 @@ def main():
             time.sleep(ART_DELAY-d)
 
         d = 0
+        db['last_date'] = new_last_date
 
 
 if __name__ == '__main__':

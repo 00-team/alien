@@ -61,6 +61,8 @@ def tweet(text: str, reply: str = None) -> str:
 
     response = post(TWEET_URL, headers=headers, json=data).json()
     twt_id = response.get('data', {}).get('id')
+    if twt_id is None:
+        logging.warn(json.dumps(response, indent=2))
 
     logging.info(f'tweeted: {twt_id}')
 
