@@ -70,6 +70,7 @@ def get_sales(date, min_price=1) -> list[Sold]:
     items = result.json().get('data', {}).get('items')
     if not items:
         logging.info(f'[sold] nothing new was found {now() - int(date)}')
+        return []
 
     for i in items:
         n = i['nft']
