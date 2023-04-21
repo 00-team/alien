@@ -104,41 +104,46 @@ def callback():
 
 @app.get('/1')
 def oauth1():
-    cb = quote('http://136.243.198.57/cb1/')
+    try:
+        cb = quote('http://136.243.198.57/cb1/')
 
-    nonce = random_string()
-    timestamp = int(time.time())
-    sign = [
-        f'oauth_callback={cb}',
-        f'oauth_consumer_key={KEYS["API_KEY"]}',
-        f'oauth_nonce={nonce}',
-        'oauth_signature_method=HMAC-SHA1',
-        f'oauth_timestamp={timestamp}',
-        'oauth_version=1.0'
-    ]
-    sign.sort()
-    sign = '&'.join(sign)
-    sign = f'POST&{quote(O1_REQ_TOKEN)}&{quote(sign)}'
-    sign_key = KEYS['API_KEY_SECRET'] + '&'
+        nonce = random_string()
+        timestamp = int(time.time())
+        sign = [
+            f'oauth_callback={cb}',
+            f'oauth_consumer_key={KEYS["API_KEY"]}',
+            f'oauth_nonce={nonce}',
+            'oauth_signature_method=HMAC-SHA1',
+            f'oauth_timestamp={timestamp}',
+            'oauth_version=1.0'
+        ]
+        sign.sort()
+        sign = '&'.join(sign)
+        sign = f'POST&{quote(O1_REQ_TOKEN)}&{quote(sign)}'.encode()
+        sign_key = (KEYS['API_KEY_SECRET'] + '&').encode()
 
-    sout = base64.b64encode(hmac.new(sign_key, sign, sha1).digest())
-    print(sout)
+        sout = base64.b64encode(
+            hmac.new(sign_key, sign, sha1).digest()
+        ).decode()
+        print(sout)
 
-    headers = {'Authorization': (
-        f'OAuth oauth_consumer_key="{KEYS["API_KEY"]}", '
-        f'oauth_nonce="{nonce}", oauth_signature="{sout}", '
-        f'oauth_signature_method="HMAC-SHA1", oauth_timestamp="{timestamp}", '
-        'oauth_version="1.0"'
-    )}
+        headers = {'Authorization': (
+            f'OAuth oauth_consumer_key="{KEYS["API_KEY"]}", '
+            f'oauth_nonce="{nonce}", oauth_signature="{sout}", '
+            f'oauth_signature_method="HMAC-SHA1", '
+            f'oauth_timestamp="{timestamp}", '
+            'oauth_version="1.0"'
+        )}
 
-    response = httpx.post(
-        O1_REQ_TOKEN,
-        params={'oauth_callback': cb},
-        headers=headers
-    )
-    print(response.status_code)
-    print(response.json())
-    return {}
+        response = httpx.post(
+            O1_REQ_TOKEN,
+            params={'oauth_callback': cb},
+            headers=headers
+        )
+        print(response.status_code)
+        print(response.json())
+    except Exception as e:
+        logger.exception(e)
 
 
 if __name__ == '__main__':
