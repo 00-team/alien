@@ -75,14 +75,19 @@ def main():
             if art is None:
                 continue
 
+            tags = ' '.join(['#' + t for t in art.tags if ' ' not in t][:3])
+            if tags:
+                tags += '\n'
+
             twt_id = tweet((
                 f'🖼️ {art.name}\n\n'
                 f'🎨 Artist {art.creator.in_twt}\n'
                 f'🍾 Collector {art.owner.in_twt}\n'
-                f'💰 Sold for {sold.price} # eth '
+                f'💰 Sold for {sold.price} #eth '
                 f'(${eth_to_usd(sold.price)} USD) '
-                'on the #foundation marketplace'
-                '\n\n🔗 Link👇👇👇'
+                'on the #foundation marketplace\n\n'
+                f'{tags}'
+                '🔗 Link👇👇👇'
             ))
 
             if twt_id:
