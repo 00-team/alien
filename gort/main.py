@@ -1,5 +1,8 @@
+import base64
+import hmac
 import json
 import time
+from hashlib import sha1
 from urllib.parse import quote
 
 import httpx
@@ -105,10 +108,25 @@ def oauth1():
 
     nonce = random_string()
     timestamp = int(time.time())
+    sign = [
+        f'oauth_callback={cb}',
+        f'oauth_consumer_key={KEYS["API_KEY"]}',
+        f'oauth_nonce={nonce}',
+        'oauth_signature_method=HMAC-SHA1',
+        f'oauth_timestamp={timestamp}',
+        'oauth_version=1.0'
+    ]
+    sign.sort()
+    sign = '&'.join(sign)
+    sign = f'POST&{quote(O1_REQ_TOKEN)}&{quote(sign)}'
+    sign_key = KEYS['API_KEY_SECRET'] + '&'
+
+    sout = base64.b64encode(hmac.new(sign_key, sign, sha1).digest())
+    print(sout)
 
     headers = {'Authorization': (
         f'OAuth oauth_consumer_key="{KEYS["API_KEY"]}", '
-        f'oauth_nonce="{nonce}", oauth_signature="oauth_signature", '
+        f'oauth_nonce="{nonce}", oauth_signature="{sout}", '
         f'oauth_signature_method="HMAC-SHA1", oauth_timestamp="{timestamp}", '
         'oauth_version="1.0"'
     )}
@@ -120,6 +138,7 @@ def oauth1():
     )
     print(response.status_code)
     print(response.json())
+    return {}
 
 
 if __name__ == '__main__':
