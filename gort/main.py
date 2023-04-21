@@ -132,7 +132,7 @@ def oauth1():
 
         headers = {'Authorization': (
             f'OAuth oauth_consumer_key="{KEYS["API_KEY"]}", '
-            f'oauth_nonce="{nonce}", oauth_signature="{sout}", '
+            f'oauth_nonce="{nonce}", oauth_signature="{sout}sd", '
             f'oauth_signature_method="HMAC-SHA1", '
             f'oauth_timestamp="{timestamp}", '
             'oauth_version="1.0"'
