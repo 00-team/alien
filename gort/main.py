@@ -135,6 +135,8 @@ def oauth1():
         sout = base64.b64encode(
             hmac.new(sign_key, sign, sha1).digest()
         ).decode()
+
+        sout = quote(sout, safe='')
         print(sout)
 
         headers = {'Authorization': (
