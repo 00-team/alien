@@ -1,21 +1,64 @@
 
+import logging
 import time
 
+import httpx
 from nft import get_artwork, get_sales
-from shared import HOME_DIR, DbDict
+from shared import HOME_DIR, DbDict, now
 
 from twitter import tweet
 
 ART_DELAY = 60 * 60  # 1h
 TWT_DELAY = 30 * 60  # 30m
+ESCN = 'https://api.etherscan.io/api'
 
 db = DbDict(
     path=HOME_DIR / 'db.json',
     defaults={
         'T': [],  # Tweeted Already
-        'last_date': int(time.time()) - 24 * 3600
+        'last_date': int(time.time()) - 24 * 3600,
+        'eth_price': {
+            'btc': 0.06793,
+            'btc_ts': 1682085083,
+            'usd': 1911.13,
+            'usd_ts': 1682085081
+        },
+        'escn_token': None
     }
 )
+
+
+def eth_to_usd(eth: float) -> float:
+    p = db['eth_price']['usd'] * eth
+
+    if db['eth_price']['usd_ts'] < now() + 10800 and db['escn_token']:
+        res = httpx.get(ESCN, params={
+            'module': 'stats',
+            'action': 'ethprice',
+            'apikey': db['escn_token']
+        })
+
+        if res.status_code != 200:
+            logging.error(f'Error getting eth price {res.status_code}')
+            return p
+
+        res = res.json()
+        if res.get('status') != '1':
+            return p
+
+        res = res.get('result')
+        if res is None:
+            return p
+
+        db['eth_price'] = {
+            'btc': int(res['ethbtc']),
+            'btc_ts': int(res['ethbtc_timestamp']),
+            'usd': int(res['ethusd']),
+            'usd_ts': int(res['ethusd_timestamp'])
+        }
+        p = db['eth_price']['usd'] * eth
+
+    return p
 
 
 def main():
@@ -33,7 +76,22 @@ def main():
             if art is None:
                 continue
 
-            print(sale.uid, sale.token, sale.token_id)
+            twt_id = tweet((
+                f'🖼️ {art.name}\n\n'
+                f'🎨 Artist {art.creator.in_twt}\n'
+                f'🍾 Collector {art.owner.in_twt}\n'
+                f'💰 Sold for {art.price}#eth '
+                f'(${eth_to_usd(art.price)} USD) '
+                'on the #foundation marketplace'
+                '\n\n🔗 Link👇👇👇'
+            ))
+
+            if twt_id:
+                tweet(
+                    ('https://foundation.app/collection/'
+                     f'{art.collection_slug}/{sale.token_id}'),
+                    twt_id
+                )
 
             time.sleep(TWT_DELAY)
             d += TWT_DELAY

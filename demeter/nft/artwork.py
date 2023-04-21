@@ -77,6 +77,17 @@ class User(BaseModel):
             public_key=data['publicKey']
         )
 
+    @property
+    def in_twt(self) -> str:
+        if self.twitter:
+            return '@' + self.twitter
+        elif self.username:
+            return self.username
+        elif self.name:
+            return self.name
+        else:
+            return self.public_key[:10] + '...'
+
 
 class Artwork(BaseModel):
     name: str
