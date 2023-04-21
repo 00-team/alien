@@ -93,6 +93,9 @@ def main():
                     twt_id
                 )
 
+            db['T'].append(sale.uid)
+            db.save()
+
             time.sleep(TWT_DELAY)
             d += TWT_DELAY
 

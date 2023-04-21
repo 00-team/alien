@@ -52,6 +52,9 @@ class DbDict(dict):
         super().clear()
         self.__save__()
 
+    def save(self):
+        self.__save__()
+
 
 __all__ = [
     'DbDict'
