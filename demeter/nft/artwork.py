@@ -126,6 +126,7 @@ def get_artwork(addr: str, token_id: int) -> Artwork:
 
     arts = result.json()['data']['artworks']
     if not arts:
+        logging.warn(f'no art for {addr}/{token_id}')
         return None
 
     a = arts[0]
