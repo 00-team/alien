@@ -166,6 +166,7 @@ def oauth1():
         logger.info('headers:\n' + json.dumps(headers, indent=2))
 
         res = httpx.post(api_url, params=params, headers=headers)
+        logger.info(res.status_code, res.text)
 
         logger.info(f'[{res.status_code}] response:\n' +
                     json.dumps(res.json(), indent=2))
