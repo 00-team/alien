@@ -14,7 +14,11 @@ query LatestSales($min_price: String!, $date: Int!) {
   items:nftMarketAuctions(
     where: {
         dateFinalized_gte: $date,
-        highestBid_: {amountInETH_gte: $min_price}
+        highestBid_: {
+            amountInETH_gte: $min_price,
+            bidder_not: null
+        },
+        nft_: {creator_not: null}
     }
     orderBy: dateFinalized
     orderDirection: asc
