@@ -129,16 +129,22 @@ def get_artwork(addr: str, token_id: int) -> Artwork:
     a = arts[0]
 
     scheme = a['assetScheme']
-    host = a['assetHost'].rstrip('/')
-    path = a['assetPath'].lstrip('/')
+    host = a['assetHost'].strip('/')
+    path = a['assetPath'].strip('/')
+
+    asset = f'{scheme}{host}/{path}'
+    mime_type = a['mimeType']
+
+    if not asset.endswith('.mp4') and mime_type in ['video/mp4']:
+        asset += '/nft.mp4'
 
     art = Artwork(
         name=a['name'],
         id=a['id'],
         tags=a['tags'],
-        asset=f'{scheme}{host}/{path}',
+        asset=asset,
         duration=a['duration'],
-        mime_type=a['mimeType'],
+        mime_type=mime_type,
         collection_name=a['collection']['name'],
         collection_slug=a['collection']['slug'],
         collection_maxt=a['collection']['maxTokenId'],

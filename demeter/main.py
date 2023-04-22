@@ -4,7 +4,7 @@ import time
 
 import httpx
 from nft import get_artwork, get_sales
-from shared import HOME_DIR, DbDict, now
+from shared import HOME_DIR, DbDict, format_duration, now
 
 from twitter import tweet, upload_media
 
@@ -79,7 +79,7 @@ def main():
             asset_info = ''
 
             if art.mime_type in ['video/mp4']:
-                asset_info = f'\n\n🎥 video nft {art.duration}'
+                asset_info = f'\n\n🎥 video {format_duration(art.duration)}'
             else:
                 asset_type = 'gif' if art.mime_type == 'image/gif' else 'image'
                 asset_info = f'\n\n📷 {asset_type}'
