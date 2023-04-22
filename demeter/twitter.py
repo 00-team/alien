@@ -115,7 +115,6 @@ def get_oauth(method, api_url, params={}):
 def upload_media(url: str) -> str | None:
     api_url = 'https://upload.twitter.com/1.1/media/upload.json'
 
-    '''
     # download file
     file = NamedTemporaryFile()
     with stream('GET', url) as response:
@@ -137,7 +136,7 @@ def upload_media(url: str) -> str | None:
     logging.info(f'file size: {(file.tell() / 1024):,}K')
     file.seek(0, 0)
 
-    new_file = BytesIO()
+    media_file = BytesIO()
 
     # convert
     try:
@@ -146,23 +145,23 @@ def upload_media(url: str) -> str | None:
             (512, 512),
             Image.Resampling.LANCZOS
         )
-        image.save(new_file, format=image.format)
+        image.save(media_file, format=image.format)
     except Exception as e:
         logging.exception(e)
         return None
 
-    new_file.seek(0, 2)
-    file_size = new_file.tell()
-    logging.info(f'new file size: {(file_size / 1024):,}K')
-    new_file.seek(0, 0)
-    '''
+    media_file.seek(0, 2)
+    media_size = media_file.tell()
+    logging.info(f'new file size: {(media_size / 1024):,}K')
+    media_file.seek(0, 0)
 
-    file_size = 300224
-    mime_type = 'image/png'
-    new_file = BytesIO()
+    # file_size = 300224
+    # mime_type = 'image/png'
+    # new_file = BytesIO()
+
     params = {
         'command': 'INIT',
-        'total_bytes': file_size,
+        'total_bytes': media_size,
         'media_type': mime_type,
     }
 
@@ -172,7 +171,8 @@ def upload_media(url: str) -> str | None:
         params=params,
         headers=get_oauth('POST', api_url, params)
     )
-    if result.status_code != 200:
+    logging.info(f'init: {result.status_code}')
+    if result.status_code >= 400:
         logging.error(f'media init error: {result.status_code}')
         logging.error(result.text)
         return None
@@ -180,35 +180,36 @@ def upload_media(url: str) -> str | None:
     result.json()
     media_id = result['media_id_string']
     logging.info(f'[{media_id}] init\n' + json.dumps(result))
-
+    params = {
+        'command': 'APPEND',
+        'media_id': media_id,
+        'segment_index': 0,
+    }
     # append upload
-
     result = post(
         api_url,
-        params={
-            'command': 'APPEND',
-            'media_id': media_id,
-            'segment_index': 0,
-        },
-        files={
-            'media': new_file
-        },
-        headers=get_oauth('POST', api_url)
+        params=params,
+        files={'media': media_file},
+        headers=get_oauth('POST', api_url, params)
     )
-    if result.status_code != 200:
+    logging.info(f'append: {result.status_code}')
+    if result.status_code >= 400:
         logging.error(f'media append error: {result.status_code}')
         logging.error(result.text)
+
         return None
 
+    params = {
+        'command': 'FINALIZE',
+        'media_id': media_id,
+    }
     result = post(
         api_url,
-        params={
-            'command': 'FINALIZE',
-            'media_id': media_id,
-        },
+        params=params,
         headers=get_oauth('POST', api_url)
     )
-    if result.status_code != 200:
+    logging.info(f'finalize: {result.status_code}')
+    if result.status_code >= 400:
         logging.error(f'media finalize error: {result.status_code}')
         logging.error(result.text)
         return None
