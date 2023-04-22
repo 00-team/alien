@@ -6,7 +6,7 @@ import httpx
 from nft import get_artwork, get_sales
 from shared import HOME_DIR, DbDict, now
 
-from twitter import tweet
+from twitter import tweet, upload_media
 
 ART_DELAY = 30 * 60  # 30m
 TWT_DELAY = 10 * 60  # 10m
@@ -61,7 +61,7 @@ def eth_to_usd(eth: float) -> float:
     return round(p, 2)
 
 
-def main():
+def old_main():
 
     while True:
         new_last_date = now()
@@ -72,6 +72,11 @@ def main():
                 continue
 
             art = get_artwork(sold.token, sold.token_id)
+
+            # art.mime_type
+            # art.asset
+            # art.duration
+
             if art is None:
                 continue
 
@@ -111,6 +116,14 @@ def main():
 
         d = 0
         db['last_date'] = new_last_date
+
+
+def main():
+    gif_url = 'https://f8n-production-collection-assets.imgix.net/0x9FB417ED526Fc0770D7292F7368a3939a6b3bcB6/12/nft.gif'
+    png_url = 'https://f8n-production-collection-assets.imgix.net/0x239A26a0397ffbC9c4Eca1ABA101DD673a8d4694/5/nft.png'
+
+    media_id = upload_media(png_url)
+    logging.info(f'media_id: {media_id}')
 
 
 if __name__ == '__main__':
