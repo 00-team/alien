@@ -85,7 +85,7 @@ def get_oauth(method, api_url, params={}):
     ]
 
     p = [
-        f'{escape(k)}={escape(v)}'
+        f'{escape(str(k))}={escape(str(v))}'
         for k, v in [*oauth_params, *params.items()]
     ]
     p.sort()
