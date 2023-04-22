@@ -114,28 +114,42 @@ def oauth1():
         api_url = 'https://api.twitter.com/oauth/request_token'
         cb = 'http://136.243.198.57/cb1/'
         cb = escape(cb)
+        nonce = random_string(15)
+        timestamp = int(time.time())
 
         params = {
             'oauth_callback': cb
         }
 
-        headers = {}
+        oauth_params = [
+            # ['oauth_callback', cb],
+            ['oauth_consumer_key', KEYS['API_KEY']],
+            ['oauth_nonce', nonce],
+            ['oauth_signature_method', 'HMAC-SHA1'],
+            ['oauth_signature', 'oauth_signature']
+            ['oauth_timestamp', str(timestamp)],
+            ['oauth_version', '1.0'],
+        ]
+
+        headers = {
+            'Authorization': 'OAuth ' + ', '.join(
+                [f'{k}="{v}"' for k, v in oauth_params]
+            )
+        }
 
         logger.info('params:\n' + json.dumps(params, indent=2))
         logger.info('headers:\n' + json.dumps(headers, indent=2))
 
         res = httpx.post(api_url, params=params, headers=headers)
 
-        logger.info(f'response code: {res.status_code}')
-        logger.info('response:\n' + json.dumps(res.json(), indent=2))
+        logger.info(f'[{res.status_code}] response:\n' +
+                    json.dumps(res.json(), indent=2))
 
         return '{}'
 
         base_string = 'POST&'
         # base_string += escape(O1_REQ_TOKEN) + '&'
 
-        nonce = random_string(15)
-        timestamp = int(time.time())
         sign = [
             ['oauth_callback', cb],
             ['oauth_consumer_key', KEYS["API_KEY"]],
