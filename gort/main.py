@@ -126,7 +126,7 @@ def oauth1():
             ['oauth_consumer_key', KEYS['API_KEY']],
             ['oauth_nonce', nonce],
             ['oauth_signature_method', 'HMAC-SHA1'],
-            ['oauth_signature', 'oauth_signature']
+            ['oauth_signature', 'oauth_signature'],
             ['oauth_timestamp', str(timestamp)],
             ['oauth_version', '1.0'],
         ]
