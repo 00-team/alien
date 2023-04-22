@@ -109,8 +109,6 @@ def upload_media(url: str) -> str | None:
             headers=get_oauth('POST', MEDIA_URL, params)
         )
 
-        logging.info(f'init: {result.status_code}')
-
         if result.status_code != 202:
             logging.error(f'media init error: {result.status_code}')
             logging.error(result.text)
@@ -119,9 +117,8 @@ def upload_media(url: str) -> str | None:
         result = result.json()
         media_id = result['media_id_string']
 
-        logging.info(f'[{media_id}] init\n' + json.dumps(result))
-
         # append upload
+        media.seek(0, 0)
         params = {
             'command': 'APPEND',
             'media_id': media_id,
@@ -133,8 +130,6 @@ def upload_media(url: str) -> str | None:
             files={'media': media},
             headers=get_oauth('POST', MEDIA_URL, params)
         )
-
-        logging.info(f'append: {result.status_code}')
 
         if result.status_code != 204:
             logging.error(f'media append error: {result.status_code}')
@@ -153,20 +148,17 @@ def upload_media(url: str) -> str | None:
             headers=get_oauth('POST', MEDIA_URL, params)
         )
 
-        logging.info(f'finalize: {result.status_code}')
-
         if result.status_code != 201:
             logging.error(f'media finalize error: {result.status_code}')
             logging.error(result.text)
             raise MediaError
 
-        logging.info('finalize\n'+json.dumps(result.json()))
         return media_id
     except MediaError:
         return None
 
 
-def tweet(text: str, media: list[str] = None, reply: str = None) -> str | None:
+def tweet(text: str, media: str = None, reply: str = None) -> str | None:
     if time.time() + 30 > BOT['expires_in']:
         logging.info('refreshing the twitter token')
         refresh_token()
@@ -178,8 +170,8 @@ def tweet(text: str, media: list[str] = None, reply: str = None) -> str | None:
     if reply:
         data['reply'] = {'in_reply_to_tweet_id': reply}
 
-    if media and isinstance(media, list):
-        data['media'] = {'media_ids': [str(i) for i in media]}
+    if media:
+        data['media'] = {'media_ids': [media]}
 
     response = post(TWEET_URL, headers=headers, json=data).json()
     twt_id = response.get('data', {}).get('id')

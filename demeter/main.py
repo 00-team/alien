@@ -75,7 +75,7 @@ def main():
             if art is None:
                 continue
 
-            media = None
+            media = upload_media(art.asset)
             asset_info = ''
 
             if art.mime_type in ['video/mp4']:
@@ -83,7 +83,6 @@ def main():
             else:
                 asset_type = 'gif' if art.mime_type == 'image/gif' else 'image'
                 asset_info = f'\n\n📷 {asset_type}'
-                media = [upload_media(art.asset)]
 
             tags = ' '.join([
                 '#' + t.strip('#')
