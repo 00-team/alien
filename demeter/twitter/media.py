@@ -15,7 +15,7 @@ def download_media(url: str) -> tuple[NamedTemporaryFile, str]:
     try:
         media = NamedTemporaryFile()
         with stream('GET', url) as response:
-            total = int(response.headers['Content-Length'])
+            total = int(response.headers.get('Content-Length', 0))
             if total > 100 * 1024 * 1024:
                 logging.warn(f'file too big: {total}')
                 raise MediaError
