@@ -155,6 +155,7 @@ def upload_media(url: str) -> str | None:
     )
     if result.status_code != 200:
         logging.error(f'media init error: {result.status_code}')
+        logging.error(result.text)
         return None
 
     result.json()
