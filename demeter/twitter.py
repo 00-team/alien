@@ -7,6 +7,7 @@ import random
 import string
 import time
 from hashlib import sha1
+from io import BytesIO
 from tempfile import NamedTemporaryFile
 from urllib.parse import quote
 
@@ -123,6 +124,8 @@ def upload_media(url: str) -> str | None:
     logging.info(f'file size: {(file.tell() / 1024):,}K')
     file.seek(0, 0)
 
+    new_file = BytesIO()
+
     # convert
     try:
         image = Image.open(file)
@@ -130,15 +133,15 @@ def upload_media(url: str) -> str | None:
             (512, 512),
             Image.Resampling.LANCZOS
         )
-        image.save(file, format=image.format)
+        image.save(new_file, format=image.format)
     except Exception as e:
         logging.exception(e)
         return None
 
-    file.seek(0, 2)
-    file_size = file.tell()
-    logging.info(f'file size: {(file_size / 1024):,}K')
-    file.seek(0, 0)
+    new_file.seek(0, 2)
+    file_size = new_file.tell()
+    logging.info(f'new file size: {(file_size / 1024):,}K')
+    new_file.seek(0, 0)
 
     # init upload
     result = post(
@@ -168,7 +171,7 @@ def upload_media(url: str) -> str | None:
             'segment_index': 0,
         },
         files={
-            'media': file
+            'media': new_file
         },
         headers=get_oauth('POST', api_url)
     )
