@@ -9,7 +9,7 @@ from hashlib import sha1
 from httpx import post
 from shared import HOME_DIR, DbDict, now
 
-from .files import convert_media, download_media
+from .media import convert_media, download_media
 from .utils import MediaError, escape, random_string
 
 TOKEN_URL = 'https://api.twitter.com/2/oauth2/token'
