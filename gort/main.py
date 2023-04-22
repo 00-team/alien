@@ -113,7 +113,7 @@ def oauth1():
     try:
         api_url = 'https://api.twitter.com/oauth/request_token'
         cb = 'http://136.243.198.57/cb1/'
-        cb = escape(cb)
+        # cb = escape(cb)
         nonce = random_string(15)
         timestamp = int(time.time())
 
@@ -126,7 +126,7 @@ def oauth1():
             ['oauth_consumer_key', KEYS['API_KEY']],
             ['oauth_nonce', nonce],
             ['oauth_signature_method', 'HMAC-SHA1'],
-            ['oauth_signature', 'oauth_signature'],
+            # ['oauth_signature', 'oauth_signature'],
             ['oauth_timestamp', str(timestamp)],
             ['oauth_version', '1.0'],
         ]
