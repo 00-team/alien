@@ -10,7 +10,7 @@ URL = 'https://api.thegraph.com/subgraphs/name/f8n/fnd'
 
 
 QUERY = '''
-query LatestSales($min_price: Int!, $date: Int!) {
+query LatestSales($min_price: String!, $date: Int!) {
   items:nftMarketAuctions(
     where: {
         dateFinalized_gte: $date,
@@ -55,7 +55,7 @@ def get_sales(date, min_price=1) -> list[Sold]:
     result = post(URL, json={
         'query': QUERY,
         'variables': {
-            'min_price': int(min_price),
+            'min_price': str(min_price),
             'date': int(date)
         }
     }, timeout=None)

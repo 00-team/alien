@@ -117,24 +117,18 @@ def oauth1():
         nonce = random_string(15)
         timestamp = int(time.time())
 
-        params = {
-            # 'oauth_callback': cb
-        }
-
         oauth_params = [
             ['oauth_callback', cb],
             ['oauth_consumer_key', KEYS['API_KEY']],
             ['oauth_nonce', nonce],
             ['oauth_signature_method', 'HMAC-SHA1'],
-            # ['oauth_signature', 'oauth_signature'],
             ['oauth_timestamp', str(timestamp)],
             ['oauth_version', '1.0'],
         ]
 
         base_string = f'POST&{escape(api_url)}&'
 
-        p = ([f'{k}={v}' for k, v in oauth_params] +
-             [f'{k}={v}' for k, v in params.items()])
+        p = [f'{k}={v}' for k, v in oauth_params]
         p.sort()
         base_string += escape('&'.join(p))
         base_string = base_string.encode()
