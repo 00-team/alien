@@ -71,7 +71,7 @@ def random_string(lenght=30) -> str:
     return ''.join(random.choices(alphabet, k=lenght))
 
 
-def get_oauth(method, api_url):
+def get_oauth(method, api_url, params={}):
     nonce = random_string(15)
     timestamp = int(time.time())
 
@@ -84,11 +84,12 @@ def get_oauth(method, api_url):
         ['oauth_version', '1.0'],
     ]
 
-    p = [f'{k}={v}' for k, v in oauth_params]
+    p = [f'{k}={v}' for k, v in oauth_params + params.items()]
     p.sort()
+    logging.info(p)
 
-    # base_string = f'{method}&{escape(api_url)}&{escape("&".join(p))}'.encode()
-    base_string = f'{escape("&".join(p))}'.encode()
+    base_string = f'{method}&{escape(api_url)}&{escape("&".join(p))}'.encode()
+    # base_string = f'{method}&{escape("&".join(p))}'.encode()
 
     sign_key = (KEY['API_KEY_SECRET'] + '&' +
                 BOT['oauth_token_secret']).encode()
@@ -156,16 +157,17 @@ def upload_media(url: str) -> str | None:
     file_size = 300224
     mime_type = 'image/png'
     new_file = BytesIO()
+    params = {
+        'command': 'INIT',
+        'total_bytes': file_size,
+        'media_type': mime_type,
+    }
 
     # init upload
     result = post(
         api_url,
-        params={
-            'command': 'INIT',
-            'total_bytes': file_size,
-            'media_type': mime_type,
-        },
-        headers=get_oauth('POST', api_url)
+        params=params,
+        headers=get_oauth('POST', api_url, params)
     )
     if result.status_code != 200:
         logging.error(f'media init error: {result.status_code}')
