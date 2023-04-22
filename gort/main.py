@@ -131,6 +131,29 @@ def oauth1():
             ['oauth_version', '1.0'],
         ]
 
+        base_string = f'POST&{api_url}&'
+
+        p = [f'{k}={v}' for k, v in oauth_params] + \
+            [f'{k}={v}' for k, v in params]
+        p.sort()
+        base_string + '&'.join(p)
+
+        # sign = (
+        #     f'POST&{quote(api_url, safe="")}&{sign}'
+        # ).encode()
+        # print(sign, '\n')
+        sign_key = (KEYS['API_KEY_SECRET'] + '&').encode()
+        # print(sign_key, '\n')
+
+        sout = base64.b64encode(
+            hmac.new(sign_key, base_string, sha1).digest()
+        ).decode()
+
+        sout = escape(sout, safe='')
+        print(sout)
+
+        oauth_params.append([['oauth_signature', sout]])
+
         headers = {
             'Authorization': 'OAuth ' + ', '.join(
                 [f'{k}="{v}"' for k, v in oauth_params]
@@ -146,39 +169,6 @@ def oauth1():
                     json.dumps(res.json(), indent=2))
 
         return '{}'
-
-        base_string = 'POST&'
-        # base_string += escape(O1_REQ_TOKEN) + '&'
-
-        sign = [
-            ['oauth_callback', cb],
-            ['oauth_consumer_key', KEYS["API_KEY"]],
-            ['oauth_nonce', nonce],
-            ['oauth_signature_method', 'HMAC-SHA1'],
-            ['oauth_timestamp', str(timestamp)],
-            ['oauth_version', '1.0'],
-        ]
-        sign = [quote(k, safe='') + '=' + quote(v, safe='') for k, v in sign]
-        sign.sort()
-        sign = '&'.join(sign)
-        print(sign, '\n')
-        # sign = sign.replace('%', '%25')
-        sign = quote(sign, safe='')
-        print(sign, '\n')
-
-        sign = (
-            f'POST&{quote(api_url, safe="")}&{sign}'
-        ).encode()
-        print(sign, '\n')
-        sign_key = (KEYS['API_KEY_SECRET'] + '&').encode()
-        print(sign_key, '\n')
-
-        sout = base64.b64encode(
-            hmac.new(sign_key, sign, sha1).digest()
-        ).decode()
-
-        sout = quote(sout, safe='')
-        print(sout)
 
         headers = {'Authorization': (
             f'OAuth oauth_consumer_key="{KEYS["API_KEY"]}", '
