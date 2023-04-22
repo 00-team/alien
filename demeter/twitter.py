@@ -58,7 +58,12 @@ def refresh_token():
 
 
 def escape(s: str) -> str:
-    return quote(s, safe='~')
+    s = quote(s.encode('utf-8'), safe=b'~')
+
+    if isinstance(s, bytes):
+        s = s.decode('utf-8')
+
+    return s
 
 
 def random_string(lenght=30) -> str:
@@ -82,7 +87,8 @@ def get_oauth(method, api_url):
     p = [f'{k}={v}' for k, v in oauth_params]
     p.sort()
 
-    base_string = f'{escape(api_url)}&{escape("&".join(p))}'.encode()
+    base_string = f'{method}&{escape(api_url)}&{escape("&".join(p))}'.encode()
+    # base_string = f'{escape(api_url)}&{escape("&".join(p))}'.encode()
 
     sign_key = (KEY['API_KEY_SECRET'] + '&' +
                 BOT['oauth_token_secret']).encode()
@@ -93,16 +99,19 @@ def get_oauth(method, api_url):
 
     oauth_params.append(['oauth_signature', escape(sout)])
 
-    return {
+    headers = {
         'Authorization': 'OAuth ' + ', '.join(
             [f'{k}="{v}"' for k, v in oauth_params]
         )
     }
+    logging.info(json.dumps(headers, indent=2))
+    return headers
 
 
 def upload_media(url: str) -> str | None:
     api_url = 'https://upload.twitter.com/1.1/media/upload.json'
 
+    '''
     # download file
     file = NamedTemporaryFile()
     with stream('GET', url) as response:
@@ -142,6 +151,11 @@ def upload_media(url: str) -> str | None:
     file_size = new_file.tell()
     logging.info(f'new file size: {(file_size / 1024):,}K')
     new_file.seek(0, 0)
+    '''
+
+    file_size = 300224
+    mime_type = 'image/png'
+    new_file = BytesIO()
 
     # init upload
     result = post(
