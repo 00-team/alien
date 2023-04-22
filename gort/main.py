@@ -150,7 +150,7 @@ def oauth1():
             hmac.new(sign_key, base_string, sha1).digest()
         ).decode()
 
-        sout = escape(sout)
+        # sout = escape(sout)
         logger.info('signature: ' + sout)
 
         oauth_params.append(['oauth_signature', sout])
