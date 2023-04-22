@@ -213,7 +213,7 @@ def upload_media(url: str) -> str | None:
     result = post(
         api_url,
         params=params,
-        headers=get_oauth('POST', api_url)
+        headers=get_oauth('POST', api_url, params)
     )
 
     logging.info(f'finalize: {result.status_code}')
