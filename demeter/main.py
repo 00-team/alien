@@ -8,7 +8,7 @@ from shared import HOME_DIR, DbDict, now
 
 from twitter import tweet
 
-ART_DELAY = 60 * 60  # 1h
+ART_DELAY = 30 * 60  # 30m
 TWT_DELAY = 10 * 60  # 10m
 ESCN = 'https://api.etherscan.io/api'
 
@@ -75,7 +75,10 @@ def main():
             if art is None:
                 continue
 
-            tags = ' '.join(['#' + t for t in art.tags if ' ' not in t][:3])
+            tags = ' '.join([
+                '#' + t.strip('#')
+                for t in art.tags if ' ' not in t
+            ][:3])
             if tags:
                 tags += '\n'
 
