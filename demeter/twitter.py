@@ -87,8 +87,8 @@ def get_oauth(method, api_url):
     p = [f'{k}={v}' for k, v in oauth_params]
     p.sort()
 
-    base_string = f'{method}&{escape(api_url)}&{escape("&".join(p))}'.encode()
-    # base_string = f'{escape(api_url)}&{escape("&".join(p))}'.encode()
+    # base_string = f'{method}&{escape(api_url)}&{escape("&".join(p))}'.encode()
+    base_string = f'{escape("&".join(p))}'.encode()
 
     sign_key = (KEY['API_KEY_SECRET'] + '&' +
                 BOT['oauth_token_secret']).encode()
