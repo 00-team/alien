@@ -131,7 +131,7 @@ def oauth1():
             ['oauth_version', '1.0'],
         ]
 
-        base_string = f'POST&{api_url}&'
+        base_string = f'POST&{escape(api_url)}&'
 
         p = ([f'{k}={v}' for k, v in oauth_params] +
              [f'{k}={v}' for k, v in params.items()])
@@ -158,7 +158,7 @@ def oauth1():
 
         headers = {
             'Authorization': 'OAuth ' + ', '.join(
-                [f'{k}="{v}"""""' for k, v in oauth_params]
+                [f'{k}="{v}"' for k, v in oauth_params]
             )
         }
 
