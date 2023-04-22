@@ -112,7 +112,7 @@ def escape(s: str) -> str:
 def oauth1():
     try:
         api_url = 'https://api.twitter.com/oauth/request_token'
-        cb = 'http://136.243.198.57/cb1/'
+        cb = 'http://136.243.198.57/cb1ss/'
         cb = escape(cb)
         nonce = random_string(15)
         timestamp = int(time.time())
