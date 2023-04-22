@@ -7,7 +7,6 @@ from urllib.parse import quote
 
 import httpx
 from flask import Flask, redirect, render_template, request, session
-from oauthlib.oauth1 import Client as O1Client
 from utils import BASE_DIR, error, get_logger, merge_params, random_string
 from utils import save_bot_token
 
@@ -18,17 +17,9 @@ AUTH2_URL = 'https://twitter.com/i/oauth2/authorize'
 ACCESS_TOKEN_URL2 = 'https://api.twitter.com/2/oauth2/token'
 
 
-O1_REQ_TOKEN = 'https://api.twitter.com/oauth/request_token'
-
-
 with open(BASE_DIR / 'keys.json') as f:
     KEYS = json.load(f)
 
-
-oclient = O1Client(
-    KEYS['API_KEY'], '',
-    # callback_uri='http://136.243.198.57/cb1/'
-)
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = KEYS['SECRET_KEY']
@@ -120,17 +111,28 @@ def escape(s: str) -> str:
 @app.get('/1')
 def oauth1():
     try:
+        api_url = 'https://api.twitter.com/oauth/request_token'
         cb = 'http://136.243.198.57/cb1/'
         cb = escape(cb)
 
-        uri, headers, _ = oclient.sign(O1_REQ_TOKEN + f'?oauth_callback={cb}')
-        response = httpx.post(uri, headers=headers)
-        print(response.status_code)
-        print(response.json())
+        params = {
+            'oauth_callback': cb
+        }
+
+        headers = {}
+
+        logger.info('params:\n' + json.dumps(params, indent=2))
+        logger.info('headers:\n' + json.dumps(headers, indent=2))
+
+        res = httpx.post(api_url, params=params, headers=headers)
+
+        logger.info(f'response code: {res.status_code}')
+        logger.info('response:\n' + json.dumps(res.json(), indent=2))
+
         return '{}'
 
         base_string = 'POST&'
-        base_string += escape(O1_REQ_TOKEN) + '&'
+        # base_string += escape(O1_REQ_TOKEN) + '&'
 
         nonce = random_string(15)
         timestamp = int(time.time())
@@ -151,7 +153,7 @@ def oauth1():
         print(sign, '\n')
 
         sign = (
-            f'POST&{quote(O1_REQ_TOKEN, safe="")}&{sign}'
+            f'POST&{quote(api_url, safe="")}&{sign}'
         ).encode()
         print(sign, '\n')
         sign_key = (KEYS['API_KEY_SECRET'] + '&').encode()
@@ -175,7 +177,7 @@ def oauth1():
         print(cb)
 
         response = httpx.post(
-            O1_REQ_TOKEN,
+            api_url,
             params={'oauth_callback': quote(cb, safe='')},
             headers=headers
         )
