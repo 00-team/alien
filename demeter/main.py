@@ -108,7 +108,7 @@ def main():
                 tweet(
                     ('https://foundation.app/collection/'
                      f'{art.collection_slug}/{sold.token_id}'),
-                    twt_id
+                    reply=twt_id
                 )
 
             db['T'].append(sold.uid)
