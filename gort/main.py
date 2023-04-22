@@ -151,9 +151,9 @@ def oauth1():
         ).decode()
 
         sout = escape(sout)
-        print(sout)
+        logger.info('signature: ' + sout)
 
-        oauth_params.append([['oauth_signature', sout]])
+        oauth_params.append(['oauth_signature', sout])
 
         headers = {
             'Authorization': 'OAuth ' + ', '.join(
