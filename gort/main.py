@@ -133,8 +133,8 @@ def oauth1():
 
         base_string = f'POST&{api_url}&'
 
-        p = [f'{k}={v}' for k, v in oauth_params] + \
-            [f'{k}={v}' for k, v in params]
+        p = ([f'{k}={v}' for k, v in oauth_params] +
+             [f'{k}={v}' for k, v in params.items()])
         p.sort()
         base_string + '&'.join(p)
 
