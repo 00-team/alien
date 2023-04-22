@@ -26,7 +26,7 @@ with open(BASE_DIR / 'keys.json') as f:
 
 
 oclient = O1Client(
-    KEYS['API_KEY'], KEYS['API_KEY_SECRET'],
+    KEYS['API_KEY'], '',
     # callback_uri='http://136.243.198.57/cb1/'
 )
 
@@ -120,7 +120,6 @@ def escape(s: str) -> str:
 @app.get('/1')
 def oauth1():
     try:
-
         cb = 'http://136.243.198.57/cb1/'
         cb = escape(cb)
 
