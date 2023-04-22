@@ -112,8 +112,7 @@ def escape(s: str) -> str:
 def oauth1():
     try:
         api_url = 'https://api.twitter.com/oauth/request_token'
-        cb = 'http://136.243.198.57/cb1/'
-        cb = escape(cb)
+        cb = escape('http://136.243.198.57/cb1/')
         nonce = random_string(15)
         timestamp = int(time.time())
 
@@ -126,29 +125,18 @@ def oauth1():
             ['oauth_version', '1.0'],
         ]
 
-        base_string = f'POST&{escape(api_url)}&'
-
         p = [f'{k}={v}' for k, v in oauth_params]
         p.sort()
-        base_string += escape('&'.join(p))
-        base_string = base_string.encode()
-        logger.info(f'base string: {base_string}')
 
-        # sign = (
-        #     f'POST&{quote(api_url, safe="")}&{sign}'
-        # ).encode()
-        # print(sign, '\n')
+        base_string = f'POST&{escape(api_url)}&{escape("&".join(p))}'.encode()
+
         sign_key = (KEYS['API_KEY_SECRET'] + '&').encode()
-        # print(sign_key, '\n')
 
         sout = base64.b64encode(
             hmac.new(sign_key, base_string, sha1).digest()
         ).decode()
 
-        sout = escape(sout)
-        logger.info('signature: ' + sout)
-
-        oauth_params.append(['oauth_signature', sout])
+        oauth_params.append(['oauth_signature', escape(sout)])
 
         headers = {
             'Authorization': 'OAuth ' + ', '.join(
@@ -156,38 +144,16 @@ def oauth1():
             )
         }
 
-        logger.info('params:\n' + json.dumps(params, indent=2))
-        logger.info('headers:\n' + json.dumps(headers, indent=2))
+        res = httpx.post(api_url, headers=headers)
+        data = dict([i.split('=') for i in res.text.split('&')])
+        logger.info(data)
 
-        res = httpx.post(api_url, params=params, headers=headers)
-        logger.info(res.status_code, res.text)
+        return json.dumps(data)
 
-        logger.info(f'[{res.status_code}] response:\n' +
-                    json.dumps(res.json(), indent=2))
-
-        return '{}'
-
-        headers = {'Authorization': (
-            f'OAuth oauth_consumer_key="{KEYS["API_KEY"]}", '
-            f'oauth_nonce="{nonce}", oauth_signature="{sout}", '
-            f'oauth_signature_method="HMAC-SHA1", '
-            f'oauth_timestamp="{timestamp}", '
-            'oauth_version="1.0"'
-        )}
-        print(headers)
-        print(cb)
-
-        response = httpx.post(
-            api_url,
-            params={'oauth_callback': quote(cb, safe='')},
-            headers=headers
-        )
-        print(response.status_code)
-        print(response.json())
     except Exception as e:
         logger.exception(e)
 
-    return 'G'
+    return '{"error":"GG"}'
 
 
 @app.get('/cb1/')
