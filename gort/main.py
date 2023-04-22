@@ -136,8 +136,9 @@ def oauth1():
         p = ([f'{k}={v}' for k, v in oauth_params] +
              [f'{k}={v}' for k, v in params.items()])
         p.sort()
-        base_string += '&'.join(p)
+        base_string += escape('&'.join(p))
         base_string = base_string.encode()
+        logger.info(f'base string: {base_string}')
 
         # sign = (
         #     f'POST&{quote(api_url, safe="")}&{sign}'
@@ -150,7 +151,7 @@ def oauth1():
             hmac.new(sign_key, base_string, sha1).digest()
         ).decode()
 
-        # sout = escape(sout)
+        sout = escape(sout)
         logger.info('signature: ' + sout)
 
         oauth_params.append(['oauth_signature', sout])
