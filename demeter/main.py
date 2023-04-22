@@ -125,6 +125,13 @@ def main():
     media_id = upload_media(png_url)
     logging.info(f'media_id: {media_id}')
 
+    tweet('test tweet', [media_id])
+
+    time.sleep(10)
+
+    media_id = upload_media(gif_url)
+    tweet('gif test', [media_id])
+
 
 if __name__ == '__main__':
     try:
