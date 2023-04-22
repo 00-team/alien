@@ -84,7 +84,7 @@ def get_oauth(method, api_url, params={}):
         ['oauth_version', '1.0'],
     ]
 
-    p = [f'{k}={v}' for k, v in oauth_params + params.items()]
+    p = [f'{k}={v}' for k, v in [*oauth_params, *params.items()]]
     p.sort()
     logging.info(p)
 
