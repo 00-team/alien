@@ -61,7 +61,7 @@ def eth_to_usd(eth: float) -> float:
     return round(p, 2)
 
 
-def old_main():
+def main():
 
     while True:
         new_last_date = now()
@@ -72,13 +72,18 @@ def old_main():
                 continue
 
             art = get_artwork(sold.token, sold.token_id)
-
-            # art.mime_type
-            # art.asset
-            # art.duration
-
             if art is None:
                 continue
+
+            media = None
+            asset_info = ''
+
+            if art.mime_type in ['video/mp4']:
+                asset_info = f'\n\n🎥 video nft {art.duration}'
+            else:
+                asset_type = 'gif' if art.mime_type == 'image/gif' else 'image'
+                asset_info = f'\n\n📷 {asset_type}'
+                media = [upload_media(art.asset)]
 
             tags = ' '.join([
                 '#' + t.strip('#')
@@ -96,7 +101,8 @@ def old_main():
                 'on the #foundation marketplace\n\n'
                 f'{tags}'
                 '🔗 Link👇👇👇'
-            ))
+                f'{asset_info}'
+            ), media=media)
 
             if twt_id:
                 tweet(
@@ -116,21 +122,6 @@ def old_main():
 
         d = 0
         db['last_date'] = new_last_date
-
-
-def main():
-    gif_url = 'https://f8n-production-collection-assets.imgix.net/0x9FB417ED526Fc0770D7292F7368a3939a6b3bcB6/12/nft.gif'
-    png_url = 'https://f8n-production-collection-assets.imgix.net/0x239A26a0397ffbC9c4Eca1ABA101DD673a8d4694/5/nft.png'
-
-    media_id = upload_media(png_url)
-    logging.info(f'media_id: {media_id}')
-
-    tweet('test tweet', [media_id])
-
-    time.sleep(10)
-
-    media_id = upload_media(gif_url)
-    tweet('gif test', [media_id])
 
 
 if __name__ == '__main__':
