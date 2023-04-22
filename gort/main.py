@@ -145,10 +145,14 @@ def oauth1():
         }
 
         res = httpx.post(api_url, headers=headers)
-        data = dict([i.split('=') for i in res.text.split('&')])
-        logger.info(data)
+        if res.status_code != 200:
+            return json.dumps({'error': 'status: ' + res.status_code})
 
-        return json.dumps(data)
+        data = dict([i.split('=') for i in res.text.split('&')])
+        return redirect((
+            'https://api.twitter.com/oauth/authorize?'
+            f'oauth_token={data["oauth_token"]}'
+        ))
 
     except Exception as e:
         logger.exception(e)
@@ -157,8 +161,18 @@ def oauth1():
 
 
 @app.get('/cb1/')
-def cb1():
-    return 'Cool'
+def oauth1_cb():
+    api_url = 'https://api.twitter.com/oauth/access_token'
+    res = httpx.post(api_url, params={
+        'oauth_verifier': request.args.get('oauth_verifier'),
+        'oauth_token': request.args.get('oauth_token')
+    })
+
+    if res.status_code != 200:
+        return json.dumps({'error': 'status: ' + res.status_code})
+
+    data = dict([i.split('=') for i in res.text.split('&')])
+    return json.dumps(data)
 
 
 if __name__ == '__main__':
