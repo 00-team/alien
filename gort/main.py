@@ -136,7 +136,8 @@ def oauth1():
         p = ([f'{k}={v}' for k, v in oauth_params] +
              [f'{k}={v}' for k, v in params.items()])
         p.sort()
-        base_string + '&'.join(p)
+        base_string += '&'.join(p)
+        base_string = base_string.encode()
 
         # sign = (
         #     f'POST&{quote(api_url, safe="")}&{sign}'
