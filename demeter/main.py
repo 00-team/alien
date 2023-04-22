@@ -67,7 +67,7 @@ def main():
         new_last_date = now()
         d = 0
 
-        for sold in get_sales(db['last_date'], min_price=1):
+        for sold in get_sales(db['last_date'], min_price=0.42):
             if sold.uid in db['T']:
                 continue
 
