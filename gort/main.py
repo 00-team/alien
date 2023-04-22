@@ -118,11 +118,11 @@ def oauth1():
         timestamp = int(time.time())
 
         params = {
-            'oauth_callback': cb
+            # 'oauth_callback': cb
         }
 
         oauth_params = [
-            # ['oauth_callback', cb],
+            ['oauth_callback', cb],
             ['oauth_consumer_key', KEYS['API_KEY']],
             ['oauth_nonce', nonce],
             ['oauth_signature_method', 'HMAC-SHA1'],
