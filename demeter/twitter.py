@@ -159,46 +159,53 @@ def upload_media(url: str) -> str | None:
     # mime_type = 'image/png'
     # new_file = BytesIO()
 
+    # init upload
     params = {
         'command': 'INIT',
         'total_bytes': media_size,
         'media_type': mime_type,
     }
 
-    # init upload
     result = post(
         api_url,
         params=params,
         headers=get_oauth('POST', api_url, params)
     )
+
     logging.info(f'init: {result.status_code}')
+
     if result.status_code >= 400:
         logging.error(f'media init error: {result.status_code}')
         logging.error(result.text)
         return None
 
-    result.json()
+    result = result.json()
     media_id = result['media_id_string']
+
     logging.info(f'[{media_id}] init\n' + json.dumps(result))
+
+    # append upload
     params = {
         'command': 'APPEND',
         'media_id': media_id,
         'segment_index': 0,
     }
-    # append upload
     result = post(
         api_url,
         params=params,
         files={'media': media_file},
         headers=get_oauth('POST', api_url, params)
     )
+
     logging.info(f'append: {result.status_code}')
+
     if result.status_code >= 400:
         logging.error(f'media append error: {result.status_code}')
         logging.error(result.text)
 
         return None
 
+    # upload finalize
     params = {
         'command': 'FINALIZE',
         'media_id': media_id,
@@ -208,7 +215,9 @@ def upload_media(url: str) -> str | None:
         params=params,
         headers=get_oauth('POST', api_url)
     )
+
     logging.info(f'finalize: {result.status_code}')
+
     if result.status_code >= 400:
         logging.error(f'media finalize error: {result.status_code}')
         logging.error(result.text)
