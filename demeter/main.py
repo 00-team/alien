@@ -15,6 +15,7 @@ db = DbDict(
     defaults={
         'T': [],  # Tweeted Already
         'last_date': now() - 24 * 3600,
+        'last_tweet': 0
     }
 )
 
@@ -57,8 +58,6 @@ def art_tweet(sold: Sold, art: Artwork):
 
 
 def main():
-    last_twt = 0
-
     while True:
         last_date = db['last_date']
         before_tweets = now()
@@ -73,10 +72,11 @@ def main():
             if art is None:
                 continue
 
-            time.sleep(max(TWT_DELAY - (now() - last_twt), 0))
-            last_twt = now()
+            time.sleep(max(TWT_DELAY - (now() - db['last_tweet']), 0))
 
+            db['last_tweet'] = now()
             art_tweet(sold, art)
+            db['last_tweet'] = now()
 
             db['T'].append(sold.uid)
             db.save()
