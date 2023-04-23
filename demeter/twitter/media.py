@@ -46,14 +46,13 @@ def download_media(url: str) -> tuple[NamedTemporaryFile, str]:
 def convert_media(file, mime_type: str) -> tuple[BytesIO, int]:
     file_size = file.seek(0, 2)
 
-    if mime_type in ['image/gif', 'video/mp4']:
-        if mime_type == 'image/gif' and file_size < 12 * 1024 * 1024:
-            return file, file_size
-
-        if mime_type == 'video/mp4' and file_size < 50 * 1024 * 1024:
-            return file, file_size
-
+    if mime_type == 'video/mp4' and file_size < 100 * 1024 * 1024:
+        return file, file_size
+    else:
         raise MediaError
+
+    if mime_type == 'image/gif' and file_size < 12 * 1024 * 1024:
+        return file, file_size
 
     media = BytesIO()
 
