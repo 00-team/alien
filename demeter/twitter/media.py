@@ -49,6 +49,7 @@ def convert_media(file, mime_type: str) -> tuple[BytesIO, int]:
     if mime_type == 'video/mp4' and file_size < 100 * 1024 * 1024:
         return file, file_size
     else:
+        logging.warn(f'video file too big: {file_size:,}')
         raise MediaError
 
     if mime_type == 'image/gif' and file_size < 12 * 1024 * 1024:
@@ -70,6 +71,9 @@ def convert_media(file, mime_type: str) -> tuple[BytesIO, int]:
 
     media_size = media.seek(0, 2)
     if media_size > 4 * 1024 * 1024:
+        logging.warn(
+            f'img too big | before: {file_size:,} / after: {media_size:,}'
+        )
         raise MediaError
 
     return media, media_size
