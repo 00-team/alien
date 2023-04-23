@@ -2,7 +2,7 @@
 import logging
 import time
 
-from nft import Artwork, eth_to_usd, get_artwork, get_sales
+from nft import Artwork, Sold, eth_to_usd, get_artwork, get_sales
 from shared import HOME_DIR, DbDict, format_duration, now
 
 from twitter import tweet, upload_media
@@ -16,19 +16,45 @@ db = DbDict(
     defaults={
         'T': [],  # Tweeted Already
         'last_date': now() - 24 * 3600,
-        'eth_price': {
-            'btc': 0.06793,
-            'btc_ts': 1682085083,
-            'usd': 1911.13,
-            'usd_ts': 1682085081
-        },
-        'escn_token': None
     }
 )
 
 
-def art_tweet(art: Artwork):
-    pass
+def art_tweet(sold: Sold, art: Artwork):
+    media = upload_media(art.asset)
+    asset_info = ''
+
+    if art.mime_type in ['video/mp4']:
+        asset_info = f'\n\n🎥 video {format_duration(art.duration)}'
+    else:
+        asset_type = 'gif' if art.mime_type == 'image/gif' else 'image'
+        asset_info = f'\n\n📷 {asset_type}'
+
+    tags = ' '.join([
+        '#' + t.strip('#')
+        for t in art.tags if ' ' not in t
+    ][:3])
+    if tags:
+        tags += '\n'
+
+    twt_id = tweet((
+        f'🖼️ {art.name}\n\n'
+        f'🎨 Artist {art.creator.in_twt}\n'
+        f'🍾 Collector {art.owner.in_twt}\n'
+        f'💰 Sold for {sold.price} #eth '
+        f'(${eth_to_usd(sold.price)} USD) '
+        'on the #foundation marketplace\n\n'
+        f'{tags}'
+        '🔗 Link👇👇👇'
+        f'{asset_info}'
+    ), media=media)
+
+    if twt_id:
+        tweet(
+            ('https://foundation.app/collection/'
+             f'{art.collection_slug}/{sold.token_id}'),
+            reply=twt_id
+        )
 
 
 def main():
@@ -45,40 +71,7 @@ def main():
             if art is None:
                 continue
 
-            media = upload_media(art.asset)
-            asset_info = ''
-
-            if art.mime_type in ['video/mp4']:
-                asset_info = f'\n\n🎥 video {format_duration(art.duration)}'
-            else:
-                asset_type = 'gif' if art.mime_type == 'image/gif' else 'image'
-                asset_info = f'\n\n📷 {asset_type}'
-
-            tags = ' '.join([
-                '#' + t.strip('#')
-                for t in art.tags if ' ' not in t
-            ][:3])
-            if tags:
-                tags += '\n'
-
-            twt_id = tweet((
-                f'🖼️ {art.name}\n\n'
-                f'🎨 Artist {art.creator.in_twt}\n'
-                f'🍾 Collector {art.owner.in_twt}\n'
-                f'💰 Sold for {sold.price} #eth '
-                f'(${eth_to_usd(sold.price)} USD) '
-                'on the #foundation marketplace\n\n'
-                f'{tags}'
-                '🔗 Link👇👇👇'
-                f'{asset_info}'
-            ), media=media)
-
-            if twt_id:
-                tweet(
-                    ('https://foundation.app/collection/'
-                     f'{art.collection_slug}/{sold.token_id}'),
-                    reply=twt_id
-                )
+            art_tweet(sold, art)
 
             db['T'].append(sold.uid)
             db.save()
