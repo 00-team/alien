@@ -3,7 +3,7 @@ import logging
 import time
 
 import httpx
-from nft import get_artwork, get_sales
+from nft import Artwork, get_artwork, get_sales
 from shared import HOME_DIR, DbDict, format_duration, now
 
 from twitter import tweet, upload_media
@@ -59,6 +59,10 @@ def eth_to_usd(eth: float) -> float:
         p = db['eth_price']['usd'] * eth
 
     return round(p, 2)
+
+
+def art_tweet(art: Artwork):
+    pass
 
 
 def main():

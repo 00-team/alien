@@ -1,7 +1,7 @@
-from .artwork import get_artwork
-from .sold import get_sales
+from .artwork import Artwork, get_artwork
+from .sold import Sold, get_sales
 
 __all__ = [
-    'get_sales',
-    'get_artwork'
+    'get_sales', 'Sold',
+    'get_artwork', 'Artwork',
 ]
