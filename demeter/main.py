@@ -2,8 +2,7 @@
 import logging
 import time
 
-import httpx
-from nft import Artwork, get_artwork, get_sales
+from nft import Artwork, eth_to_usd, get_artwork, get_sales
 from shared import HOME_DIR, DbDict, format_duration, now
 
 from twitter import tweet, upload_media
@@ -26,39 +25,6 @@ db = DbDict(
         'escn_token': None
     }
 )
-
-
-def eth_to_usd(eth: float) -> float:
-    p = db['eth_price']['usd'] * eth
-
-    if db['eth_price']['usd_ts'] + 10800 < now() and db['escn_token']:
-        res = httpx.get(ESCN, params={
-            'module': 'stats',
-            'action': 'ethprice',
-            'apikey': db['escn_token']
-        })
-
-        if res.status_code != 200:
-            logging.error(f'Error getting eth price {res.status_code}')
-            return p
-
-        res = res.json()
-        if res.get('status') != '1':
-            return p
-
-        res = res.get('result')
-        if res is None:
-            return p
-
-        db['eth_price'] = {
-            'btc': float(res['ethbtc']),
-            'btc_ts': int(res['ethbtc_timestamp']),
-            'usd': float(res['ethusd']),
-            'usd_ts': int(res['ethusd_timestamp'])
-        }
-        p = db['eth_price']['usd'] * eth
-
-    return round(p, 2)
 
 
 def art_tweet(art: Artwork):
