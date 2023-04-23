@@ -152,5 +152,5 @@ def get_artwork(addr: str, token_id: int) -> Artwork:
         owner=User.from_data(a['owner']),
     )
 
-    logging.info(f'art: {art.mime_type} {addr}')
+    logging.info(f'{art.mime_type} {addr}')
     return art
