@@ -7,9 +7,8 @@ from shared import HOME_DIR, DbDict, format_duration, now
 
 from twitter import tweet, upload_media
 
-ART_DELAY = 30 * 60  # 30m
-TWT_DELAY = 10 * 60  # 10m
-ESCN = 'https://api.etherscan.io/api'
+ART_DELAY = 10 * 60  # 10m
+TWT_DELAY = 5 * 60  # 5m
 
 db = DbDict(
     path=HOME_DIR / 'db.json',
@@ -58,12 +57,15 @@ def art_tweet(sold: Sold, art: Artwork):
 
 
 def main():
+    last_twt = 0
 
     while True:
-        new_last_date = now()
-        d = 0
+        last_date = db['last_date']
+        before_tweets = now()
 
-        for sold in get_sales(db['last_date'], min_price=0.42):
+        logging.info(f'{before_tweets=}')
+
+        for sold in get_sales(last_date, min_price=0.42):
             if sold.uid in db['T']:
                 continue
 
@@ -71,19 +73,16 @@ def main():
             if art is None:
                 continue
 
+            time.sleep(max(TWT_DELAY - (now() - last_twt), 0))
+            last_twt = now()
+
             art_tweet(sold, art)
 
             db['T'].append(sold.uid)
             db.save()
 
-            time.sleep(TWT_DELAY)
-            d += TWT_DELAY
-
-        if d < ART_DELAY:
-            time.sleep(ART_DELAY-d)
-
-        d = 0
-        db['last_date'] = new_last_date
+        time.sleep(max(ART_DELAY - (now() - before_tweets), 0))
+        db['last_date'] = before_tweets
 
 
 if __name__ == '__main__':
