@@ -46,9 +46,10 @@ def download_media(url: str) -> tuple[NamedTemporaryFile, str]:
 def convert_media(file, mime_type: str) -> tuple[BytesIO, int]:
     file_size = file.seek(0, 2)
 
-    if mime_type == 'video/mp4' and file_size < 100 * 1024 * 1024:
-        return file, file_size
-    else:
+    if mime_type == 'video/mp4':
+        if file_size < 100 * 1024 * 1024:
+            return file, file_size
+
         logging.warn(f'video file too big: {file_size:,}')
         raise MediaError
 
