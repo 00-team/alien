@@ -62,8 +62,6 @@ def main():
         last_date = db['last_date']
         before_tweets = now()
 
-        logging.info(f'{before_tweets=}')
-
         for sold in get_sales(last_date, min_price=0.42):
             if sold.uid in db['T']:
                 continue

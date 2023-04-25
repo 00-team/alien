@@ -98,7 +98,6 @@ def get_sales(date, min_price=1) -> list[Sold]:
         return []
 
     if not buy_now and not auction:
-        logging.info(f'nothing new was found {now() - int(date)}')
         return []
 
     for a in auction:
