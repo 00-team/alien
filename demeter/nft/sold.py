@@ -11,21 +11,17 @@ URL = 'https://api.thegraph.com/subgraphs/name/f8n/fnd'
 
 QUERY = '''
 query LatestSales($min_price: String!, $date: Int!) {
-  items:nftMarketAuctions(
+  buy_now: nftMarketBuyNows(
     where: {
-        dateFinalized_gte: $date,
-        highestBid_: {
-            amountInETH_gte: $min_price,
-            bidder_not: null
-        },
-        nft_: {creator_not: null}
+        dateAccepted_gte: $date,
+        amountInETH_gte: $min_price,
+        nft_: {creator_not: null},
+        buyer_not: null
     }
-    orderBy: dateFinalized
-    orderDirection: asc
+    orderBy: dateAccepted
+    orderDirection: desc
   ) {
-    dateFinalized
-    auctionId
-
+    dateAccepted
     nft {
       id
       tokenId
@@ -33,7 +29,28 @@ query LatestSales($min_price: String!, $date: Int!) {
         id
       }
     }
-
+    buyer {
+      id
+    }
+    amountInETH
+  }
+  auction: nftMarketAuctions(
+    where: {
+        dateFinalized_gte: $date,
+        highestBid_: {amountInETH_gte: $min_price, bidder_not: null},
+        nft_: {creator_not: null}
+    }
+    orderBy: dateFinalized
+    orderDirection: asc
+  ) {
+    dateFinalized
+    nft {
+      id
+      tokenId
+      creator {
+        id
+      }
+    }
     highestBid {
       amountInETH
       bidder {
@@ -71,18 +88,28 @@ def get_sales(date, min_price=1) -> list[Sold]:
         ))
         return []
 
-    items = result.json().get('data', {}).get('items')
-    if not items:
+    data = result.json().get('data', {})
+
+    buy_now = data.get('buy_now')
+    auction = data.get('auction')
+
+    if buy_now is None or auction is None:
+        logging.error(f'{buy_now=} | {auction=}')
+        return []
+
+    if not buy_now and not auction:
         logging.info(f'nothing new was found {now() - int(date)}')
         return []
 
-    for i in items:
-        n = i['nft']
-        h = i['highestBid']
+    for a in auction:
+        n = a['nft']
+        h = a['highestBid']
 
-        sale = Sold(
-            uid=i['auctionId'],
-            datetime=datetime.fromtimestamp(int(i['dateFinalized'])),
+        uid = a['dateFinalized'] + n['id'] + h['bidder']['id']
+
+        sold = Sold(
+            uid=uid,
+            datetime=datetime.fromtimestamp(int(a['dateFinalized'])),
             token=n['id'].split('-')[0],
             token_id=n['tokenId'],
             price=h['amountInETH'],
@@ -90,37 +117,22 @@ def get_sales(date, min_price=1) -> list[Sold]:
             creator=n['creator']['id']
         )
 
-        logging.info(f'{sale.token}/{sale.token_id} - {sale.price}')
-        yield sale
+        logging.info(f'auction: {sold.token}/{sold.token_id} - {sold.price}')
+        yield sold
 
+    for b in buy_now:
+        n = b['nft']
+        uid = b['dateAccepted'] + n['id'] + b['buyer']['id']
 
-'''
-query LatestSales($min_price: Int!, $date: Int!) {
-  items: nftTransfers(
-    orderBy: dateTransferred
-    orderDirection: asc
-    where: {
-        nft_: {
-            lastSalePriceInETH_gte: $min_price
-        },
-        dateTransferred_gt: $date
-    }
-  ) {
-    id
-    dateTransferred
-    nft {
-      id
-      lastSalePriceInETH
-      tokenId
-      owner {
-        id
-      }
-      creator {
-        id
-      }
-    }
-  }
-}
+        sold = Sold(
+            uid=uid,
+            datetime=datetime.fromtimestamp(int(b['dateAccepted'])),
+            token=n['id'].split('-')[0],
+            token_id=n['tokenId'],
+            price=b['amountInETH'],
+            owner=b['buyer']['id'],
+            creator=n['creator']['id']
+        )
 
-
-'''
+        logging.info(f'buy_now: {sold.token}/{sold.token_id} - {sold.price}')
+        yield sold
