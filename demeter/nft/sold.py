@@ -4,7 +4,6 @@ from datetime import datetime
 
 from httpx import post
 from pydantic import BaseModel
-from shared import now
 
 URL = 'https://api.thegraph.com/subgraphs/name/f8n/fnd'
 
@@ -80,6 +79,10 @@ def get_sales(date, min_price=1) -> list[Sold]:
             'date': int(date)
         }
     }, timeout=None)
+
+    if result.status_code == 524:
+        logging.error('server timeoit 524')
+        return []
 
     if result.status_code != 200:
         logging.error((
