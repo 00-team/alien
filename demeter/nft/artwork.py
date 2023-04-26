@@ -94,7 +94,7 @@ class Artwork(BaseModel):
     tags: list[str]
 
     asset: str
-    duration: str | None
+    duration: float | None
     mime_type: str
 
     collection_name: str
