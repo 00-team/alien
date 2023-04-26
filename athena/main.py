@@ -44,9 +44,15 @@ async def send_all(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
     STATE['FA'][user.id] = not STATE['FA'].get(user.id, False)
 
-    await update.message.reply_text(
-        f'ok. forward your message: {STATE["FA"][user.id]}'
-    )
+    if STATE['FA'][user.id]:
+        await update.message.reply_text((
+            'پیامت رو ارسال کن \n'
+            'غیرفعال کردن با /send_all'
+        ))
+    else:
+        await update.message.reply_text(
+            'ارسال همگانی غیرفعال شد.'
+        )
 
 
 async def send_all_job(ctx: ContextTypes.DEFAULT_TYPE):
@@ -110,8 +116,9 @@ async def forward_to_channel_job(ctx: ContextTypes.DEFAULT_TYPE):
     )
 
 
-@require_joined
+@ require_joined
 async def send_message(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    total_users = len(get_users())
     msg = update.message
     user = msg.from_user
 
@@ -129,7 +136,9 @@ async def send_message(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             data=msg.message_id,
             name='send_all'
         )
-        await msg.reply_text('running... 🐧')
+        await msg.reply_text(
+            f'✅ پیام شما ذخیره شد ، پیام شما به {total_users} نفر ارسال خواهد شد .'
+        )
         return
 
     if not is_forwards_enable():
