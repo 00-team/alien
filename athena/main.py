@@ -51,9 +51,15 @@ async def send_all(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 async def send_all_job(ctx: ContextTypes.DEFAULT_TYPE):
     users = get_users().copy()
+    data = {
+        'success': 0,
+        'blocked': 0,
+        'error': 0,
+        'timeout': 0,
+    }
 
     for uid, udata in users.items():
-        sleep(1)
+        sleep(0.2)
         uid = int(uid)
         try:
             chat = await ctx.bot.get_chat(uid)
@@ -65,9 +71,11 @@ async def send_all_job(ctx: ContextTypes.DEFAULT_TYPE):
                 from_chat_id=ctx.job.chat_id,
                 message_id=ctx.job.data,
             )
+            data['success'] += 1
         except RetryAfter as e:
             sleep(e.retry_after + 10)
             logging.info(f'[send_all]: retry_after {e.retry_after}')
+            data['timeout'] += 1
         except Forbidden:
             username = None
             if isinstance(udata, dict):
@@ -77,10 +85,21 @@ async def send_all_job(ctx: ContextTypes.DEFAULT_TYPE):
                 user_remove(uid)
 
             logging.info(f'[send_all]: forbidden {uid} - {username}')
+            data['blocked'] += 1
         except NetworkError:
-            pass
+            data['error'] += 1
         except TelegramError as e:
             logging.exception(e)
+            data['error'] += 1
+
+    sleep(2)
+    await ctx.bot.send_message(ctx.job.user_id, (
+        'send to all done.\n'
+        f'success: {data["success"]}\n'
+        f'blocked: {data["blocked"]}\n'
+        f'error: {data["error"]}\n'
+        f'timeout: {data["timeout"]}\n'
+    ))
 
 
 async def forward_to_channel_job(ctx: ContextTypes.DEFAULT_TYPE):
