@@ -139,3 +139,6 @@ keys.json
 node_modules/
 admin/src/
 db.json
+bot.json
+media.db.json
+price.db.json

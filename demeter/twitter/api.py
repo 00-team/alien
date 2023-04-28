@@ -21,6 +21,9 @@ KEY = DbDict(path=HOME_DIR / 'keys.json', load=True)
 BOT = DbDict(path=HOME_DIR / 'bot.json', load=True)
 
 
+media_db = DbDict(path=HOME_DIR / 'media.db.json')
+
+
 def refresh_token():
     try:
         headers = {'Authorization': f'Basic {KEY["BASIC_TOKEN"]}'}
@@ -91,8 +94,13 @@ def get_oauth(method, api_url, params={}):
     }
 
 
-def upload_media(url: str) -> str | None:
+def upload_media(url: str, addr_token: str = None) -> str | None:
     try:
+        if addr_token:
+            mid = media_db.get(addr_token)
+            if mid:
+                return mid
+
         file, mime_type = download_media(url)
         media, media_size = convert_media(file, mime_type)
 
@@ -152,6 +160,9 @@ def upload_media(url: str) -> str | None:
             logging.error(f'media finalize error: {result.status_code}')
             logging.error(result.text)
             raise MediaError
+
+        if media_id and addr_token:
+            media_db[addr_token] = media_id
 
         return media_id
     except MediaError:

@@ -2,7 +2,7 @@
 import logging
 import time
 
-from nft import Artwork, Sold, eth_to_usd, get_artwork, get_sales
+from nft import Event, get_events
 from shared import HOME_DIR, DbDict, format_duration, now
 
 from twitter import tweet, upload_media
@@ -13,48 +13,11 @@ TWT_DELAY = 5 * 60  # 5m
 db = DbDict(
     path=HOME_DIR / 'db.json',
     defaults={
-        'T': [],  # Tweeted Already
+        'ET': [],  # Tweeted Already
         'last_date': now() - 24 * 3600,
         'last_tweet': 0
     }
 )
-
-
-def art_tweet(sold: Sold, art: Artwork):
-    media = upload_media(art.asset)
-    asset_info = ''
-
-    if art.mime_type in ['video/mp4']:
-        asset_info = f'\n\n🎥 video {format_duration(art.duration)}'
-    else:
-        asset_type = 'gif' if art.mime_type == 'image/gif' else 'image'
-        asset_info = f'\n\n📷 {asset_type}'
-
-    tags = ' '.join([
-        '#' + t.strip('#')
-        for t in art.tags if ' ' not in t
-    ][:3])
-    if tags:
-        tags += '\n'
-
-    twt_id = tweet((
-        f'🖼️ {art.name}\n\n'
-        f'🎨 Artist {art.creator.in_twt}\n'
-        f'🍾 Collector {art.owner.in_twt}\n'
-        f'💰 Sold for {sold.price} #eth '
-        f'(${eth_to_usd(sold.price)} USD) '
-        'on the #foundation marketplace\n\n'
-        f'{tags}'
-        '🔗 Link👇👇👇'
-        f'{asset_info}'
-    ), media=media)
-
-    if twt_id:
-        tweet(
-            ('https://foundation.app/collection/'
-             f'{art.collection_slug}/{sold.token_id}'),
-            reply=twt_id
-        )
 
 
 def main():
@@ -62,21 +25,34 @@ def main():
         last_date = db['last_date']
         before_tweets = now()
 
-        for sold in get_sales(last_date, min_price=0.42):
-            if sold.uid in db['T']:
+        for event in get_events(last_date, min_price=0.42):
+            if event.uid in db['ET']:
                 continue
 
-            art = get_artwork(sold.token, sold.token_id)
-            if art is None:
-                continue
-
-            time.sleep(max(TWT_DELAY - (now() - db['last_tweet']), 0))
-
-            db['last_tweet'] = now()
-            art_tweet(sold, art)
+            # time.sleep(max(TWT_DELAY - (now() - db['last_tweet']), 0))
             db['last_tweet'] = now()
 
-            db['T'].append(sold.uid)
+            tweet_text = event.tweet_message()
+            logging.info(event.date)
+            logging.info(event.tx)
+            logging.info(tweet_text)
+            logging.info(event.art.asset)
+            logging.info(event.nft_id)
+            logging.info(event.url)
+
+            # if tweet_text:
+            #
+            #     media = upload_media(event.art.asset, event.nft_id)
+            #     twt_id = tweet(tweet_text, media=media)
+            #
+            #     if twt_id:
+            #         tweet(
+            #             event.url,
+            #             reply=twt_id
+            #         )
+
+            db['last_tweet'] = now()
+            db['ET'].append(event.uid)
             db.save()
 
         time.sleep(max(ART_DELAY - (now() - before_tweets), 0))

@@ -1,9 +1,6 @@
-from .artwork import Artwork, get_artwork
-from .price import eth_to_usd
-from .sold import Sold, get_sales
+
+from .event import Event, get_events
 
 __all__ = [
-    'get_sales', 'Sold',
-    'get_artwork', 'Artwork',
-    'eth_to_usd',
+    'Event', 'get_events'
 ]
