@@ -161,6 +161,9 @@ def upload_media(url: str, addr_token: str = None) -> str | None:
             logging.error(result.text)
             raise MediaError
 
+        if media_id and addr_token:
+            media_db[addr_token] = media_id
+
         return media_id
     except MediaError:
         return None
