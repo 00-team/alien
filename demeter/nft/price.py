@@ -20,27 +20,16 @@ price_db = DbDict(
 )
 
 
-def eth_to_usd(eth: float) -> float:
-    p = round(price_db['usd'] * eth, 2)
+def update_price():
+    if price_db['usd_ts'] + 10800 > now() and KEY['ETHERSCAN_TOKEN']:
+        return
 
-    if price_db['usd_ts'] + 10800 < now() and KEY['ETHERSCAN_TOKEN']:
+    try:
         res = httpx.get(API_URL, params={
             'module': 'stats',
             'action': 'ethprice',
             'apikey': KEY['ETHERSCAN_TOKEN']
-        })
-
-        if res.status_code != 200:
-            logging.error(f'Error getting eth price {res.status_code}')
-            return p
-
-        res = res.json()
-        if res.get('status') != '1':
-            return p
-
-        res = res.get('result')
-        if res is None:
-            return p
+        }).json()['result']
 
         price_db.update({
             'btc': float(res['ethbtc']),
@@ -48,6 +37,16 @@ def eth_to_usd(eth: float) -> float:
             'usd': float(res['ethusd']),
             'usd_ts': int(res['ethusd_timestamp'])
         })
-        return round(price_db['usd'] * eth, 2)
+    except Exception as e:
+        logging.error('Error getting eth price')
+        logging.exception(e)
 
-    return p
+
+def eth_to_usd(eth: float) -> float:
+    update_price()
+    return round(price_db['usd'] * eth, 2)
+
+
+def eth_usd_price() -> float:
+    update_price()
+    return price_db['usd']
