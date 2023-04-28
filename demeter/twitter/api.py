@@ -94,8 +94,13 @@ def get_oauth(method, api_url, params={}):
     }
 
 
-def upload_media(url: str) -> str | None:
+def upload_media(url: str, addr_token: str = None) -> str | None:
     try:
+        if addr_token:
+            mid = media_db.get(addr_token)
+            if mid:
+                return mid
+
         file, mime_type = download_media(url)
         media, media_size = convert_media(file, mime_type)
 
