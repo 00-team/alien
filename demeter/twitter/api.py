@@ -21,6 +21,9 @@ KEY = DbDict(path=HOME_DIR / 'keys.json', load=True)
 BOT = DbDict(path=HOME_DIR / 'bot.json', load=True)
 
 
+media_db = DbDict(path=HOME_DIR / 'media.db.json')
+
+
 def refresh_token():
     try:
         headers = {'Authorization': f'Basic {KEY["BASIC_TOKEN"]}'}
