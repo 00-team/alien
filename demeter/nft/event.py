@@ -50,6 +50,7 @@ class Event(ABC):
         self.token_id = int(tid)
 
         self.usd_eth = usd_eth
+        self.usd = round(self.price_eth * self.usd_eth, 2)
 
         try:
             data = get_display_raw(self.addr, self.token_id, self.actor_pk)
@@ -138,13 +139,12 @@ class Auction(Event):
         super().__init__(data, *args, **kwargs)
 
     def sold_message(self):
-        usd = round(self.price_eth * self.usd_eth, 2)
 
         return (
             f'🖼️ {self.art.name}\n\n'
             f'🎨 Artist {self.art.creator.in_twt}\n'
             f'🍾 Collector {self.art.owner.in_twt}\n'
-            f'💰 Sold for {self.price_eth} #eth (${usd} USD) '
+            f'💰 Sold for {self.price_eth} #eth (${self.usd} USD) '
             'on the #foundation marketplace\n\n'
             f'{self.tags}\n'
             '🔗 Link👇👇👇\n\n'
@@ -152,14 +152,19 @@ class Auction(Event):
         )
 
     def bid_message(self):
-        usd = round(self.price_eth * self.usd_eth, 2)
+        ob = ''
+
+        if self.ob_user:
+            ob = f'Old bid {self.price_eth} eth by {self.ob_user.in_twt}\n'
 
         return (
-            f'🖼️ {self.art.name}\n\n'
+            '💠 Auction\n\n'
+            f'🖼️ {self.art.name}\n'
+            f'New bid {self.price_eth} #eth '
+            f'(${self.usd} USD) by {self.actor.in_twt}\n{ob}'
             f'🎨 Artist {self.art.creator.in_twt}\n'
-            f'🍾 Collector {self.art.owner.in_twt}\n'
-            f'💰 Bid for {self.price_eth} #eth (${usd} USD) '
-            'on the #foundation marketplace\n\n'
+            'On #foundation\n\n'
+            '→ 💎 Did you have a higher offer?'
             f'{self.tags}\n'
             '🔗 Link👇👇👇\n\n'
             f'{self.asset_info}'
@@ -178,7 +183,16 @@ class BuyNow(Event):
         super().__init__(data, *args, **kwargs)
 
     def tweet_message(self):
-        return ''
+        return (
+            f'🖼️ {self.art.name}\n\n'
+            f'🎨 Artist {self.art.creator.in_twt}\n'
+            f'🍾 Collector {self.art.owner.in_twt}\n'
+            f'💰 Sold for {self.price_eth} #eth (${self.usd} USD) '
+            'on the #foundation marketplace\n\n'
+            f'{self.tags}\n'
+            '🔗 Link👇👇👇\n\n'
+            f'{self.asset_info}'
+        )
 
 
 class Offer(Event):
@@ -186,8 +200,35 @@ class Offer(Event):
         self.actor_pk = data['offer']['buyer']['id']
         super().__init__(data, *args, **kwargs)
 
+    def offer_made_message(self):
+        return (
+            f'🔔 New Offer by {self.actor.in_twt}'
+            f'for 💰 {self.price_eth} #eth (${self.usd} USD) \n'
+            f'🖼️ {self.art.name}\n\n'
+            f'🎨 Artist {self.art.creator.in_twt}\n'
+            'on the #foundation marketplace\n\n'
+            f'{self.tags}\n'
+            '🔗 Link👇👇👇\n\n'
+            f'{self.asset_info}'
+        )
+
+    def offer_accepted_message(self):
+        return (
+            f'🖼️ {self.art.name}\n\n'
+            f'🎨 Artist {self.art.creator.in_twt}\n'
+            f'🍾 Collector {self.art.owner.in_twt}\n'
+            f'💰 Sold for {self.price_eth} #eth (${self.usd} USD) '
+            'on the #foundation marketplace\n\n'
+            f'{self.tags}\n'
+            '🔗 Link👇👇👇\n\n'
+            f'{self.asset_info}'
+        )
+
     def tweet_message(self):
-        return ''
+        if self.event == 'OfferMade':
+            return self.offer_made_message()
+        else:
+            return self.offer_accepted_message()
 
 
 class PrivateSale(Event):
@@ -196,13 +237,11 @@ class PrivateSale(Event):
         super().__init__(data, *args, **kwargs)
 
     def tweet_message(self):
-        usd = round(self.price_eth * self.usd_eth, 2)
-
         return (
             f'🖼️ {self.art.name}\n\n'
             f'🎨 Artist {self.art.creator.in_twt}\n'
             f'🍾 Collector {self.art.owner.in_twt}\n'
-            f'💰 Private Saled for {self.price_eth} #eth (${usd} USD) '
+            f'💰 Private Sold for {self.price_eth} #eth (${self.usd} USD) '
             'on the #foundation marketplace\n\n'
             f'{self.tags}\n'
             '🔗 Link👇👇👇\n\n'
