@@ -237,13 +237,11 @@ class PrivateSale(Event):
         super().__init__(data, *args, **kwargs)
 
     def tweet_message(self):
-        usd = round(self.price_eth * self.usd_eth, 2)
-
         return (
             f'🖼️ {self.art.name}\n\n'
             f'🎨 Artist {self.art.creator.in_twt}\n'
             f'🍾 Collector {self.art.owner.in_twt}\n'
-            f'💰 Private Saled for {self.price_eth} #eth (${usd} USD) '
+            f'💰 Private Sold for {self.price_eth} #eth (${self.usd} USD) '
             'on the #foundation marketplace\n\n'
             f'{self.tags}\n'
             '🔗 Link👇👇👇\n\n'
