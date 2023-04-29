@@ -183,7 +183,16 @@ class BuyNow(Event):
         super().__init__(data, *args, **kwargs)
 
     def tweet_message(self):
-        return ''
+        return (
+            f'🖼️ {self.art.name}\n\n'
+            f'🎨 Artist {self.art.creator.in_twt}\n'
+            f'🍾 Collector {self.art.owner.in_twt}\n'
+            f'💰 Sold for {self.price_eth} #eth (${self.usd} USD) '
+            'on the #foundation marketplace\n\n'
+            f'{self.tags}\n'
+            '🔗 Link👇👇👇\n\n'
+            f'{self.asset_info}'
+        )
 
 
 class Offer(Event):
