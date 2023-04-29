@@ -2,13 +2,13 @@
 import logging
 import time
 
-from nft import Event, get_events
-from shared import HOME_DIR, DbDict, format_duration, now
+from nft import get_events
+from shared import HOME_DIR, DbDict, now
 
 from twitter import tweet, upload_media
 
 ART_DELAY = 10 * 60  # 10m
-TWT_DELAY = 5 * 60  # 5m
+TWT_DELAY = 40 * 60  # 5m
 
 db = DbDict(
     path=HOME_DIR / 'db.json',
@@ -29,27 +29,21 @@ def main():
             if event.uid in db['ET']:
                 continue
 
-            # time.sleep(max(TWT_DELAY - (now() - db['last_tweet']), 0))
+            time.sleep(max(TWT_DELAY - (now() - db['last_tweet']), 0))
             db['last_tweet'] = now()
 
             tweet_text = event.tweet_message()
-            logging.info(event.date)
-            logging.info(event.tx)
-            logging.info(tweet_text)
-            logging.info(event.art.asset)
-            logging.info(event.nft_id)
-            logging.info(event.url)
 
-            # if tweet_text:
-            #
-            #     media = upload_media(event.art.asset, event.nft_id)
-            #     twt_id = tweet(tweet_text, media=media)
-            #
-            #     if twt_id:
-            #         tweet(
-            #             event.url,
-            #             reply=twt_id
-            #         )
+            if tweet_text:
+
+                media = upload_media(event.art.asset, event.nft_id)
+                twt_id = tweet(tweet_text, media=media)
+
+                if twt_id:
+                    tweet(
+                        event.url,
+                        reply=twt_id
+                    )
 
             db['last_tweet'] = now()
             db['ET'].append(event.uid)
