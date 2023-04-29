@@ -200,8 +200,35 @@ class Offer(Event):
         self.actor_pk = data['offer']['buyer']['id']
         super().__init__(data, *args, **kwargs)
 
+    def offer_made_message(self):
+        return (
+            f'🔔 New Offer by {self.actor.in_twt}'
+            f'for 💰 {self.price_eth} #eth (${self.usd} USD) \n'
+            f'🖼️ {self.art.name}\n\n'
+            f'🎨 Artist {self.art.creator.in_twt}\n'
+            'on the #foundation marketplace\n\n'
+            f'{self.tags}\n'
+            '🔗 Link👇👇👇\n\n'
+            f'{self.asset_info}'
+        )
+
+    def offer_accepted_message(self):
+        return (
+            f'🖼️ {self.art.name}\n\n'
+            f'🎨 Artist {self.art.creator.in_twt}\n'
+            f'🍾 Collector {self.art.owner.in_twt}\n'
+            f'💰 Sold for {self.price_eth} #eth (${self.usd} USD) '
+            'on the #foundation marketplace\n\n'
+            f'{self.tags}\n'
+            '🔗 Link👇👇👇\n\n'
+            f'{self.asset_info}'
+        )
+
     def tweet_message(self):
-        return ''
+        if self.event == 'OfferMade':
+            return self.offer_made_message()
+        else:
+            return self.offer_accepted_message()
 
 
 class PrivateSale(Event):
