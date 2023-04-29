@@ -50,6 +50,7 @@ class Event(ABC):
         self.token_id = int(tid)
 
         self.usd_eth = usd_eth
+        self.usd = round(self.price_eth * self.usd_eth, 2)
 
         try:
             data = get_display_raw(self.addr, self.token_id, self.actor_pk)
