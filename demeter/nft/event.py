@@ -152,14 +152,19 @@ class Auction(Event):
         )
 
     def bid_message(self):
-        usd = round(self.price_eth * self.usd_eth, 2)
+        ob = ''
+
+        if self.ob_user:
+            ob = f'Old bid {self.price_eth} eth by {self.ob_user.in_twt}\n'
 
         return (
-            f'🖼️ {self.art.name}\n\n'
+            '💠 Auction\n\n'
+            f'🖼️ {self.art.name}\n'
+            f'New bid {self.price_eth} #eth '
+            f'(${self.usd} USD) by {self.actor.in_twt}\n{ob}'
             f'🎨 Artist {self.art.creator.in_twt}\n'
-            f'🍾 Collector {self.art.owner.in_twt}\n'
-            f'💰 Bid for {self.price_eth} #eth (${usd} USD) '
-            'on the #foundation marketplace\n\n'
+            'On #foundation\n\n'
+            '→ 💎 Did you have a higher offer?'
             f'{self.tags}\n'
             '🔗 Link👇👇👇\n\n'
             f'{self.asset_info}'
