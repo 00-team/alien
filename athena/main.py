@@ -161,7 +161,6 @@ async def send_message(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     user = msg.from_user
 
     if user.id in blocked_users:
-        await msg.reply_text('you have been block. contact ...')
         return
 
     if (
