@@ -149,8 +149,8 @@ async def block(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     bu = blocked_users.keys()
 
     await update.message.reply_text(
-        '\n'.join(bu) +
-        f'total blocked: {len(bu)}'
+        '\n'.join((str(u) for u in bu)) +
+        f'\n\ntotal blocked: {len(bu)}'
     )
 
 
