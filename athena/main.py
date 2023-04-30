@@ -127,6 +127,7 @@ async def block(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             block_id = int(ctx.args[0])
         except Exception:
             await update.message.reply_text('invalid user_id')
+            return
 
         if block_id in CONF['ADMINS']:
             await update.message.reply_text('you cant block an admin :/')
