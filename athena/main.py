@@ -11,8 +11,9 @@ from shared.database import channel_remove, channel_set_limit, channel_toggle
 from shared.database import check_user, get_keyboard_chats, get_users
 from shared.database import is_forwards_enable, setup_databases
 from shared.database import toggle_forwards, user_remove
+from shared.db import DbDict
 from shared.dependencies import require_admin, require_joined
-from shared.settings import CONF, FORWARD_DELAY
+from shared.settings import CONF, DATA_DIR, FORWARD_DELAY
 from telegram import Update
 from telegram.error import Forbidden, NetworkError, RetryAfter, TelegramError
 from telegram.ext import Application, CallbackQueryHandler, ChatMemberHandler
@@ -23,6 +24,9 @@ STATE = {
     'FA': {},
     'SCL': {}
 }
+
+
+blocked_users = DbDict(path=DATA_DIR / 'blocked_users.json')
 
 
 @require_joined
@@ -116,11 +120,49 @@ async def forward_to_channel_job(ctx: ContextTypes.DEFAULT_TYPE):
     )
 
 
-@ require_joined
+@require_admin
+async def block(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    if ctx.args:
+        try:
+            block_id = int(ctx.args[0])
+        except Exception:
+            await update.message.reply_text('invalid user_id')
+
+        if block_id in CONF['ADMINS']:
+            await update.message.reply_text('you cant block an admin :/')
+            return
+
+        if blocked_users.pop(block_id, False):
+            await update.message.reply_text((
+                f'user <{block_id}> was Unblocked 🔓\n\n'
+                'see all blocked users with /block 🧊'
+            ))
+        else:
+            blocked_users[block_id] = 1
+            await update.message.reply_text((
+                f'user <{block_id}> has been blocked 🔒\n\n'
+                'see all blocked users with /block 🐧'
+            ))
+
+        return
+
+    bu = blocked_users.keys()
+
+    await update.message.reply_text(
+        '\n'.join(bu) +
+        f'total blocked: {len(bu)}'
+    )
+
+
+@require_joined
 async def send_message(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     total_users = len(get_users())
     msg = update.message
     user = msg.from_user
+
+    if user.id in blocked_users:
+        await msg.reply_text('you have been block. contact ...')
+        return
 
     if (
         not msg.forward_from_chat or
@@ -238,6 +280,7 @@ def main(args: list[str]):
     application.add_handler(CommandHandler('help', help_command))
     application.add_handler(CommandHandler('users', users))
     application.add_handler(CommandHandler('send_all', send_all))
+    application.add_handler(CommandHandler('block', block))
 
     application.add_handler(ChatMemberHandler(
         chat_member_update, ChatMemberHandler.CHAT_MEMBER
