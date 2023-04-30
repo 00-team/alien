@@ -34,8 +34,8 @@ class DbDict(dict):
         super().update(*a, **k)
         self.__save__()
 
-    def pop(self, k):
-        v = super().pop(k)
+    def pop(self, *a, **k):
+        v = super().pop(*a, **k)
         self.__save__()
         return v
 
