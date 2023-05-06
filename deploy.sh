@@ -28,7 +28,14 @@ if check_diff "requirements.txt"; then
     echo $SPACER
 fi
 
+if check_diff "gshare"; then
+    echo "$EG installing gshare"
+    cd gshare && ./update && cd ..
+    echo "$SPACER"
+fi
 
+
+### Athena ###
 
 if check_diff "athena/athena.service"; then
     echo "$EG update athena service"
@@ -43,6 +50,20 @@ if check_diff "athena/*"; then
     echo $SPACER
 fi
 
+### Bchat ###
+
+if check_diff "bchat/bchat.service"; then
+    echo "$EG update bchat service"
+    cp bchat/bchat.service /etc/systemd/system/ --force
+    systemctl daemon-reload
+    echo $SPACER
+fi
+
+if check_diff "bchat/*"; then
+    echo "$EG restart bchat service"
+    systemctl restart bchat
+    echo $SPACER
+fi
 
 ### demeter ###
 
@@ -55,7 +76,7 @@ fi
 
 if check_diff "demeter/*"; then
     echo "$EG restart demeter service"
-    systemctl restart demeter
+    # systemctl restart demeter
     echo $SPACER
 fi
 
