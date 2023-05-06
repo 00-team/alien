@@ -55,7 +55,7 @@ fi
 
 if check_diff "demeter/*"; then
     echo "$EG restart demeter service"
-    systemctl restart demeter
+    # systemctl restart demeter
     echo $SPACER
 fi
 
