@@ -3,12 +3,15 @@ import logging
 import sys
 from pathlib import Path
 
-from telegram import Update
-from telegram.error import Forbidden, NetworkError, RetryAfter, TelegramError
-from telegram.ext import Application, CallbackQueryHandler, ChatMemberHandler
-from telegram.ext import CommandHandler, ContextTypes, MessageHandler, filters
+from telegram import KeyboardButton, ReplyKeyboardMarkup, Update
+from telegram.ext import Application, CommandHandler, ContextTypes
 
 from gshare import DbDict, get_error_handler, setup_logging
+
+# from telegram.error import Forbidden, NetworkError, RetryAfter, TelegramError
+# from telegram.ext import CallbackQueryHandler, ChatMemberHandler
+# from telegram.ext import essageHandler, filters
+
 
 HOME_DIR = Path(__file__).parent
 
@@ -17,7 +20,14 @@ setup_logging(HOME_DIR)
 
 async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
-    await update.message.reply_text(f'hi there {user.id}')
+    keyboard = [
+        [KeyboardButton('row 1 text 1')],
+        [KeyboardButton('row 2 text 2')],
+    ]
+    await update.message.reply_text(
+        f'hi there {user.id}',
+        reply_markup=ReplyKeyboardMarkup(keyboard)
+    )
 
 
 def main(args: list[str]):
