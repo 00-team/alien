@@ -1,0 +1,5 @@
+#!/bin/sh
+
+python -m build --no-isolation --sdist --wheel --outdir dist/ .
+pip install dist/gshare-*-py3-none-any.whl
+rm -rf build dist gshare.egg-info
