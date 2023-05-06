@@ -8,7 +8,7 @@ from telegram.error import Forbidden, NetworkError, RetryAfter, TelegramError
 from telegram.ext import Application, CallbackQueryHandler, ChatMemberHandler
 from telegram.ext import CommandHandler, ContextTypes, MessageHandler, filters
 
-from gshare import DbDict, setup_logging
+from gshare import DbDict, get_error_handler, setup_logging
 
 HOME_DIR = Path(__file__).parent
 
@@ -25,7 +25,7 @@ def main(args: list[str]):
     config = DbDict(args[1], load=True)
 
     application = Application.builder().token(config['TOKEN']).build()
-    # application.add_error_handler(error_handler)
+    application.add_error_handler(get_error_handler(config['ADMINS'][0]))
 
     application.add_handler(CommandHandler('start', start))
     # application.add_handler(CommandHandler('help', help_command))
