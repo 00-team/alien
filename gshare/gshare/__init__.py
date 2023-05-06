@@ -2,7 +2,7 @@
 import time
 
 from .db import DbDict
-from .logger import WeeklyRotating
+from .logger import WeeklyRotating, setup_logging
 
 
 def now() -> int:
@@ -18,6 +18,6 @@ def format_duration(dur):
 
 __all__ = [
     'DbDict',
-    'WeeklyRotating',
+    'WeeklyRotating', 'setup_logging',
     'now', 'format_duration'
 ]

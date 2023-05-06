@@ -4,8 +4,8 @@ from datetime import date
 
 
 class WeeklyRotating(logging.FileHandler):
-    def __init__(self):
-        self.path = logging.LOGS_PATH / 'logs'
+    def __init__(self, path):
+        self.path = path / 'logs'
         self.path.mkdir(parents=True, exist_ok=True)
 
         self.week = self.get_week()
@@ -39,31 +39,33 @@ class WeeklyRotating(logging.FileHandler):
             self.handleError(record)
 
 
-logging.config.dictConfig({
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'main': {
-            'format': (
-                '%(asctime)s.%(msecs)03d <%(levelname)s> '
-                '[%(module)s]: %(message)s'
-            ),
-            'datefmt': '%H:%M:%S'
-        }
-    },
-    'handlers': {
-        'term': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'main'
+def setup_logging(path):
+    logging.config.dictConfig({
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'main': {
+                'format': (
+                    '%(asctime)s.%(msecs)03d <%(levelname)s> '
+                    '[%(module)s]: %(message)s'
+                ),
+                'datefmt': '%H:%M:%S'
+            }
         },
-        'file': {
-            '()': WeeklyRotating,
-            'formatter': 'main'
-        }
-    },
-    'root': {
-        'handlers': ['term', 'file'],
-        'level': 'INFO'
+        'handlers': {
+            'term': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'main'
+            },
+            'file': {
+                '()': WeeklyRotating,
+                'formatter': 'main',
+                'path': path
+            }
+        },
+        'root': {
+            'handlers': ['term', 'file'],
+            'level': 'INFO'
 
-    }
-})
+        }
+    })
