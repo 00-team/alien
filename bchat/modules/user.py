@@ -17,11 +17,9 @@ async def user_link(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     else:
         code = toggle_code(user_data.row_id)
 
-    bot_username = config['BOT_USERNAME']
-
-    logging.info(ctx.bot)
-    logging.info(f'code: {code}')
+    bot_username = config['BOT']['username']
 
     await update.message.reply_text(
-        f't.me/{bot_username}'
+        'your link\n'
+        f't.me/@{bot_username}?start={code}'
     )
