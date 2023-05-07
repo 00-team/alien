@@ -3,8 +3,9 @@ import logging
 
 from database import add_user, get_user
 from models.user import gender_pattern
-from modules import user_edit_age, user_edit_gender, user_edit_profile
-from modules import user_link, user_profile, user_set_gender
+from modules import cancel_edit_profile, user_edit_age, user_edit_gender
+from modules import user_edit_profile, user_link, user_profile
+from modules import user_set_gender
 from settings import HOME_DIR, database
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler
@@ -99,6 +100,7 @@ def main():
                 pattern=f'^user_gender_({gender_pattern})$'
             )]
         },
+        fallbacks=[CommandHandler('cancel', cancel_edit_profile)],
         conversation_timeout=60
     ))
 

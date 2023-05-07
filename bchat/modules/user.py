@@ -4,7 +4,7 @@ from dependencies import require_user_data
 from models import GENDER_DISPLAY, Genders, UserModel
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardMarkup, Update
-from telegram.ext import ContextTypes
+from telegram.ext import ContextTypes, ConversationHandler
 from utils import config, toggle_code
 
 Ctx = ContextTypes.DEFAULT_TYPE
@@ -102,3 +102,14 @@ async def user_edit_age(update: Update, ctx: Ctx, user_data: UserModel):
     )
 
     return 'EDIT_AGE'
+
+
+@require_user_data
+async def cancel_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
+    # user = update.message.from_user
+    await update.message.reply_text(
+        "Bye! I hope we can talk again some day.",
+        # reply_markup=ReplyKeyboardRemove()
+    )
+
+    return ConversationHandler.END
