@@ -30,7 +30,7 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     logging.info(ctx.args)
 
-    logging.info(get_user(user_id=user.id))
+    logging.info(await get_user(user_id=user.id))
 
     # database.execute()
 
