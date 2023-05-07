@@ -1,9 +1,7 @@
 
-import logging
 
 from database import add_user, get_user
 from models import UserModel
-# from database import get_channels, user_add
 from settings import config
 from telegram import Update
 from telegram.ext import ContextTypes
