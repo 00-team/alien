@@ -142,3 +142,9 @@ db.json
 bot.json
 media.db.json
 price.db.json
+
+
+# ignore database files
+*.db
+
+bchat/migrations/versions/
