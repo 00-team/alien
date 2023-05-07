@@ -82,7 +82,7 @@ def main():
     application.add_handler(ConversationHandler(
         entry_points=[CallbackQueryHandler(
             user_edit_profile,
-            pattern=lambda d: d == 'edit_profile'
+            pattern='^edit_profile$'
         )],
         states={
             'CHANGE_ROUTE': [
@@ -101,7 +101,7 @@ def main():
             )]
         },
         fallbacks=[CommandHandler('cancel', cancel_edit_profile)],
-        conversation_timeout=60
+        # conversation_timeout=60
     ))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)

@@ -54,8 +54,8 @@ async def user_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
         'choice which one do you want to edit',
         reply_markup=ReplyKeyboardMarkup(
             [['gender', 'age']],
-            one_time_keyboard=True,
-            input_field_placeholder='GFG'
+            # one_time_keyboard=True,
+            # input_field_placeholder='GFG'
         )
     )
 
