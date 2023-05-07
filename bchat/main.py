@@ -37,6 +37,9 @@ def main(args: list[str]):
     application = Application.builder().token(config['TOKEN']).build()
     application.add_error_handler(get_error_handler(config['ADMINS'][0]))
 
+    logging.info(application.post_init)
+    logging.info(application.post_shutdown)
+
     application.add_handler(CommandHandler('start', start))
     # application.add_handler(CommandHandler('help', help_command))
     # application.add_handler(CommandHandler('users', users))
