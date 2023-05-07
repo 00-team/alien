@@ -35,3 +35,7 @@ GENDER_DISPLAY = {
     Genders.boy: 'پسر',
     Genders.girl: 'دختر'
 }
+
+
+gender_keys = [g.value for g in Genders.__members__.values()]
+gender_pattern = '|'.join((str(g) for g in gender_keys))
