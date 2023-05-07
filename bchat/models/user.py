@@ -12,8 +12,8 @@ class Users(BaseTable):
     row_id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     user_id = Column(Integer, unique=True, index=True, nullable=False)
     name = Column(String, nullable=False)
-    gender = Column(Integer, server_default=text('0'))
-    age = Column(Integer, server_default=text('20'))
+    gender = Column(Integer, nullable=False, server_default=text('0'))
+    age = Column(Integer, nullable=False, server_default=text('20'))
 
 
 class Genders(int, Enum):
