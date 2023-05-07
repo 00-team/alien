@@ -1,8 +1,8 @@
 
 from enum import Enum, auto
 
-from database import BaseTable
 from pydantic import BaseModel
+from settings import BaseTable
 from sqlalchemy import Column, Integer, String, text
 
 
