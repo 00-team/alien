@@ -2,10 +2,9 @@
 
 from dependencies import require_user_data
 from models import GENDER_DISPLAY, UserModel
-from settings import config
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
-from utils import toggle_code
+from utils import config, toggle_code
 
 Ctx = ContextTypes.DEFAULT_TYPE
 

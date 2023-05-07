@@ -2,9 +2,9 @@
 
 from database import add_user, get_user
 from models import UserModel
-from settings import config
 from telegram import Update
 from telegram.ext import ContextTypes
+from utils import config
 
 
 def require_admin(func):
