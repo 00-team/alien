@@ -20,8 +20,8 @@ class Users(Base):
     gender = Column(Integer, server_default=text('0'))
     name = Column(String, nullable=False)
     code = Column(
-        Integer, autoincrement=True, unique=True,
-        nullable=False, index=True
+        Integer, autoincrement=True,
+        unique=True, index=True
     )
 
 
