@@ -23,4 +23,9 @@ delete_all_tags)
     # git tag | grep <pattern> | xargs -n 1 -i% git push origin :refs/tags/%
     # git tag | xargs -n 1 -i% sh -c 'git push origin :% && git tag -d %'
     ;;
+
+freeze)
+    pip freeze --exclude gshare > requirements.txt
+
+    ;;
 esac
