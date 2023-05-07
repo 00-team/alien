@@ -13,6 +13,7 @@ class Users(BaseTable):
     user_id = Column(Integer, unique=True, index=True, nullable=False)
     name = Column(String, nullable=False)
     gender = Column(Integer, server_default=text('0'))
+    age = Column(Integer, server_default=text('20'))
 
 
 class Genders(int, Enum):
@@ -26,6 +27,7 @@ class UserModel(BaseModel):
     user_id: int
     gender: Genders
     name: str
+    age: int
 
 
 GENDER_DISPLAY = {
