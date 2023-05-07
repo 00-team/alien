@@ -33,7 +33,7 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     user_data = await get_user(user_id=user.id)
     if user_data is None:
         res = await add_user(user.id, user.full_name)
-        logging.info(res)
+        logging.info(f'res: {res}')
 
     logging.info(user_data)
 

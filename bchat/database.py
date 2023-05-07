@@ -16,13 +16,10 @@ Base = declarative_base(metadata=metadata)
 class Users(Base):
     __tablename__ = 'users'
 
-    user_id = Column(Integer, primary_key=True, unique=True, index=True)
-    gender = Column(Integer, server_default=text('0'))
+    row_id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    user_id = Column(Integer, unique=True, index=True, nullable=False)
     name = Column(String, nullable=False)
-    code = Column(
-        Integer, autoincrement=True,
-        unique=True, index=True
-    )
+    gender = Column(Integer, server_default=text('0'))
 
 
 class Genders(int, Enum):
