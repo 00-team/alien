@@ -30,11 +30,10 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     logging.info(ctx.args)
 
-    logging.info(await get_user(user_id=user.id))
-
-    # database.execute()
-
-    # user.full_name
+    user_data = await get_user(user_id=user.id)
+    if user_data is None:
+        res = await add_user(user.id, user.full_name)
+        logging.info(res)
 
 
 async def post_init(self):
