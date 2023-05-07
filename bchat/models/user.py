@@ -16,7 +16,7 @@ class Users(BaseTable):
 
 
 class Genders(int, Enum):
-    unknown = auto()
+    unknown = 0
     boy = auto()
     girl = auto()
 
