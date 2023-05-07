@@ -1,8 +1,9 @@
 
 import logging
 import sys
-from pathlib import Path
 
+from database import database
+from settings import HOME_DIR
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
@@ -12,8 +13,6 @@ from gshare import DbDict, get_error_handler, setup_logging
 # from telegram.ext import CallbackQueryHandler, ChatMemberHandler
 # from telegram.ext import essageHandler, filters
 
-
-HOME_DIR = Path(__file__).parent
 
 setup_logging(HOME_DIR)
 
@@ -30,15 +29,24 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     )
 
 
-def main(args: list[str]):
+async def post_init():
+    await database.connect()
     logging.info('Starting Bchat')
+
+
+async def post_shutdown():
+    await database.disconnect()
+    logging.info('Shuting Down Bchat')
+
+
+def main(args: list[str]):
     config = DbDict(args[1], load=True)
 
     application = Application.builder().token(config['TOKEN']).build()
     application.add_error_handler(get_error_handler(config['ADMINS'][0]))
 
-    logging.info(application.post_init)
-    logging.info(application.post_shutdown)
+    application.post_init = post_init
+    application.post_shutdown = post_shutdown
 
     application.add_handler(CommandHandler('start', start))
     # application.add_handler(CommandHandler('help', help_command))
