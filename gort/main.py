@@ -1,16 +1,18 @@
 import base64
 import hmac
 import json
+import logging
 import time
 from hashlib import sha1
 from urllib.parse import quote
 
 import httpx
 from flask import Flask, redirect, render_template, request, session
-from utils import BASE_DIR, error, get_logger, merge_params, random_string
-from utils import save_bot_token
+from utils import BASE_DIR, error, merge_params, random_string, save_bot_token
 
-logger = get_logger('main')
+from gshare import setup_logging
+
+setup_logging(BASE_DIR)
 
 
 AUTH2_URL = 'https://twitter.com/i/oauth2/authorize'
@@ -88,7 +90,7 @@ def callback():
     response = httpx.post(ACCESS_TOKEN_URL2, params=params, headers=headers)
 
     if response.status_code != 200:
-        logger.error(json.dumps(response.json(), indent=2))
+        logging.error(json.dumps(response.json(), indent=2))
         return error('error getting access token!')
 
     try:
@@ -155,7 +157,7 @@ def oauth1():
         ))
 
     except Exception as e:
-        logger.exception(e)
+        logging.exception(e)
 
     return '{"error":"GG"}'
 

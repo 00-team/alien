@@ -59,19 +59,3 @@ def save_bot_token(data: dict):
 
     with open(BASE_DIR / f'{filename}.json', 'w') as f:
         json.dump(bot, f, indent=4)
-
-
-def get_logger(name: str):
-    formatter = logging.Formatter(
-        fmt='%(asctime)s.%(msecs)03d <%(levelname)s>: %(message)s',
-        datefmt='%H:%M:%S'
-    )
-
-    handler = logging.StreamHandler()
-    handler.setFormatter(formatter)
-
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(handler)
-
-    return logger
