@@ -1,4 +1,5 @@
 
+import logging
 from enum import Enum, auto
 
 from databases import Database
@@ -60,5 +61,6 @@ async def get_user(user_id: int = None, code: int = None):
         query = select(Users).where(Users.code == code)
 
     d = await database.fetch_one(query)
+    logging.info(UserModel(d))
     print(type(d), dir(d), d)
     return d
