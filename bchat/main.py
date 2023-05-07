@@ -2,7 +2,7 @@
 import logging
 
 from database import add_user, get_user
-from modules import user_info, user_link, user_profile
+from modules import get_file_id, user_info, user_link, user_profile
 from settings import HOME_DIR, config, database
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler
@@ -74,6 +74,8 @@ def main():
         filters.Text(['profile']),
         user_profile
     ))
+
+    application.add_handler(MessageHandler(filters.PHOTO, get_file_id))
 
     # application.add_handler(ChatMemberHandler(
     #     chat_member_update, ChatMemberHandler.CHAT_MEMBER
