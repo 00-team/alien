@@ -2,16 +2,16 @@
 import logging
 
 from database import add_user, get_user
-from modules import user_info, user_link
+from modules import user_info, user_link, user_profile
 from settings import HOME_DIR, config, database
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update
-from telegram.ext import Application, CommandHandler, ContextTypes
+from telegram.ext import Application, CallbackQueryHandler, CommandHandler
+from telegram.ext import ContextTypes, MessageHandler, filters
 
 from gshare import get_error_handler, setup_logging
 
 # from telegram.error import Forbidden, NetworkError, RetryAfter, TelegramError
-# from telegram.ext import CallbackQueryHandler, ChatMemberHandler
-# from telegram.ext import essageHandler, filters
+# from telegram.ext import ChatMemberHandler
 
 
 setup_logging(HOME_DIR)
@@ -20,6 +20,7 @@ setup_logging(HOME_DIR)
 async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
     keyboard = [
+        [KeyboardButton('profile')],
         [KeyboardButton('row 1 text 1')],
         [KeyboardButton('row 2 text 2')],
     ]
@@ -67,11 +68,13 @@ def main():
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('my_link', user_link))
     application.add_handler(CommandHandler('my_info', user_info))
-    # application.add_handler(CommandHandler('help', help_command))
-    # application.add_handler(CommandHandler('users', users))
-    # application.add_handler(CommandHandler('send_all', send_all))
-    # application.add_handler(CommandHandler('block', block))
-    #
+    application.add_handler(CommandHandler('my_profile', user_profile))
+
+    application.add_handler(MessageHandler(
+        filters.Text(['profile']),
+        user_profile
+    ))
+
     # application.add_handler(ChatMemberHandler(
     #     chat_member_update, ChatMemberHandler.CHAT_MEMBER
     # ))
