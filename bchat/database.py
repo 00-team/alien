@@ -59,4 +59,6 @@ async def get_user(user_id: int = None, code: int = None):
     else:
         query = select(Users).where(Users.code == code)
 
-    return await database.fetch_one(query)
+    d = await database.fetch_one(query)
+    print(type(d), dir(d), d)
+    return d
