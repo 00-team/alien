@@ -1,8 +1,9 @@
 
 
 from dependencies import require_user_data
-from models import GENDER_DISPLAY, UserModel
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from models import GENDER_DISPLAY, Genders, UserModel
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 from utils import config, toggle_code
 
@@ -47,7 +48,57 @@ async def user_profile(update: Update, ctx: Ctx, user_data: UserModel):
     )
 
 
-# @require_user_data
-# async def user_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
-#     await update.message.
-#     return ''
+@require_user_data
+async def user_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
+    await update.message.reply_text(
+        'choice which one do you want to edit',
+        reply_markup=ReplyKeyboardMarkup(
+            [['gender', 'age']],
+            one_time_keyboard=True,
+            input_field_placeholder='GFG'
+        )
+    )
+
+    return 'CHANGE_ROUTE'
+
+
+@require_user_data
+async def user_edit_gender(update: Update, ctx: Ctx, user_data: UserModel):
+
+    keyboard = []
+
+    for g in Genders.__members__.values():
+        if g.value == user_data.gender:
+            continue
+
+        keyboard.append(InlineKeyboardButton(
+            GENDER_DISPLAY[g],
+            callback_data=f'user_gender_{g.value}'
+        ))
+
+    await update.message.reply_text(
+        'select your gender',
+        reply_markup=InlineKeyboardMarkup(
+            keyboard,
+        )
+    )
+
+    return 'EDIT_GENDER'
+
+
+@require_user_data
+async def user_set_gender(update: Update, ctx: Ctx, user_data: UserModel):
+    await update.message.reply_text('your chosen gender: ' + update.callback_query.data)
+
+    return 'CHANGE_ROUTE'
+
+
+@require_user_data
+async def user_edit_age(update: Update, ctx: Ctx, user_data: UserModel):
+
+    await update.message.reply_text(
+        'send your age btween 10 and 80',
+
+    )
+
+    return 'EDIT_AGE'

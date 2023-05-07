@@ -2,11 +2,14 @@
 import logging
 
 from database import add_user, get_user
-from modules import user_link, user_profile
+from models.user import gender_pattern
+from modules import user_edit_age, user_edit_gender, user_edit_profile
+from modules import user_link, user_profile, user_set_gender
 from settings import HOME_DIR, database
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler
-from telegram.ext import ContextTypes, MessageHandler, filters
+from telegram.ext import ContextTypes, ConversationHandler, MessageHandler
+from telegram.ext import filters
 from utils import config
 
 from gshare import get_error_handler, setup_logging
@@ -75,25 +78,29 @@ def main():
         user_profile
     ))
 
-    # application.add_handler(MessageHandler(filters.PHOTO, get_file_id))
-
-    # application.add_handler(ChatMemberHandler(
-    #     chat_member_update, ChatMemberHandler.CHAT_MEMBER
-    # ))
-    # application.add_handler(ChatMemberHandler(
-    #     my_chat_update, ChatMemberHandler.MY_CHAT_MEMBER
-    # ))
-    #
-    # application.add_handler(CallbackQueryHandler(query_update))
-    # application.add_handler(MessageHandler(
-    #     ((filters.TEXT | filters.PHOTO) &
-    #      (filters.FORWARDED & filters.ChatType.PRIVATE)),
-    #     send_message
-    # ))
-    # application.add_handler(MessageHandler(
-    #     filters.TEXT & filters.Regex(r'^-?\d+$') & filters.ChatType.PRIVATE,
-    #     set_chat_limit
-    # ))
+    application.add_handler(ConversationHandler(
+        entry_points=[CallbackQueryHandler(
+            user_edit_profile,
+            pattern=lambda d: d == 'edit_profile'
+        )],
+        states={
+            'CHANGE_ROUTE': [
+                CallbackQueryHandler(
+                    user_edit_gender,
+                    pattern=lambda d: d == 'edit_gender'
+                ),
+                CallbackQueryHandler(
+                    user_edit_age,
+                    pattern=lambda d: d == 'edit_age'
+                ),
+            ],
+            'EDIT_GENDER': [CallbackQueryHandler(
+                user_set_gender,
+                pattern=f'^user_gender_({gender_pattern})$'
+            )]
+        },
+        conversation_timeout=60
+    ))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
