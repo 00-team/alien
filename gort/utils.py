@@ -38,6 +38,9 @@ def get_bot_info(token: str) -> dict:
 
 
 def save_bot_token(data: dict):
+    logging.info('save bot token')
+    logging.info(json.dumps(data))
+
     if not isinstance(data, dict) or data.get('access_token') is None:
         raise ValueError('Error to Save Bot Token')
 
