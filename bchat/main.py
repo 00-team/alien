@@ -35,6 +35,8 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         res = await add_user(user.id, user.full_name)
         logging.info(res)
 
+    logging.info(user_data)
+
 
 async def post_init(self):
     await database.connect()
