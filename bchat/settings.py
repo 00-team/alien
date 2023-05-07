@@ -16,5 +16,4 @@ metadata = MetaData()
 
 BaseTable = declarative_base(metadata=metadata)
 
-
 database = Database(DATABASE_URL)
