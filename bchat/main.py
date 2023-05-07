@@ -1,14 +1,13 @@
 
 import logging
-import sys
 
 from database import add_user, get_user
 from modules import user_link
-from settings import HOME_DIR, database
+from settings import HOME_DIR, config, database
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
-from gshare import DbDict, get_error_handler, setup_logging
+from gshare import get_error_handler, setup_logging
 
 # from telegram.error import Forbidden, NetworkError, RetryAfter, TelegramError
 # from telegram.ext import CallbackQueryHandler, ChatMemberHandler
@@ -41,6 +40,9 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 async def post_init(self):
     await database.connect()
+    bot = await self.bot.get_me()
+    logging.info(dir(bot))
+    logging.info(bot)
     logging.info('Starting Bchat')
 
 
@@ -49,8 +51,7 @@ async def post_shutdown(self):
     logging.info('Shuting Down Bchat')
 
 
-def main(args: list[str]):
-    config = DbDict(args[1], load=True)
+def main():
 
     application = Application.builder().token(config['TOKEN']).build()
     application.add_error_handler(get_error_handler(config['ADMINS'][0]))
@@ -87,4 +88,4 @@ def main(args: list[str]):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main()
