@@ -2,9 +2,9 @@
 import logging
 import sys
 
-from database import add_user, database, get_user
+from database import add_user, get_user
 from modules import user_link
-from settings import HOME_DIR
+from settings import HOME_DIR, database
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
