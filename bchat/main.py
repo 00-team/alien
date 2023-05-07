@@ -3,6 +3,7 @@ import logging
 import sys
 
 from database import add_user, database, get_user
+from modules import user_link
 from settings import HOME_DIR
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update
 from telegram.ext import Application, CommandHandler, ContextTypes
@@ -58,6 +59,7 @@ def main(args: list[str]):
     application.post_shutdown = post_shutdown
 
     application.add_handler(CommandHandler('start', start))
+    application.add_handler(CommandHandler('my_link', user_link))
     # application.add_handler(CommandHandler('help', help_command))
     # application.add_handler(CommandHandler('users', users))
     # application.add_handler(CommandHandler('send_all', send_all))
