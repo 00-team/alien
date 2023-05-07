@@ -59,6 +59,13 @@ if check_diff "bchat/bchat.service"; then
     echo $SPACER
 fi
 
+if check_diff "bchat/database.py"; then
+    echo "$EG Updateing the bchat database"
+    alembic revision --autogenerate
+    alembic upgrade head
+    echo $SPACER
+fi
+
 if check_diff "bchat/*"; then
     echo "$EG restart bchat service"
     systemctl restart bchat
