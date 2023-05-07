@@ -61,8 +61,10 @@ fi
 
 if check_diff "bchat/database.py"; then
     echo "$EG Updateing the bchat database"
+    cd bchat
     alembic revision --autogenerate
     alembic upgrade head
+    cd ..
     echo $SPACER
 fi
 
