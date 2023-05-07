@@ -6,7 +6,7 @@ from settings import BYTE_ORDER
 
 def toggle_code(code: int | str) -> str | int:
     if isinstance(code, int):
-        b = code.to_bytes(6, byteorder=BYTE_ORDER).hex()
+        b = code.to_bytes(6, byteorder=BYTE_ORDER)
         return base64.b64encode(b).decode()
     else:
         b = base64.b64decode(code.encode())
