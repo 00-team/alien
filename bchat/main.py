@@ -2,7 +2,7 @@
 import logging
 import sys
 
-from database import database
+from database import add_user, database, get_user
 from settings import HOME_DIR
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update
 from telegram.ext import Application, CommandHandler, ContextTypes
@@ -27,6 +27,14 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         f'hi there {user.id}',
         reply_markup=ReplyKeyboardMarkup(keyboard)
     )
+
+    logging.info(ctx.args)
+
+    logging.info(get_user(user_id=user.id))
+
+    # database.execute()
+
+    # user.full_name
 
 
 async def post_init():
