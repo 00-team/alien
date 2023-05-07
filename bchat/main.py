@@ -37,12 +37,12 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     # user.full_name
 
 
-async def post_init():
+async def post_init(self):
     await database.connect()
     logging.info('Starting Bchat')
 
 
-async def post_shutdown():
+async def post_shutdown(self):
     await database.disconnect()
     logging.info('Shuting Down Bchat')
 
