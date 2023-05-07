@@ -3,10 +3,11 @@ import logging
 
 from database import add_user, get_user
 from modules import user_link, user_profile
-from settings import HOME_DIR, config, database
+from settings import HOME_DIR, database
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler
 from telegram.ext import ContextTypes, MessageHandler, filters
+from utils import config
 
 from gshare import get_error_handler, setup_logging
 
