@@ -2,7 +2,7 @@
 import logging
 
 from database import add_user, get_user
-from modules import get_file_id, user_info, user_link, user_profile
+from modules import user_link, user_profile
 from settings import HOME_DIR, config, database
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler
@@ -69,7 +69,6 @@ def main():
 
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('my_link', user_link))
-    application.add_handler(CommandHandler('my_info', user_info))
     application.add_handler(CommandHandler('my_profile', user_profile))
 
     application.add_handler(MessageHandler(
