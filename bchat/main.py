@@ -49,6 +49,8 @@ async def post_init(self):
         'id': bot.id
     }
 
+    config['default_profile_picture'] = 'AgACAgQAAxkBAANiZFftx_oKp43X4qDtgvyzsVR3YH0AAqa7MRtTqMBS6CeeVmBMjNYBAAMCAANzAAMvBA'
+
     logging.info('Starting Bchat')
 
 
@@ -75,7 +77,7 @@ def main():
         user_profile
     ))
 
-    application.add_handler(MessageHandler(filters.PHOTO, get_file_id))
+    # application.add_handler(MessageHandler(filters.PHOTO, get_file_id))
 
     # application.add_handler(ChatMemberHandler(
     #     chat_member_update, ChatMemberHandler.CHAT_MEMBER
