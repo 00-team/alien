@@ -45,7 +45,7 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
         code_user_data = await get_user(row_id=code_row_id)
         if code_user_data is None:
             await update.effective_message.reply_text(
-                f'no user found with this code: {code}'
+                f'کاربری با کد {code} پیدا نشد. ❌'
             )
             return
 
@@ -58,7 +58,7 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
             file_id = pictures.photos[0][0].file_id
 
         await update.effective_message.reply_photo(
-            file_id, get_profile_text(user_data, ctx.bot.username),
+            file_id, get_profile_text(code_user_data, ctx.bot.username),
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton(
                     'Send Message ✉',
