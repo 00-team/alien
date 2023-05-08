@@ -31,9 +31,9 @@ class UserModel(BaseModel):
 
 
 GENDER_DISPLAY = {
-    Genders.unknown: 'نامعلوم',
-    Genders.boy: 'پسر',
-    Genders.girl: 'دختر'
+    Genders.unknown: 'نامعلوم 👤',
+    Genders.boy: 'پسر 👨',
+    Genders.girl: 'دختر 👩'
 }
 
 
