@@ -93,13 +93,16 @@ def main():
     application.post_init = post_init
     application.post_shutdown = post_shutdown
 
-    application.add_handler(CommandHandler('start', start))
-    application.add_handler(CommandHandler('my_link', user_link))
-    application.add_handler(CommandHandler('my_profile', user_profile))
+    application.add_handler(CommandHandler(['start', 'restart'], start))
 
     application.add_handler(MessageHandler(
-        filters.Text(['profile']),
+        filters.Text([KW_PROFILE]),
         user_profile
+    ))
+
+    application.add_handler(MessageHandler(
+        filters.Text([KW_MY_LINK]),
+        user_link
     ))
 
     application.add_handler(ConversationHandler(
