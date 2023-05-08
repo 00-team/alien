@@ -79,25 +79,27 @@ def main():
         user_profile
     ))
 
-    def x(d):
-        logging.info(d)
-        return True
-
     application.add_handler(ConversationHandler(
         per_message=True,
-        entry_points=[CallbackQueryHandler(
-            user_edit_gender,
-            pattern=x
-        )],
+        entry_points=[
+            CallbackQueryHandler(
+                user_edit_gender,
+                pattern='^user_edit_gender$'
+            )
+        ],
         states={
             'EDIT_GENDER': [CallbackQueryHandler(
                 user_set_gender,
                 pattern=f'^user_gender_({gender_pattern})$'
             )]
         },
-        fallbacks=[CallbackQueryHandler(
-            cancel_edit_profile, pattern='^cancel_edit_profile$')],
-        # conversation_timeout=60
+        fallbacks=[
+            CallbackQueryHandler(
+                cancel_edit_profile,
+                pattern='^cancel_edit_profile$'
+            )
+        ],
+        conversation_timeout=60
     ))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)

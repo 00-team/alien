@@ -76,21 +76,18 @@ async def user_edit_gender(update: Update, ctx: Ctx, user_data: UserModel):
         if g.value == user_data.gender:
             continue
 
-        keyboard.append(InlineKeyboardButton(
+        keyboard.append([InlineKeyboardButton(
             GENDER_DISPLAY[g],
             callback_data=f'user_gender_{g.value}'
-        ))
+        )])
+
+    keyboard.append([InlineKeyboardButton(
+        'Cancel ❌', callback_data='cancel_edit_profile'
+    )])
 
     await update.effective_message.edit_reply_markup(
         InlineKeyboardMarkup(keyboard)
     )
-
-    # await update.message.reply_text(
-    #     'select your gender',
-    #     reply_markup=InlineKeyboardMarkup(
-    #         keyboard,
-    #     )
-    # )
 
     return 'EDIT_GENDER'
 
