@@ -35,16 +35,18 @@ def get_profile_text(user_data: UserModel, bot_username):
 @require_user_data
 async def user_link(update: Update, ctx: Ctx, user_data: UserModel):
     user = update.effective_user
+    link = get_link(user_data.row_id, ctx.bot.username)
 
     await update.effective_message.reply_text(
-        f'سلام {user.first_name} هستم ✋😉\n'
-        f'👇👇\n{get_link(user_data.row_id, ctx.bot.username)}'
+        f'سلام {user.first_name} هستم ✋😉\n\n'
+        f'👇👇\n{link}'
     )
 
     await update.effective_message.reply_text((
-        '👆👆 پیام بالا رو برای دوستات و گروه هایی که میشناسی فوروارد کن'
+        '👆👆 پیام بالا رو برای دوستات و گروه هایی که میشناسی فوروارد کن\n'
         'یا لینک پایین رو توی شبکه های اجتماعیت پخش کن،'
-        'تا بقیه بتونن بهت پیام ناشناس بفرستن.'),
+        'تا بقیه بتونن بهت پیام ناشناس بفرستن.\n\n'
+        f'{link}'),
         reply_markup=InlineKeyboardMarkup([[
             InlineKeyboardButton(
                 'برای اینستاگرام 📷',
