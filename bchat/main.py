@@ -79,11 +79,15 @@ def main():
         user_profile
     ))
 
+    def x(d):
+        logging.info(d)
+        return True
+
     application.add_handler(ConversationHandler(
         per_message=True,
         entry_points=[CallbackQueryHandler(
             user_edit_gender,
-            pattern='^user_edit_gender$',
+            pattern=x
         )],
         states={
             'EDIT_GENDER': [CallbackQueryHandler(

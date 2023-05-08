@@ -69,6 +69,7 @@ async def user_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
 
 @require_user_data
 async def user_edit_gender(update: Update, ctx: Ctx, user_data: UserModel):
+    logging.info('in user edit gender')
     keyboard = []
 
     for g in Genders.__members__.values():
