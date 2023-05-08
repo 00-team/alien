@@ -10,6 +10,14 @@ from telegram.ext import ContextTypes, ConversationHandler
 from utils import config, toggle_code
 
 Ctx = ContextTypes.DEFAULT_TYPE
+profile_keyboard = InlineKeyboardMarkup([[
+    InlineKeyboardButton(
+        'Edit Gender', callback_data='user_edit_gender'
+    ),
+    InlineKeyboardButton(
+        'Edit Age', callback_data='user_edit_age'
+    ),
+]])
 
 
 def get_link(code):
@@ -42,14 +50,7 @@ async def user_profile(update: Update, ctx: Ctx, user_data: UserModel):
             f'age: {user_data.age}\n\n'
             f'link: {get_link(code)}\n\n'
         ),
-        reply_markup=InlineKeyboardMarkup([[
-            InlineKeyboardButton(
-                'Edit Gender', callback_data='user_edit_gender'
-            ),
-            InlineKeyboardButton(
-                'Edit Age', callback_data='user_edit_age'
-            ),
-        ]])
+        reply_markup=profile_keyboard
     )
 
 
@@ -108,7 +109,6 @@ async def user_edit_age(update: Update, ctx: Ctx, user_data: UserModel):
 
     await update.message.reply_text(
         'send your age btween 10 and 80',
-
     )
 
     return 'EDIT_AGE'
@@ -116,10 +116,6 @@ async def user_edit_age(update: Update, ctx: Ctx, user_data: UserModel):
 
 @require_user_data
 async def cancel_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
-    # user = update.message.from_user
-    await update.message.reply_text(
-        "Bye! I hope we can talk again some day.",
-        # reply_markup=ReplyKeyboardRemove()
-    )
+    await update.effective_message.edit_reply_markup(profile_keyboard)
 
     return ConversationHandler.END
