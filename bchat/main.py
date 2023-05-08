@@ -82,7 +82,7 @@ def main():
     application.add_handler(ConversationHandler(
         entry_points=[CallbackQueryHandler(
             user_edit_profile,
-            pattern='^edit_profile$'
+            pattern=lambda d: logging.log(f'pattern: {d}')
         )],
         states={
             'CHANGE_ROUTE': [
