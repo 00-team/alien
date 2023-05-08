@@ -1,7 +1,5 @@
 
 
-import logging
-
 from database import add_user, get_user
 from models import UserModel
 from telegram import Update
