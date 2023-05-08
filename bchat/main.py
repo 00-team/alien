@@ -45,14 +45,6 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 async def post_init(self):
     await database.connect()
-    bot = await self.bot.get_me()
-
-    config['BOT'] = {
-        'username': bot.username,
-        'name': bot.full_name,
-        'id': bot.id
-    }
-
     logging.info('Starting Bchat')
 
 
