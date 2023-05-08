@@ -104,7 +104,7 @@ async def user_edit_age(update: Update, ctx: Ctx, user_data: UserModel):
         )]])
     )
 
-    ctx.user_data['user_edit_age_message_id'] = update.effective_message.id
+    ctx.user_data['user_profile_message_id'] = update.effective_message.id
 
     return 'EDIT_AGE'
 
@@ -129,7 +129,7 @@ async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
 
         return
 
-    msg_id = ctx.user_data.pop('user_edit_age_message_id', None)
+    msg_id = ctx.user_data.pop('user_profile_message_id', None)
 
     await update_user(user_data.user_id, age=age)
     user_data.age = age
@@ -158,5 +158,8 @@ async def cancel_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
         get_profile_text(user_data, ctx.bot.username),
         reply_markup=profile_keyboard
     )
+
+    ctx.user_data.pop('user_profile_message_id', None)
+    ctx.user_data.pop('user_set_age_error_message_id', None)
 
     return ConversationHandler.END
