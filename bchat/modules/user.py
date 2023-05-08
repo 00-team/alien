@@ -44,8 +44,11 @@ async def user_profile(update: Update, ctx: Ctx, user_data: UserModel):
         ),
         reply_markup=InlineKeyboardMarkup([[
             InlineKeyboardButton(
-                'Edit Profile', callback_data='edit_profile'
-            )
+                'Edit Gender', callback_data='user_edit_gender'
+            ),
+            InlineKeyboardButton(
+                'Edit Age', callback_data='user_edit_age'
+            ),
         ]])
     )
 
