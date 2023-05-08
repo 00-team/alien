@@ -83,7 +83,7 @@ def main():
         # per_message=
         entry_points=[CallbackQueryHandler(
             user_edit_profile,
-            pattern=lambda d: logging.info(f'pattern: {d}')
+            pattern=lambda d: True
         )],
         states={
             'CHANGE_ROUTE': [
