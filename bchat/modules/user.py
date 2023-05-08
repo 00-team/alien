@@ -96,15 +96,13 @@ async def user_edit_gender(update: Update, ctx: Ctx, user_data: UserModel):
 async def user_set_gender(update: Update, ctx: Ctx, user_data: UserModel):
     gender = int(update.callback_query.data[12:])
 
-    res = await update_user(user_data.user_id, gender=gender)
+    await update_user(user_data.user_id, gender=gender)
+    user_data = await get_user(user_id=user_data.user_id)
 
-    logging.info(res)
-
-    await update.effective_message.edit_reply_markup(profile_keyboard)
-
-    # await update.effective_message.reply_text(
-    #     'your chosen gender: ' + update.callback_query.data
-    # )
+    await update.effective_message.edit_caption(
+        get_profile_text(user_data),
+        reply_markup=profile_keyboard
+    )
 
     return ConversationHandler.END
 
