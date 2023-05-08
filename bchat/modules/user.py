@@ -1,5 +1,7 @@
 
 
+import logging
+
 from dependencies import require_user_data
 from models import GENDER_DISPLAY, Genders, UserModel
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -64,7 +66,6 @@ async def user_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
 
 @require_user_data
 async def user_edit_gender(update: Update, ctx: Ctx, user_data: UserModel):
-
     keyboard = []
 
     for g in Genders.__members__.values():
@@ -76,21 +77,24 @@ async def user_edit_gender(update: Update, ctx: Ctx, user_data: UserModel):
             callback_data=f'user_gender_{g.value}'
         ))
 
-    await update.message.reply_text(
-        'select your gender',
-        reply_markup=InlineKeyboardMarkup(
-            keyboard,
-        )
-    )
+    await update.message.edit_reply_markup(InlineKeyboardMarkup(keyboard))
+
+    # await update.message.reply_text(
+    #     'select your gender',
+    #     reply_markup=InlineKeyboardMarkup(
+    #         keyboard,
+    #     )
+    # )
 
     return 'EDIT_GENDER'
 
 
 @require_user_data
 async def user_set_gender(update: Update, ctx: Ctx, user_data: UserModel):
+    logging.info(update.callback_query.data)
     await update.message.reply_text('your chosen gender: ' + update.callback_query.data)
 
-    return 'CHANGE_ROUTE'
+    return ConversationHandler.END
 
 
 @require_user_data

@@ -82,21 +82,10 @@ def main():
     application.add_handler(ConversationHandler(
         per_message=True,
         entry_points=[CallbackQueryHandler(
-            user_edit_profile,
-            pattern=lambda d: True,
-
+            user_edit_gender,
+            pattern='^user_edit_gender$',
         )],
         states={
-            'CHANGE_ROUTE': [
-                CallbackQueryHandler(
-                    user_edit_gender,
-                    pattern=lambda d: d == 'edit_gender'
-                ),
-                CallbackQueryHandler(
-                    user_edit_age,
-                    pattern=lambda d: d == 'edit_age'
-                ),
-            ],
             'EDIT_GENDER': [CallbackQueryHandler(
                 user_set_gender,
                 pattern=f'^user_gender_({gender_pattern})$'
