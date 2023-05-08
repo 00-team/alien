@@ -97,9 +97,7 @@ async def user_edit_gender(update: Update, ctx: Ctx, user_data: UserModel):
 async def user_set_gender(update: Update, ctx: Ctx, user_data: UserModel):
     gender = int(update.callback_query.data[12:])
 
-    res = await update_user(user_data.user_id, {
-        'gender': gender
-    })
+    res = await update_user(user_data.user_id, gender=gender)
 
     logging.info(res)
 
