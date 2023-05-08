@@ -24,8 +24,7 @@ def require_admin(func):
 def require_user_data(func):
     async def decorator(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         logging.info('in require_user_data')
-        logging.info(update.message)
-        logging.info(update.message.from_user)
+        logging.info(update.effective_message, update.effective_user)
 
         if not update.message or not update.message.from_user:
             return
