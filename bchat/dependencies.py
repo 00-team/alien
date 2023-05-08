@@ -11,10 +11,8 @@ from utils import config
 
 def require_admin(func):
     async def decorator(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
-        if not update.message or not update.message.from_user:
-            return
+        user = update.effective_user
 
-        user = update.message.from_user
         if user.id in config['ADMINS']:
             return await func(update, ctx)
 
@@ -23,14 +21,9 @@ def require_admin(func):
 
 def require_user_data(func):
     async def decorator(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
-        logging.info('in require_user_data')
-        logging.info(update.effective_message, update.effective_user)
-
-        if not update.message or not update.message.from_user:
-            return
-
-        user = update.message.from_user
+        user = update.effective_user
         user_data = await get_user(user.id)
+
         if user_data is None:
             row_id = await add_user(user.id, user.full_name)
             user_data = UserModel(

@@ -23,7 +23,7 @@ setup_logging(HOME_DIR)
 
 
 async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
-    user = update.message.from_user
+    user = update.effective_user
     keyboard = [
         [KeyboardButton('profile')],
         [KeyboardButton('row 1 text 1')],

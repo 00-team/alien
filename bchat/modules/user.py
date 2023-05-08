@@ -81,7 +81,9 @@ async def user_edit_gender(update: Update, ctx: Ctx, user_data: UserModel):
             callback_data=f'user_gender_{g.value}'
         ))
 
-    await update.message.edit_reply_markup(InlineKeyboardMarkup(keyboard))
+    await update.effective_message.edit_reply_markup(
+        InlineKeyboardMarkup(keyboard)
+    )
 
     # await update.message.reply_text(
     #     'select your gender',
@@ -96,7 +98,10 @@ async def user_edit_gender(update: Update, ctx: Ctx, user_data: UserModel):
 @require_user_data
 async def user_set_gender(update: Update, ctx: Ctx, user_data: UserModel):
     logging.info(update.callback_query.data)
-    await update.message.reply_text('your chosen gender: ' + update.callback_query.data)
+
+    await update.effective_message.reply_text(
+        'your chosen gender: ' + update.callback_query.data
+    )
 
     return ConversationHandler.END
 
