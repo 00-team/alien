@@ -28,15 +28,41 @@ def get_profile_text(user_data: UserModel, bot_username):
         f'نام: {user_data.name}\n'
         f'جنسیت: {GENDER_DISPLAY[user_data.gender]}\n'
         f'سن: {user_data.age}\n\n'
-        f'لینک دعوت: {get_link(user_data.row_id, bot_username)}\n\n'
+        f'لینک ناشناس: {get_link(user_data.row_id, bot_username)}\n\n'
     )
 
 
 @require_user_data
 async def user_link(update: Update, ctx: Ctx, user_data: UserModel):
-    await update.message.reply_text(
-        'لینک دعوت شما:\n\n' + get_link(user_data.row_id, ctx.bot.username)
+    user = update.effective_user
+
+    await update.effective_message.reply_text(
+        f'سلام {user.first_name} هستم ✋😉\n'
+        f'👇👇\n{get_link(user_data.row_id, ctx.bot.username)}'
     )
+
+    await update.effective_message.reply_text((
+        '👆👆 پیام بالا رو برای دوستات و گروه هایی که میشناسی فوروارد کن'
+        'یا لینک پایین رو توی شبکه های اجتماعیت پخش کن،'
+        'تا بقیه بتونن بهت پیام ناشناس بفرستن.'),
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton(
+                'برای اینستاگرام 📷',
+                callback_data='user_link_instagram'
+            ),
+            InlineKeyboardButton(
+                'برای تویتر 🕊',
+                callback_data='user_link_twitter'
+            ),
+        ]])
+    )
+
+
+@require_user_data
+async def user_link_extra(update: Update, ctx: Ctx, user_data: UserModel):
+    # user = update.effective_user
+    platform = update.callback_query.data[10:]
+    await update.effective_message.reply_text(f'extra messages for {platform}')
 
 
 @require_user_data

@@ -6,8 +6,8 @@ from dependencies import require_user_data
 from models import UserModel
 from models.user import gender_pattern
 from modules import cancel_edit_profile, get_profile_text, user_edit_age
-from modules import user_edit_gender, user_link, user_profile, user_set_age
-from modules import user_set_gender
+from modules import user_edit_gender, user_link, user_link_extra, user_profile
+from modules import user_set_age, user_set_gender
 from settings import HOME_DIR, KW_MY_LINK, KW_PROFILE, MAIN_KEYBOARD, database
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardMarkup, Update
@@ -103,6 +103,11 @@ def main():
     application.add_handler(MessageHandler(
         filters.Text([KW_MY_LINK]),
         user_link
+    ))
+
+    application.add_handler(CallbackQueryHandler(
+        user_link_extra,
+        pattern='^user_link_(.*)$'
     ))
 
     application.add_handler(ConversationHandler(
