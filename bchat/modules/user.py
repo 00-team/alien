@@ -1,20 +1,20 @@
 
 
-from database import get_user, update_user
+from database import update_user
 from dependencies import require_user_data
 from models import GENDER_DISPLAY, Genders, UserModel
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram import ReplyKeyboardMarkup, Update
+from settings import AGE_RANGE
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes, ConversationHandler
 from utils import config, toggle_code
 
 Ctx = ContextTypes.DEFAULT_TYPE
 profile_keyboard = InlineKeyboardMarkup([[
     InlineKeyboardButton(
-        'Edit Gender', callback_data='user_edit_gender'
+        'تغییر جنسیت', callback_data='user_edit_gender'
     ),
     InlineKeyboardButton(
-        'Edit Age', callback_data='user_edit_age'
+        'تغییر سن', callback_data='user_edit_age'
     ),
 ]])
 
@@ -25,17 +25,17 @@ def get_link(row_id, bot_username):
 
 def get_profile_text(user_data: UserModel, bot_username):
     return (
-        f'name: {user_data.name}\n'
-        f'gender: {GENDER_DISPLAY[user_data.gender]}\n'
-        f'age: {user_data.age}\n\n'
-        f'link: {get_link(user_data.row_id, bot_username)}\n\n'
+        f'نام: {user_data.name}\n'
+        f'جنسیت: {GENDER_DISPLAY[user_data.gender]}\n'
+        f'سن: {user_data.age}\n\n'
+        f'لینک دعوت: {get_link(user_data.row_id, bot_username)}\n\n'
     )
 
 
 @require_user_data
 async def user_link(update: Update, ctx: Ctx, user_data: UserModel):
     await update.message.reply_text(
-        'your link\n' + get_link(user_data.row_id, ctx.bot.username)
+        'لینک دعوت شما:\n\n' + get_link(user_data.row_id, ctx.bot.username)
     )
 
 
@@ -98,7 +98,7 @@ async def user_set_gender(update: Update, ctx: Ctx, user_data: UserModel):
 async def user_edit_age(update: Update, ctx: Ctx, user_data: UserModel):
 
     await update.effective_message.edit_caption(
-        'سن خود را وارد کنید. \nبین ۵ تا ۹۹ سال.',
+        f'سن خود را وارد کنید. \nبین {AGE_RANGE[0]} تا {AGE_RANGE[1]} سال.',
         reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
             'لغو ❌', callback_data='cancel_edit_profile'
         )]])
@@ -115,14 +115,15 @@ async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
 
     try:
         age = int(update.effective_message.text)
-        if age < 5 or age > 99:
+        if age < AGE_RANGE[0] or age > AGE_RANGE[1]:
             raise ValueError('invalid age rage')
     except Exception:
         await update.effective_message.delete()
 
         if error_msg_id is None:
             em = await update.effective_message.reply_text(
-                'خطا! پیام باید یک عدد بین ۵ تا ۹۹ باشد. ❌'
+                'خطا! پیام باید یک عدد بین '
+                f'{AGE_RANGE[0]} تا {AGE_RANGE[1]} باشد. ❌'
             )
             ctx.user_data['user_set_age_error_message_id'] = em.id
 
