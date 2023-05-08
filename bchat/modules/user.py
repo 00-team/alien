@@ -2,6 +2,7 @@
 
 import logging
 
+from database import update_user
 from dependencies import require_user_data
 from models import GENDER_DISPLAY, Genders, UserModel
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -70,7 +71,6 @@ async def user_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
 
 @require_user_data
 async def user_edit_gender(update: Update, ctx: Ctx, user_data: UserModel):
-    logging.info('in user edit gender')
     keyboard = []
 
     for g in Genders.__members__.values():
@@ -83,7 +83,7 @@ async def user_edit_gender(update: Update, ctx: Ctx, user_data: UserModel):
         )])
 
     keyboard.append([InlineKeyboardButton(
-        'Cancel ❌', callback_data='cancel_edit_profile'
+        'لغو ❌', callback_data='cancel_edit_profile'
     )])
 
     await update.effective_message.edit_reply_markup(
@@ -95,11 +95,19 @@ async def user_edit_gender(update: Update, ctx: Ctx, user_data: UserModel):
 
 @require_user_data
 async def user_set_gender(update: Update, ctx: Ctx, user_data: UserModel):
-    logging.info(update.callback_query.data)
+    gender = int(update.callback_query.data[12:])
 
-    await update.effective_message.reply_text(
-        'your chosen gender: ' + update.callback_query.data
-    )
+    res = await update_user(user_data.user_id, {
+        'gender': gender
+    })
+
+    logging.info(res)
+
+    await update.effective_message.edit_reply_markup(profile_keyboard)
+
+    # await update.effective_message.reply_text(
+    #     'your chosen gender: ' + update.callback_query.data
+    # )
 
     return ConversationHandler.END
 
