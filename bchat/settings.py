@@ -12,6 +12,8 @@ DATABASE_PATH = HOME_DIR / 'sqlite.db'
 DATABASE_URL = 'sqlite:///' + str(DATABASE_PATH)
 
 
+AGE_RANGE = [5, 99]
+
 metadata = MetaData()
 
 BaseTable = declarative_base(metadata=metadata)
