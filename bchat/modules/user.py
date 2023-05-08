@@ -115,6 +115,8 @@ async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
 
     try:
         age = int(update.effective_message.text)
+        if age < 5 or age > 99:
+            raise ValueError('invalid age rage')
     except Exception:
         await update.effective_message.delete()
 
