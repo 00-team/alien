@@ -19,23 +19,24 @@ profile_keyboard = InlineKeyboardMarkup([[
 ]])
 
 
-def get_link(row_id):
-    bot_username = config['BOT']['username']
+def get_link(row_id, bot_username):
     return f't.me/{bot_username}?start={toggle_code(row_id)}'
 
 
-def get_profile_text(user_data: UserModel):
+def get_profile_text(user_data: UserModel, bot_username):
     return (
         f'name: {user_data.name}\n'
         f'gender: {GENDER_DISPLAY[user_data.gender]}\n'
         f'age: {user_data.age}\n\n'
-        f'link: {get_link(user_data.row_id)}\n\n'
+        f'link: {get_link(user_data.row_id, bot_username)}\n\n'
     )
 
 
 @require_user_data
 async def user_link(update: Update, ctx: Ctx, user_data: UserModel):
-    await update.message.reply_text('your link\n' + get_link(user_data.row_id))
+    await update.message.reply_text(
+        'your link\n' + get_link(user_data.row_id, ctx.bot.username)
+    )
 
 
 @require_user_data
@@ -49,7 +50,7 @@ async def user_profile(update: Update, ctx: Ctx, user_data: UserModel):
         file_id = pictures.photos[0][0].file_id
 
     await update.message.reply_photo(
-        file_id, get_profile_text(user_data),
+        file_id, get_profile_text(user_data, ctx.bot.username),
         reply_markup=profile_keyboard
     )
 
@@ -83,10 +84,10 @@ async def user_set_gender(update: Update, ctx: Ctx, user_data: UserModel):
     gender = int(update.callback_query.data[12:])
 
     await update_user(user_data.user_id, gender=gender)
-    user_data = await get_user(user_id=user_data.user_id)
+    user_data.gender = gender
 
     await update.effective_message.edit_caption(
-        get_profile_text(user_data),
+        get_profile_text(user_data, ctx.bot.username),
         reply_markup=profile_keyboard
     )
 
@@ -116,13 +117,16 @@ async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
     await update_user(user_data.user_id, age=age)
     user_data.age = age
 
-    print(dir(ctx.bot))
-    print(ctx.bot.username)
-
-    await update.effective_message.edit_caption(
-        get_profile_text(user_data),
-        reply_markup=profile_keyboard
-    )
+    if msg_id:
+        await ctx.bot.edit_message_caption(
+            chat_id=update.effective_message.chat_id,
+            message_id=msg_id,
+            caption=get_profile_text(user_data, ctx.bot.username),
+            reply_markup=profile_keyboard
+        )
+        await update.effective_message.delete()
+    else:
+        await update.effective_message.reply_text('سن شما ثبت شد. ✅')
 
     return ConversationHandler.END
 
@@ -130,7 +134,7 @@ async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
 @require_user_data
 async def cancel_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
     await update.effective_message.edit_caption(
-        get_profile_text(user_data),
+        get_profile_text(user_data, ctx.bot.username),
         reply_markup=profile_keyboard
     )
 
