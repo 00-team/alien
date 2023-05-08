@@ -1,16 +1,20 @@
 
 import logging
 
-from database import add_user, get_user
+from database import get_user
+from dependencies import require_user_data
+from models import UserModel
 from models.user import gender_pattern
-from modules import cancel_edit_profile, user_edit_age, user_edit_gender
-from modules import user_link, user_profile, user_set_age, user_set_gender
-from settings import HOME_DIR, database
-from telegram import KeyboardButton, ReplyKeyboardMarkup, Update
+from modules import cancel_edit_profile, get_profile_text, user_edit_age
+from modules import user_edit_gender, user_link, user_profile, user_set_age
+from modules import user_set_gender
+from settings import HOME_DIR, KW_MY_LINK, KW_PROFILE, MAIN_KEYBOARD, database
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler
 from telegram.ext import ContextTypes, ConversationHandler, MessageHandler
 from telegram.ext import filters
-from utils import config
+from utils import config, toggle_code
 
 from gshare import get_error_handler, setup_logging
 
@@ -21,26 +25,54 @@ from gshare import get_error_handler, setup_logging
 setup_logging(HOME_DIR)
 
 
-async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+Ctx = ContextTypes.DEFAULT_TYPE
+
+
+@require_user_data
+async def start(update: Update, ctx: Ctx, user_data: UserModel):
     user = update.effective_user
-    keyboard = [
-        [KeyboardButton('profile')],
-        [KeyboardButton('row 1 text 1')],
-        [KeyboardButton('row 2 text 2')],
-    ]
-    await update.message.reply_text(
-        f'hi there {user.id}',
-        reply_markup=ReplyKeyboardMarkup(keyboard)
+
+    if ctx.args:
+        code = ctx.args[0]
+        logging.info('user started with a code')
+        code_row_id = toggle_code(code)
+        if code_row_id == user_data.row_id:
+            await update.effective_message.reply_text(
+                "you can't talk to your self."
+            )
+            return
+
+        code_user_data = await get_user(row_id=code_row_id)
+        if code_user_data is None:
+            await update.effective_message.reply_text(
+                f'no user found with this code: {code}'
+            )
+            return
+
+        pictures = await ctx.bot.get_user_profile_photos(
+            code_user_data.user_id, limit=1
+        )
+
+        file_id = config['default_profile_picture']
+        if pictures.total_count > 0:
+            file_id = pictures.photos[0][0].file_id
+
+        await update.effective_message.reply_photo(
+            file_id, get_profile_text(user_data, ctx.bot.username),
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton(
+                    'Send Message ✉',
+                    callback_data=f'send_user_message_{code_user_data.user_id}'
+                )
+            ]])
+        )
+
+        return
+
+    await update.effective_message.reply_text(
+        f'hi there {user.full_name}',
+        reply_markup=ReplyKeyboardMarkup(MAIN_KEYBOARD)
     )
-
-    logging.info(ctx.args)
-
-    user_data = await get_user(user_id=user.id)
-    if user_data is None:
-        res = await add_user(user.id, user.full_name)
-        logging.info(f'res: {res}')
-
-    logging.info(user_data)
 
 
 async def post_init(self):

@@ -12,14 +12,14 @@ async def add_user(user_id: int, name: str):
     return await database.execute(query)
 
 
-async def get_user(user_id: int = None, code: int = None) -> None | UserModel:
-    if not (user_id or code):
+async def get_user(user_id=None, row_id=None) -> None | UserModel:
+    if not (user_id is None or row_id is None):
         return None
 
     if user_id:
         query = select(Users).where(Users.user_id == user_id)
     else:
-        query = select(Users).where(Users.code == code)
+        query = select(Users).where(Users.row_id == row_id)
 
     result = await database.fetch_one(query)
     if not result:
