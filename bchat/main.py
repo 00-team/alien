@@ -4,8 +4,7 @@ import logging
 from database import add_user, get_user
 from models.user import gender_pattern
 from modules import cancel_edit_profile, user_edit_age, user_edit_gender
-from modules import user_edit_profile, user_link, user_profile
-from modules import user_set_gender
+from modules import user_link, user_profile, user_set_age, user_set_gender
 from settings import HOME_DIR, database
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler
@@ -85,13 +84,21 @@ def main():
             CallbackQueryHandler(
                 user_edit_gender,
                 pattern='^user_edit_gender$'
+            ),
+            CallbackQueryHandler(
+                user_edit_age,
+                pattern='^user_edit_age$'
             )
         ],
         states={
             'EDIT_GENDER': [CallbackQueryHandler(
                 user_set_gender,
                 pattern=f'^user_gender_({gender_pattern})$'
-            )]
+            )],
+            'EDIT_AGE': [CallbackQueryHandler(
+                user_set_age,
+                pattern=f'^user_gender_({gender_pattern})$'
+            )],
         },
         fallbacks=[
             CallbackQueryHandler(
@@ -99,7 +106,31 @@ def main():
                 pattern='^cancel_edit_profile$'
             )
         ],
-        conversation_timeout=60
+        conversation_timeout=6
+    ))
+
+    application.add_handler(ConversationHandler(
+        per_message=False,
+        entry_points=[
+            CallbackQueryHandler(
+                user_edit_age,
+                pattern='^user_edit_age$'
+            )
+        ],
+        states={
+            'EDIT_AGE': [MessageHandler(
+                (filters.TEXT & filters.ChatType.PRIVATE &
+                 filters.Regex(r'^([5-9]|\d{2})$')),
+                user_set_age,
+            )],
+        },
+        fallbacks=[
+            CallbackQueryHandler(
+                cancel_edit_profile,
+                pattern='^cancel_edit_profile$'
+            )
+        ],
+        conversation_timeout=6
     ))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)

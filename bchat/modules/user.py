@@ -55,20 +55,6 @@ async def user_profile(update: Update, ctx: Ctx, user_data: UserModel):
 
 
 @require_user_data
-async def user_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
-    await update.message.reply_text(
-        'choice which one do you want to edit',
-        reply_markup=ReplyKeyboardMarkup(
-            [['gender', 'age']],
-            # one_time_keyboard=True,
-            # input_field_placeholder='GFG'
-        )
-    )
-
-    return 'CHANGE_ROUTE'
-
-
-@require_user_data
 async def user_edit_gender(update: Update, ctx: Ctx, user_data: UserModel):
     keyboard = []
 
@@ -110,15 +96,30 @@ async def user_set_gender(update: Update, ctx: Ctx, user_data: UserModel):
 @require_user_data
 async def user_edit_age(update: Update, ctx: Ctx, user_data: UserModel):
 
-    await update.message.reply_text(
-        'send your age btween 10 and 80',
+    await update.effective_message.edit_caption(
+        'سن خود را وارد کنید. \nبین ۵ تا ۹۹ سال.',
+        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
+            'لغو ❌', callback_data='cancel_edit_profile'
+        )]])
     )
 
     return 'EDIT_AGE'
 
 
 @require_user_data
+async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
+    age = int(update.effective_message.text)
+
+    print('age:', age)
+
+    return ConversationHandler.END
+
+
+@require_user_data
 async def cancel_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
-    await update.effective_message.edit_reply_markup(profile_keyboard)
+    await update.effective_message.edit_caption(
+        get_profile_text(user_data),
+        reply_markup=profile_keyboard
+    )
 
     return ConversationHandler.END
