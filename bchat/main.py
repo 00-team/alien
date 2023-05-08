@@ -85,18 +85,10 @@ def main():
                 user_edit_gender,
                 pattern='^user_edit_gender$'
             ),
-            CallbackQueryHandler(
-                user_edit_age,
-                pattern='^user_edit_age$'
-            )
         ],
         states={
             'EDIT_GENDER': [CallbackQueryHandler(
                 user_set_gender,
-                pattern=f'^user_gender_({gender_pattern})$'
-            )],
-            'EDIT_AGE': [CallbackQueryHandler(
-                user_set_age,
                 pattern=f'^user_gender_({gender_pattern})$'
             )],
         },
@@ -106,7 +98,6 @@ def main():
                 pattern='^cancel_edit_profile$'
             )
         ],
-        conversation_timeout=6
     ))
 
     application.add_handler(ConversationHandler(
@@ -118,11 +109,13 @@ def main():
             )
         ],
         states={
-            'EDIT_AGE': [MessageHandler(
-                (filters.TEXT & filters.ChatType.PRIVATE &
-                 filters.Regex(r'^([5-9]|\d{2})$')),
-                user_set_age,
-            )],
+            'EDIT_AGE': [
+                MessageHandler(
+                    (filters.TEXT & filters.ChatType.PRIVATE &
+                     filters.Regex(r'^([5-9]|\d{2})$')),
+                    user_set_age,
+                )
+            ],
         },
         fallbacks=[
             CallbackQueryHandler(
@@ -130,7 +123,6 @@ def main():
                 pattern='^cancel_edit_profile$'
             )
         ],
-        conversation_timeout=6
     ))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)

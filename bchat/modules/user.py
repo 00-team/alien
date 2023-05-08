@@ -109,6 +109,8 @@ async def user_edit_age(update: Update, ctx: Ctx, user_data: UserModel):
 @require_user_data
 async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
     age = int(update.effective_message.text)
+    print(ctx)
+    print(update)
 
     print('age:', age)
 
