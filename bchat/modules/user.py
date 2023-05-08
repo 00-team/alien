@@ -1,8 +1,6 @@
 
 
-import logging
-
-from database import update_user
+from database import get_user, update_user
 from dependencies import require_user_data
 from models import GENDER_DISPLAY, Genders, UserModel
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -21,20 +19,27 @@ profile_keyboard = InlineKeyboardMarkup([[
 ]])
 
 
-def get_link(code):
+def get_link(row_id):
     bot_username = config['BOT']['username']
-    return f't.me/{bot_username}?start={code}'
+    return f't.me/{bot_username}?start={toggle_code(row_id)}'
+
+
+def get_profile_text(user_data: UserModel):
+    return (
+        f'name: {user_data.name}\n'
+        f'gender: {GENDER_DISPLAY[user_data.gender]}\n'
+        f'age: {user_data.age}\n\n'
+        f'link: {get_link(user_data.row_id)}\n\n'
+    )
 
 
 @require_user_data
 async def user_link(update: Update, ctx: Ctx, user_data: UserModel):
-    code = toggle_code(user_data.row_id)
-    await update.message.reply_text('your link\n' + get_link(code))
+    await update.message.reply_text('your link\n' + get_link(user_data.row_id))
 
 
 @require_user_data
 async def user_profile(update: Update, ctx: Ctx, user_data: UserModel):
-    code = toggle_code(user_data.row_id)
     user = update.effective_user
     pictures = await user.get_profile_photos(limit=1)
 
@@ -44,13 +49,7 @@ async def user_profile(update: Update, ctx: Ctx, user_data: UserModel):
         file_id = pictures.photos[0][0].file_id
 
     await update.message.reply_photo(
-        file_id,
-        (
-            f'name: {user_data.name}\n'
-            f'gender: {GENDER_DISPLAY[user_data.gender]}\n'
-            f'age: {user_data.age}\n\n'
-            f'link: {get_link(code)}\n\n'
-        ),
+        file_id, get_profile_text(user_data),
         reply_markup=profile_keyboard
     )
 
