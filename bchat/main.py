@@ -103,8 +103,7 @@ def main():
         states={
             'EDIT_AGE': [
                 MessageHandler(
-                    (filters.TEXT & filters.ChatType.PRIVATE &
-                     filters.Regex(r'^([5-9]|\d{2})$')),
+                    filters.ChatType.PRIVATE,
                     user_set_age,
                 )
             ],

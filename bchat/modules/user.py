@@ -111,15 +111,30 @@ async def user_edit_age(update: Update, ctx: Ctx, user_data: UserModel):
 
 @require_user_data
 async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
-    age = int(update.effective_message.text)
+    error_msg_id = ctx.user_data.get('user_set_age_error_message_id')
+
+    try:
+        age = int(update.effective_message.text)
+    except Exception:
+        await update.effective_message.delete()
+
+        if error_msg_id is None:
+            em = await update.effective_message.reply_text(
+                'خطا! پیام باید یک عدد بین ۵ تا ۹۹ باشد. ❌'
+            )
+            ctx.user_data['user_set_age_error_message_id'] = em.id
+
+        return
+
     msg_id = ctx.user_data.pop('user_edit_age_message_id', None)
 
     await update_user(user_data.user_id, age=age)
     user_data.age = age
+    chat_id = update.effective_message.chat_id
 
     if msg_id:
         await ctx.bot.edit_message_caption(
-            chat_id=update.effective_message.chat_id,
+            chat_id,
             message_id=msg_id,
             caption=get_profile_text(user_data, ctx.bot.username),
             reply_markup=profile_keyboard
@@ -127,6 +142,9 @@ async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
         await update.effective_message.delete()
     else:
         await update.effective_message.reply_text('سن شما ثبت شد. ✅')
+
+    if error_msg_id:
+        await ctx.bot.delete_message(chat_id, error_msg_id)
 
     return ConversationHandler.END
 
