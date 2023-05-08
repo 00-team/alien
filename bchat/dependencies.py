@@ -1,5 +1,7 @@
 
 
+import logging
+
 from database import add_user, get_user
 from models import UserModel
 from telegram import Update
@@ -21,6 +23,10 @@ def require_admin(func):
 
 def require_user_data(func):
     async def decorator(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+        logging.info('in require_user_data')
+        logging.info(update.message)
+        logging.info(update.message.from_user)
+
         if not update.message or not update.message.from_user:
             return
 
