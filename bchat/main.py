@@ -91,7 +91,8 @@ def main():
                 pattern=f'^user_gender_({gender_pattern})$'
             )]
         },
-        fallbacks=[CommandHandler('cancel', cancel_edit_profile)],
+        fallbacks=[CallbackQueryHandler(
+            cancel_edit_profile, pattern='^cancel_edit_profile$')],
         # conversation_timeout=60
     ))
 
