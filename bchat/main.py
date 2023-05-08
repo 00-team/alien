@@ -80,10 +80,11 @@ def main():
     ))
 
     application.add_handler(ConversationHandler(
-        # per_message=
+        per_message=True,
         entry_points=[CallbackQueryHandler(
             user_edit_profile,
-            pattern=lambda d: True
+            pattern=lambda d: True,
+
         )],
         states={
             'CHANGE_ROUTE': [
