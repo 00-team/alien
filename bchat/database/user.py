@@ -1,7 +1,7 @@
 
 from models import UserModel, Users
 from settings import database
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, update
 
 
 async def add_user(user_id: int, name: str):
@@ -26,3 +26,14 @@ async def get_user(user_id: int = None, code: int = None) -> None | UserModel:
         return None
 
     return UserModel(**result)
+
+
+async def update_user(user_id: int, **values):
+    if not values:
+        return
+
+    return await database.execute(
+        update(Users)
+        .where(Users.user_id == user_id)
+        .values(**values)
+    )
