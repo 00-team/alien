@@ -28,6 +28,7 @@ def require_user_data(func):
                 row_id=row_id,
                 user_id=user.id,
                 name=user.full_name,
+                age=20,
                 gender=0
             )
 
