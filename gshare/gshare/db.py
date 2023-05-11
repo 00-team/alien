@@ -3,9 +3,10 @@ from pathlib import Path
 
 
 class DbDict(dict):
-    def __init__(self, path: Path | str, defaults={}, load=False):
+    def __init__(self, path: Path | str, defaults={}, load=False, indent=None):
         path = Path(path).with_suffix('.json')
         self.__path__ = path
+        self._indent_ = indent
 
         if path.exists():
             self.__load__(defaults)
@@ -16,7 +17,7 @@ class DbDict(dict):
 
     def __save__(self):
         with open(self.__path__, 'w') as f:
-            json.dump(self, f)
+            json.dump(self, f, self._indent_)
 
     def __load__(self, defaults={}):
         with open(self.__path__, 'r') as f:
