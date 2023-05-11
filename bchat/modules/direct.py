@@ -63,6 +63,8 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
         ]])
     )
 
+    logging.info('GG')
+
     await update.effective_message.reply_text(
         'پیام شما به صورت ناشناس ارسال شد. ✅'
     )
