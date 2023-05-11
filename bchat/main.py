@@ -84,6 +84,8 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
 
 async def post_init(self):
     await database.connect()
+    config['user_link_twitter_video'] = 'BAACAgQAAxkBAAIBimRcgehZYMJ2hOY4hZqnf_tA67K-AAI_DgACdazQUkCalCv2BexzLwQ'
+    config['user_link_instagram_video'] = 'BAACAgQAAxkBAAIBjGRcgtDcbxvk7udw0-sIOqTZzDlqAAI3DgACdazQUjeYx33aVOd_LwQ'
     logging.info('Starting Bchat')
 
 
