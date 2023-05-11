@@ -13,28 +13,25 @@ async def add_direct(user_id: int, sender_id: int, message_id: int):
     return await database.execute(query)
 
 
-# async def get_direct(direct_id=None, row_id=None) -> None | UserModel:
-#     if not (user_id is None or row_id is None):
-#         return None
-#
-#     if user_id:
-#         query = select(Users).where(Users.user_id == user_id)
-#     else:
-#         query = select(Users).where(Users.row_id == row_id)
-#
-#     result = await database.fetch_one(query)
-#     if not result:
-#         return None
-#
-#     return UserModel(**result)
-#
-#
-# async def update_user(user_id: int, **values):
-#     if not values:
-#         return
-#
-#     return await database.execute(
-#         update(Users)
-#         .where(Users.user_id == user_id)
-#         .values(**values)
-#     )
+async def get_direct(direct_id: int, user_id: int) -> DirectModel | None:
+    query = select(Direct).where(
+        Direct.user_id == user_id,
+        Direct.direct_id == direct_id,
+    )
+
+    result = await database.fetch_one(query)
+    if not result:
+        return None
+
+    return DirectModel(**result)
+
+
+async def update_direct(direct_id: int, user_id: int, seen=True):
+    return await database.execute(
+        update(Direct)
+        .where(
+            Direct.user_id == user_id,
+            Direct.direct_id == direct_id,
+        )
+        .values(seen=seen)
+    )

@@ -1,8 +1,6 @@
 
 
-import logging
-
-from database import add_direct
+from database import add_direct, get_direct, update_direct
 from dependencies import require_user_data
 from models import UserModel
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
@@ -13,14 +11,11 @@ Ctx = ContextTypes.DEFAULT_TYPE
 
 @require_user_data
 async def send_direct_message(update: Update, ctx: Ctx, user_data: UserModel):
-    logging.info('in send_direct_message')
     await update.callback_query.answer()
-
-    logging.info(update.callback_query.data)
 
     uid = int(update.callback_query.data.split('#')[-1])
 
-    msg_id = await update.effective_message.reply_text(
+    msg = await update.effective_message.reply_text(
         'پیام خود را ارسال کنید:',
         reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
             'لغو ❌', callback_data='cancel_direct_message'
@@ -28,7 +23,7 @@ async def send_direct_message(update: Update, ctx: Ctx, user_data: UserModel):
     )
 
     ctx.user_data['to_user_id'] = uid
-    ctx.user_data['send_direct_msg_id'] = msg_id
+    ctx.user_data['send_direct_msg_id'] = msg.id
 
     return 'GET_MESSAGE'
 
@@ -63,8 +58,6 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
         ]])
     )
 
-    logging.info('GG')
-
     await update.effective_message.reply_text(
         'پیام شما به صورت ناشناس ارسال شد. ✅'
     )
@@ -84,7 +77,41 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
 
 
 @require_user_data
+async def show_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
+    await update.callback_query.answer()
+
+    chat_id = update.edited_message.chat_id
+    user_id = update.effective_user.id
+
+    direct_id = int(update.callback_query.data.split('#')[-1])
+    direct = await get_direct(direct_id, user_id)
+
+    if not direct:
+        await update.effective_message.reply_text('خطا در دریافت پیام! ❌')
+        return
+
+    msg_id = await ctx.bot.copy_message(
+        chat_id, direct.sender_id, direct.message_id,
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton('پاسخ ✍', callback_data='direct_reply#xx'),
+            InlineKeyboardButton('بلاک ⛔', callback_data='block_user#xx'),
+        ]])
+    )
+
+    if msg_id:
+        await ctx.bot.send_message(
+            direct.sender_id, 'پیام شما مشاهده شد. 🧉',
+            reply_to_message_id=direct.message_id
+        )
+        await update_direct(direct_id, user_id, seen=True)
+    else:
+        await update.effective_message.reply_text('خطا در دریافت پیام! ❌')
+
+
+@require_user_data
 async def cancel_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
+    await update.callback_query.answer()
+
     chat_id = update.effective_message.chat_id
     msg_id = ctx.user_data.pop('send_direct_msg_id', None)
     error_msg_id = ctx.user_data.pop('handle_dirt_msg_err_msg_id', None)
