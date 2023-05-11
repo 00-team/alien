@@ -7,7 +7,7 @@ from settings import BYTE_ORDER
 
 from gshare import DbDict
 
-config = DbDict(sys.argv[1], load=True)
+config = DbDict(sys.argv[1], load=True, indent=2)
 
 
 def toggle_code(code: int | str) -> str | int | None:
