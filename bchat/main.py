@@ -5,10 +5,11 @@ from database import get_user
 from dependencies import require_user_data
 from models import UserModel
 from models.user import gender_pattern
-from modules import cancel_edit_profile, get_file_id, get_profile_text
-from modules import user_edit_age, user_edit_gender, user_edit_name, user_link
-from modules import user_link_extra, user_profile, user_set_age
-from modules import user_set_gender, user_set_name
+from modules import cancel_direct_message, cancel_edit_profile
+from modules import get_profile_text, handle_direct_message
+from modules import send_direct_message, user_edit_age, user_edit_gender
+from modules import user_edit_name, user_link, user_link_extra, user_profile
+from modules import user_set_age, user_set_gender, user_set_name
 from settings import HOME_DIR, KW_MY_LINK, KW_PROFILE, MAIN_KEYBOARD, database
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardMarkup, Update
@@ -71,7 +72,7 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton(
                     'ارسال پیام ✉',
-                    callback_data=f'send_user_message_{code_user_data.user_id}'
+                    callback_data=f'send_user_message#{code_user_data.user_id}'
                 )
             ]])
         )
@@ -194,6 +195,31 @@ def main():
             CallbackQueryHandler(
                 cancel_edit_profile,
                 pattern='^cancel_edit_profile$'
+            )
+        ],
+    ))
+
+    # send message
+    application.add_handler(ConversationHandler(
+        per_message=False,
+        entry_points=[
+            CallbackQueryHandler(
+                send_direct_message,
+                pattern='^send_direct_message#(.*)$'
+            )
+        ],
+        states={
+            'GET_MESSAGE': [
+                MessageHandler(
+                    filters.ChatType.PRIVATE,
+                    handle_direct_message,
+                )
+            ],
+        },
+        fallbacks=[
+            CallbackQueryHandler(
+                cancel_direct_message,
+                pattern='^cancel_direct_message$'
             )
         ],
     ))
