@@ -1,8 +1,4 @@
 
-
-import json
-import logging
-
 from database import update_user
 from dependencies import require_user_data
 from models import GENDER_DISPLAY, Genders, UserModel
@@ -158,15 +154,12 @@ async def user_edit_age(update: Update, ctx: Ctx, user_data: UserModel):
     )
 
     ctx.user_data['user_profile_message_id'] = update.effective_message.id
-    logging.info('edit age')
-    logging.info(json.dumps(ctx.user_data))
+
     return 'EDIT_AGE'
 
 
 @require_user_data
 async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
-    logging.info('set age')
-    logging.info(json.dumps(ctx.user_data))
     error_msg_id = ctx.user_data.get('user_set_age_error_message_id')
 
     try:
@@ -203,6 +196,7 @@ async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
         await update.effective_message.reply_text('سن شما ثبت شد. ✅')
 
     if error_msg_id:
+        ctx.user_data.pop('user_set_age_error_message_id', None)
         await ctx.bot.delete_message(chat_id, error_msg_id)
 
     return ConversationHandler.END
@@ -223,16 +217,11 @@ async def user_edit_name(update: Update, ctx: Ctx, user_data: UserModel):
 
     ctx.user_data['user_profile_message_id'] = update.effective_message.id
 
-    logging.info('edit name')
-    logging.info(json.dumps(ctx.user_data))
-
     return 'EDIT_NAME'
 
 
 @require_user_data
 async def user_set_name(update: Update, ctx: Ctx, user_data: UserModel):
-    logging.info('set name')
-    logging.info(json.dumps(ctx.user_data))
     error_msg_id = ctx.user_data.get('user_set_name_error_message_id')
 
     try:
@@ -270,6 +259,7 @@ async def user_set_name(update: Update, ctx: Ctx, user_data: UserModel):
         await update.effective_message.reply_text('نام شما ثبت شد. ✅')
 
     if error_msg_id:
+        ctx.user_data.pop('user_set_name_error_message_id', None)
         await ctx.bot.delete_message(chat_id, error_msg_id)
 
     return ConversationHandler.END
