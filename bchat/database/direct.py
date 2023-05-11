@@ -1,7 +1,9 @@
 
 from models import Direct, DirectModel
 from settings import database
-from sqlalchemy import insert, select, update
+from sqlalchemy import insert
+from sqlalchemy import query as Q
+from sqlalchemy import select, update
 
 
 async def add_direct(user_id: int, sender_id: int, message_id: int):
@@ -26,11 +28,20 @@ async def get_direct(direct_id: int, user_id: int) -> DirectModel | None:
     return DirectModel(**result)
 
 
+async def get_direct_notseen_count(user_id: int) -> int:
+    query = Q(Direct).filter(
+        Direct.user_id == user_id,
+        Direct.seen is False
+    ).count()
+
+    return await database.fetch_one(query)
+
+
 async def get_direct_notseen(user_id: int) -> list[DirectModel]:
     query = select(Direct).where(
         Direct.user_id == user_id,
         Direct.seen is False
-    )
+    ).limit(10)
 
     for result in await database.fetch_all(query):
         yield DirectModel(**result)
