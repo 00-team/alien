@@ -93,6 +93,11 @@ def main():
     application.post_init = post_init
     application.post_shutdown = post_shutdown
 
+    application.add_handler(MessageHandler(
+        filters.VIDEO | filters.PHOTO | filters.ANIMATION,
+        get_file_id
+    ))
+
     application.add_handler(CommandHandler(['start', 'restart'], start))
 
     application.add_handler(MessageHandler(
