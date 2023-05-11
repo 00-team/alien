@@ -72,7 +72,7 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton(
                     'ارسال پیام ✉',
-                    callback_data=f'send_user_message#{code_user_data.user_id}'
+                    callback_data=f'send_direct_message#{code_user_data.user_id}'
                 )
             ]])
         )
