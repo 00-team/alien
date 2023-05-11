@@ -41,7 +41,7 @@ async def get_direct_notseen_count(user_id: int) -> int:
         'WHERE user_id = :user_id AND seen is false'
     )
 
-    return await database.fetch_one(query, {'user_id': user_id})[0]
+    return (await database.fetch_one(query, {'user_id': user_id}))[0]
 
 
 async def get_direct_notseen(user_id: int) -> list[DirectModel]:
