@@ -118,7 +118,7 @@ async def show_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
 
     direct_id = update.callback_query.data.split('#')[-1]
     if direct_id == 'all':
-        async for direct in await get_direct_notseen(user_id):
+        async for direct in get_direct_notseen(user_id):
             await send(direct)
             time.sleep(5)
 
