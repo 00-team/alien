@@ -2,7 +2,8 @@
 from models import Direct, DirectModel
 from settings import database
 from sqlalchemy import insert, select, update
-from sqlalchemy.orm import Query as Q
+
+# from sqlalchemy.orm import Query as Q
 
 
 async def add_direct(user_id: int, sender_id: int, message_id: int):
@@ -28,12 +29,17 @@ async def get_direct(direct_id: int, user_id: int) -> DirectModel | None:
 
 
 async def get_direct_notseen_count(user_id: int) -> int:
-    query = Q(Direct).filter(
-        Direct.user_id == user_id,
-        Direct.seen is False
-    ).count()
+    # query = Q(Direct).filter(
+    #     Direct.user_id == user_id,
+    #     Direct.seen is False
+    # ).count()
 
-    return await database.fetch_one(query)
+    query = (
+        'SELECT COUNT(direct_id) FROM direct '
+        'WHERE user_id = :user_id AND seen is false'
+    )
+
+    return await database.fetch_one(query, {'user_id': user_id})
 
 
 async def get_direct_notseen(user_id: int) -> list[DirectModel]:
