@@ -26,6 +26,16 @@ async def get_direct(direct_id: int, user_id: int) -> DirectModel | None:
     return DirectModel(**result)
 
 
+async def get_direct_notseen(user_id: int) -> list[DirectModel]:
+    query = select(Direct).where(
+        Direct.user_id == user_id,
+        Direct.seen is False
+    )
+
+    for result in await database.fetch_all(query):
+        yield DirectModel(**result)
+
+
 async def update_direct(direct_id: int, user_id: int, seen=True):
     return await database.execute(
         update(Direct)
