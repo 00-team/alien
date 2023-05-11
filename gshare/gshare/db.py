@@ -17,7 +17,7 @@ class DbDict(dict):
 
     def __save__(self):
         with open(self.__path__, 'w') as f:
-            json.dump(self, f, self._indent_)
+            json.dump(self, f, indent=self._indent_)
 
     def __load__(self, defaults={}):
         with open(self.__path__, 'r') as f:
