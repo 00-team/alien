@@ -30,15 +30,15 @@ Ctx = ContextTypes.DEFAULT_TYPE
 
 @require_user_data
 async def start(update: Update, ctx: Ctx, user_data: UserModel):
-    user = update.effective_user
-
     if ctx.args:
         code = ctx.args[0]
-        logging.info('user started with a code')
+        logging.info(f'user started with a code {code}')
         code_row_id = toggle_code(code)
         if code_row_id == user_data.row_id:
             await update.effective_message.reply_text(
-                "you can't talk to your self."
+                'اینکه آدم گاهی با خودش حرف بزنه خوبه ، '
+                'ولی اینجا نمیتونی به خودت پیام ناشناس بفرستی ! :)\n\n'
+                'چه کاری برات انجام بدم؟'
             )
             return
 
