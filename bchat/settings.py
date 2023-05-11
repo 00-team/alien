@@ -13,6 +13,7 @@ DATABASE_URL = 'sqlite:///' + str(DATABASE_PATH)
 
 
 AGE_RANGE = [5, 99]
+NAME_RANGE = [3, 15]
 KW_PROFILE = 'پروفایل من 👤'
 KW_MY_LINK = 'لینک ناشناس من 🔗'
 
