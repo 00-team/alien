@@ -41,10 +41,7 @@ async def get_direct_notseen_count(user_id: int) -> int:
         'WHERE user_id = :user_id AND seen is false'
     )
 
-    res = await database.fetch_one(query, {'user_id': user_id})
-    logging.info(res)
-    logging.info(type(res))
-    return res
+    return await database.fetch_one(query, {'user_id': user_id})[0]
 
 
 async def get_direct_notseen(user_id: int) -> list[DirectModel]:
@@ -53,8 +50,12 @@ async def get_direct_notseen(user_id: int) -> list[DirectModel]:
         Direct.seen is False
     ).limit(10)
 
+    directs = []
+
     for result in await database.fetch_all(query):
-        yield DirectModel(**result)
+        directs.append(DirectModel(**result))
+
+    return directs
 
 
 async def update_direct(direct_id: int, user_id: int, seen=True):

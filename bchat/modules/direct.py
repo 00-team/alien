@@ -49,20 +49,20 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
         return
 
     nseen_count = await get_direct_notseen_count(to_user_id)
+    keyboard = [InlineKeyboardButton(
+        'مشاهده 👀', callback_data=f'show_direct#{direct_id}'
+    )]
+
+    if nseen_count > 1:
+        keyboard.append(InlineKeyboardButton(
+            'مشاهده همه 📭',
+            callback_data='show_direct#all'
+        ))
 
     await ctx.bot.send_message(
         to_user_id,
         f'شما یک پیام جدید دارید!\n\n {nseen_count} پیام خوانده نشده.',
-        reply_markup=InlineKeyboardMarkup([[
-            InlineKeyboardButton(
-                'مشاهده 👀',
-                callback_data=f'show_direct#{direct_id}'
-            ),
-            InlineKeyboardButton(
-                'مشاهده همه 📭',
-                callback_data='show_direct#all'
-            ),
-        ]])
+        reply_markup=InlineKeyboardMarkup([keyboard])
     )
 
     await update.effective_message.reply_text(
@@ -118,7 +118,7 @@ async def show_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
 
     direct_id = update.callback_query.data.split('#')[-1]
     if direct_id == 'all':
-        async for direct in get_direct_notseen(user_id):
+        for direct in await get_direct_notseen(user_id):
             await send(direct)
             time.sleep(5)
 
