@@ -1,5 +1,8 @@
 
 
+import json
+import logging
+
 from database import update_user
 from dependencies import require_user_data
 from models import GENDER_DISPLAY, Genders, UserModel
@@ -135,12 +138,15 @@ async def user_edit_age(update: Update, ctx: Ctx, user_data: UserModel):
     )
 
     ctx.user_data['user_profile_message_id'] = update.effective_message.id
-
+    logging.info('edit age')
+    logging.info(json.dumps(ctx.user_data))
     return 'EDIT_AGE'
 
 
 @require_user_data
 async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
+    logging.info('set age')
+    logging.info(json.dumps(ctx.user_data))
     error_msg_id = ctx.user_data.get('user_set_age_error_message_id')
 
     try:
@@ -197,11 +203,16 @@ async def user_edit_name(update: Update, ctx: Ctx, user_data: UserModel):
 
     ctx.user_data['user_profile_message_id'] = update.effective_message.id
 
+    logging.info('edit name')
+    logging.info(json.dumps(ctx.user_data))
+
     return 'EDIT_NAME'
 
 
 @require_user_data
 async def user_set_name(update: Update, ctx: Ctx, user_data: UserModel):
+    logging.info('set name')
+    logging.info(json.dumps(ctx.user_data))
     error_msg_id = ctx.user_data.get('user_set_name_error_message_id')
 
     try:
@@ -214,7 +225,7 @@ async def user_set_name(update: Update, ctx: Ctx, user_data: UserModel):
 
         if error_msg_id is None:
             em = await update.effective_message.reply_text(
-                'خطا! طول نام باید بین'
+                'خطا! طول نام باید بین '
                 f'{NAME_RANGE[0]} و {NAME_RANGE[1]} باشد. ❌'
             )
             ctx.user_data['user_set_name_error_message_id'] = em.id
