@@ -58,19 +58,22 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
         if pictures.total_count > 0:
             file_id = pictures.photos[0][0].file_id
 
+        text = get_profile_text(code_user_data, ctx.bot.username)
+
+        text += (
+            f'\n\n می تونی برای {code_user_data.name} پیام ناشناس بفرستی'
+            ' و هر حرف یا انتقادی که تو دلت هست رو بگی چون پیامت به صورت '
+            'کاملا ناشناس ارسال میشه!\n'
+        )
+
         await update.effective_message.reply_photo(
-            file_id, get_profile_text(code_user_data, ctx.bot.username),
+            file_id, text,
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton(
                     'ارسال پیام ✉',
                     callback_data=f'send_user_message_{code_user_data.user_id}'
                 )
             ]])
-        )
-        await update.effective_message.reply_text(
-            f'در حال ارسال پیام ناشناس به {code_user_data.name} هستی.\n\n'
-            'می تونی هر حرف یا انتقادی که تو دلت هست رو بگی چون'
-            ' پیامت به صورت کاملا ناشناس ارسال میشه!'
         )
 
         return
