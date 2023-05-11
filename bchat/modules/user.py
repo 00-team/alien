@@ -3,7 +3,7 @@
 from database import update_user
 from dependencies import require_user_data
 from models import GENDER_DISPLAY, Genders, UserModel
-from settings import AGE_RANGE
+from settings import AGE_RANGE, NAME_RANGE
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes, ConversationHandler
 from utils import config, toggle_code
@@ -15,6 +15,9 @@ profile_keyboard = InlineKeyboardMarkup([[
     ),
     InlineKeyboardButton(
         'تغییر سن', callback_data='user_edit_age'
+    ),
+    InlineKeyboardButton(
+        'تغییر نام', callback_data='user_edit_name'
     ),
 ]])
 
@@ -34,11 +37,10 @@ def get_profile_text(user_data: UserModel, bot_username):
 
 @require_user_data
 async def user_link(update: Update, ctx: Ctx, user_data: UserModel):
-    user = update.effective_user
     link = get_link(user_data.row_id, ctx.bot.username)
 
     await update.effective_message.reply_text(
-        f'سلام {user.first_name} هستم ✋😉\n\n'
+        f'سلام {user_data.name} هستم ✋😉\n\n'
         f'👇👇\n{link}'
     )
 
@@ -173,6 +175,68 @@ async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
         await update.effective_message.delete()
     else:
         await update.effective_message.reply_text('سن شما ثبت شد. ✅')
+
+    if error_msg_id:
+        await ctx.bot.delete_message(chat_id, error_msg_id)
+
+    return ConversationHandler.END
+
+
+''' edit name  '''
+
+
+@require_user_data
+async def user_edit_name(update: Update, ctx: Ctx, user_data: UserModel):
+
+    await update.effective_message.edit_caption(
+        'نام خود را ارسال کنید.',
+        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
+            'لغو ❌', callback_data='cancel_edit_profile'
+        )]])
+    )
+
+    ctx.user_data['user_profile_message_id'] = update.effective_message.id
+
+    return 'EDIT_NAME'
+
+
+@require_user_data
+async def user_set_name(update: Update, ctx: Ctx, user_data: UserModel):
+    error_msg_id = ctx.user_data.get('user_set_name_error_message_id')
+
+    try:
+        name = update.effective_message.text
+        name_len = len(name)
+        if name_len < NAME_RANGE[0] or name_len > NAME_RANGE[1]:
+            raise ValueError('invalid name length')
+    except Exception:
+        await update.effective_message.delete()
+
+        if error_msg_id is None:
+            em = await update.effective_message.reply_text(
+                'خطا! طول نام باید بین'
+                f'{NAME_RANGE[0]} و {NAME_RANGE[1]} باشد. ❌'
+            )
+            ctx.user_data['user_set_name_error_message_id'] = em.id
+
+        return
+
+    msg_id = ctx.user_data.pop('user_profile_message_id', None)
+
+    await update_user(user_data.user_id, name=name)
+    user_data.name = name
+    chat_id = update.effective_message.chat_id
+
+    if msg_id:
+        await ctx.bot.edit_message_caption(
+            chat_id,
+            message_id=msg_id,
+            caption=get_profile_text(user_data, ctx.bot.username),
+            reply_markup=profile_keyboard
+        )
+        await update.effective_message.delete()
+    else:
+        await update.effective_message.reply_text('نام شما ثبت شد. ✅')
 
     if error_msg_id:
         await ctx.bot.delete_message(chat_id, error_msg_id)

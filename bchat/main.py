@@ -5,9 +5,10 @@ from database import get_user
 from dependencies import require_user_data
 from models import UserModel
 from models.user import gender_pattern
-from modules import cancel_edit_profile, get_profile_text, user_edit_age
-from modules import user_edit_gender, user_link, user_link_extra, user_profile
-from modules import user_set_age, user_set_gender
+from modules import cancel_edit_profile, get_file_id, get_profile_text
+from modules import user_edit_age, user_edit_gender, user_edit_name, user_link
+from modules import user_link_extra, user_profile, user_set_age
+from modules import user_set_gender, user_set_name
 from settings import HOME_DIR, KW_MY_LINK, KW_PROFILE, MAIN_KEYBOARD, database
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardMarkup, Update
@@ -121,6 +122,7 @@ def main():
         pattern='^user_link_(.*)$'
     ))
 
+    # edit gender
     application.add_handler(ConversationHandler(
         per_message=True,
         entry_points=[
@@ -143,6 +145,7 @@ def main():
         ],
     ))
 
+    # edit age
     application.add_handler(ConversationHandler(
         per_message=False,
         entry_points=[
@@ -156,6 +159,31 @@ def main():
                 MessageHandler(
                     filters.ChatType.PRIVATE,
                     user_set_age,
+                )
+            ],
+        },
+        fallbacks=[
+            CallbackQueryHandler(
+                cancel_edit_profile,
+                pattern='^cancel_edit_profile$'
+            )
+        ],
+    ))
+
+    # edit name
+    application.add_handler(ConversationHandler(
+        per_message=False,
+        entry_points=[
+            CallbackQueryHandler(
+                user_edit_name,
+                pattern='^user_edit_name$'
+            )
+        ],
+        states={
+            'EDIT_NAME': [
+                MessageHandler(
+                    filters.ChatType.PRIVATE,
+                    user_set_name,
                 )
             ],
         },
