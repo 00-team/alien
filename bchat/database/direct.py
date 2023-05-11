@@ -1,9 +1,8 @@
 
 from models import Direct, DirectModel
 from settings import database
-from sqlalchemy import insert
-from sqlalchemy import query as Q
-from sqlalchemy import select, update
+from sqlalchemy import insert, select, update
+from sqlalchemy.orm import Query as Q
 
 
 async def add_direct(user_id: int, sender_id: int, message_id: int):
