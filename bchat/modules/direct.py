@@ -1,5 +1,7 @@
 
 
+import logging
+
 from database import add_direct
 from dependencies import require_user_data
 from models import UserModel
@@ -11,6 +13,10 @@ Ctx = ContextTypes.DEFAULT_TYPE
 
 @require_user_data
 async def send_direct_message(update: Update, ctx: Ctx, user_data: UserModel):
+    logging.info('in send_direct_message')
+    await update.callback_query.answer()
+
+    logging.info(update.callback_query.data)
 
     uid = int(update.callback_query.data.split('#')[-1])
 

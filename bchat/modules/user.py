@@ -68,6 +68,7 @@ async def user_link(update: Update, ctx: Ctx, user_data: UserModel):
 
 @require_user_data
 async def user_link_extra(update: Update, ctx: Ctx, user_data: UserModel):
+    await update.callback_query.answer()
     platform = update.callback_query.data[10:]
     link = get_link(user_data.row_id, ctx.bot.username)
 
@@ -106,6 +107,7 @@ async def user_profile(update: Update, ctx: Ctx, user_data: UserModel):
 
 @require_user_data
 async def user_edit_gender(update: Update, ctx: Ctx, user_data: UserModel):
+    await update.callback_query.answer()
     keyboard = []
 
     for g in Genders.__members__.values():
@@ -130,6 +132,7 @@ async def user_edit_gender(update: Update, ctx: Ctx, user_data: UserModel):
 
 @require_user_data
 async def user_set_gender(update: Update, ctx: Ctx, user_data: UserModel):
+    await update.callback_query.answer()
     gender = int(update.callback_query.data[12:])
 
     await update_user(user_data.user_id, gender=gender)
@@ -145,6 +148,7 @@ async def user_set_gender(update: Update, ctx: Ctx, user_data: UserModel):
 
 @require_user_data
 async def user_edit_age(update: Update, ctx: Ctx, user_data: UserModel):
+    await update.callback_query.answer()
 
     await update.effective_message.edit_caption(
         f'سن خود را وارد کنید. \nبین {AGE_RANGE[0]} تا {AGE_RANGE[1]} سال.',
@@ -207,6 +211,7 @@ async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
 
 @require_user_data
 async def user_edit_name(update: Update, ctx: Ctx, user_data: UserModel):
+    await update.callback_query.answer()
 
     await update.effective_message.edit_caption(
         'نام خود را ارسال کنید.',
@@ -267,6 +272,8 @@ async def user_set_name(update: Update, ctx: Ctx, user_data: UserModel):
 
 @require_user_data
 async def cancel_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
+    await update.callback_query.answer()
+
     await update.effective_message.edit_caption(
         get_profile_text(user_data, ctx.bot.username),
         reply_markup=profile_keyboard
