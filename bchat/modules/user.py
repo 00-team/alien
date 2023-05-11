@@ -67,9 +67,23 @@ async def user_link(update: Update, ctx: Ctx, user_data: UserModel):
 
 @require_user_data
 async def user_link_extra(update: Update, ctx: Ctx, user_data: UserModel):
-    # user = update.effective_user
     platform = update.callback_query.data[10:]
-    await update.effective_message.reply_text(f'extra messages for {platform}')
+    link = get_link(user_data.row_id, ctx.bot.username)
+
+    if platform == 'twitter':
+        file_id = config['user_link_twitter_video']
+        await update.effective_message.reply_video(file_id, caption=(
+            'میخوای دنبال کننده های توییترت برات پیام ناشناش بفرستن؟ 🤔\n\n'
+            'کافیه لینک ناشناس رو کپی کنی و توی قسمت گفته شده در '
+            f'پروفایلت وارد کنی ☝️)\n\nلینک مخصوصت 👉 {link}'
+        ))
+    elif platform == 'instagram':
+        file_id = config['user_link_instagram_video']
+        await update.effective_message.reply_video(file_id, caption=(
+            'میخوای دنبال کننده های اینستاگرامت برات پیام ناشناش بفرستن؟ 🤔\n\n'
+            'کافیه لینک ناشناس رو کپی کنی و توی قسمت گفته شده در '
+            f'پروفایلت وارد کنی ☝️)\n\nلینک مخصوصت 👉 {link}'
+        ))
 
 
 @require_user_data
