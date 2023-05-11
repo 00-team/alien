@@ -61,16 +61,22 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
             file_id, get_profile_text(code_user_data, ctx.bot.username),
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton(
-                    'Send Message ✉',
+                    'ارسال پیام ✉',
                     callback_data=f'send_user_message_{code_user_data.user_id}'
                 )
             ]])
+        )
+        await update.effective_message.reply_text(
+            f'در حال ارسال پیام ناشناس به {code_user_data.name} هستی.\n\n'
+            'می تونی هر حرف یا انتقادی که تو دلت هست رو بگی چون'
+            ' پیامت به صورت کاملا ناشناس ارسال میشه!'
         )
 
         return
 
     await update.effective_message.reply_text(
-        f'hi there {user.full_name}',
+        f'سلام {user_data.name}\n\n'
+        'چه کاری برات انجام بدم؟',
         reply_markup=ReplyKeyboardMarkup(MAIN_KEYBOARD)
     )
 
