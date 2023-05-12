@@ -87,6 +87,11 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
     )
 
 
+@require_user_data
+async def coming_soon(update: Update, ctx: Ctx, user_data: UserModel):
+    await update.effective_message.reply_text('به زوردی... 🌩')
+
+
 async def post_init(self):
     await database.connect()
     logging.info('Starting Bchat')
@@ -125,6 +130,11 @@ def main():
     application.add_handler(CallbackQueryHandler(
         user_link_extra,
         pattern='^user_link_(.*)$'
+    ))
+
+    application.add_handler(CallbackQueryHandler(
+        coming_soon,
+        pattern='^coming_soon$'
     ))
 
     # edit gender

@@ -8,17 +8,24 @@ from telegram.ext import ContextTypes, ConversationHandler
 from utils import config, toggle_code
 
 Ctx = ContextTypes.DEFAULT_TYPE
-profile_keyboard = InlineKeyboardMarkup([[
-    InlineKeyboardButton(
-        'تغییر جنسیت', callback_data='user_edit_gender'
-    ),
-    InlineKeyboardButton(
-        'تغییر سن', callback_data='user_edit_age'
-    ),
-    InlineKeyboardButton(
-        'تغییر نام', callback_data='user_edit_name'
-    ),
-]])
+profile_keyboard = InlineKeyboardMarkup([
+    [
+        InlineKeyboardButton(
+            'تغییر جنسیت 👤', callback_data='user_edit_gender'
+        ),
+        InlineKeyboardButton(
+            'تغییر سن 🪪', callback_data='user_edit_age'
+        ),
+        InlineKeyboardButton(
+            'تغییر نام ✏', callback_data='user_edit_name'
+        ),
+    ],
+    [
+        InlineKeyboardButton(
+            'تغییر عکس پروفایل 🖼', callback_data='coming_soon'
+        ),
+    ]
+])
 
 
 def get_link(row_id, bot_username):
