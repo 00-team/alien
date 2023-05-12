@@ -107,13 +107,14 @@ async def show_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
             ]])
         )
 
-        if msg_id:
+        if msg_id and not d.seen:
             await ctx.bot.send_message(
                 d.sender_id, 'پیام شما مشاهده شد. 🧉',
                 reply_to_message_id=d.message_id
             )
             await update_direct(d.direct_id, user_id, seen=True)
-        else:
+
+        if not msg_id:
             await update.effective_message.reply_text('خطا در دریافت پیام! ❌')
 
     direct_id = update.callback_query.data.split('#')[-1]
