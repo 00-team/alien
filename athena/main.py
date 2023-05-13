@@ -19,6 +19,7 @@ from telegram.error import Forbidden, NetworkError, RetryAfter, TelegramError
 from telegram.ext import Application, CallbackQueryHandler, ChatMemberHandler
 from telegram.ext import CommandHandler, ContextTypes, MessageHandler, filters
 
+CHANNEL_TIMEOUT = 0
 MAIN_CHANNEL = CONF['CHANNEL']
 STATE = {
     'FA': {},
@@ -113,11 +114,25 @@ async def send_all_job(ctx: ContextTypes.DEFAULT_TYPE):
 
 
 async def forward_to_channel_job(ctx: ContextTypes.DEFAULT_TYPE):
-    await ctx.bot.forward_message(
-        MAIN_CHANNEL,
-        from_chat_id=ctx.job.chat_id,
-        message_id=ctx.job.data,
-    )
+    global CHANNEL_TIMEOUT
+    if CHANNEL_TIMEOUT:
+        sleep(CHANNEL_TIMEOUT)
+
+    try:
+        await ctx.bot.forward_message(
+            MAIN_CHANNEL,
+            from_chat_id=ctx.job.chat_id,
+            message_id=ctx.job.data,
+        )
+    except RetryAfter as e:
+        CHANNEL_TIMEOUT = e.retry_after + 10
+        sleep(CHANNEL_TIMEOUT)
+
+        await ctx.bot.forward_message(
+            MAIN_CHANNEL,
+            from_chat_id=ctx.job.chat_id,
+            message_id=ctx.job.data,
+        )
 
 
 @require_admin
