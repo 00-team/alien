@@ -302,6 +302,9 @@ async def user_block(update: Update, ctx: Ctx, user_data: UserModel):
 
     logging.info(user_data)
 
+    user_data.block_list.append(12)
+    await update_user(user_data.user_id, block_list=user_data.block_list)
+
     # await get_user(user_id=update.effective_user.id)
 
     await update.effective_message.reply_text(update.callback_query.data)
