@@ -181,7 +181,7 @@ async def send_not_seen_messages(update: Update, ctx: Ctx, _: UserModel):
 
     for direct in directs:
         await send_show_direct(update, ctx, direct)
-        time.sleep(5)
+        time.sleep(1)
 
 
 @require_user_data
