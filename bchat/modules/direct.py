@@ -150,6 +150,8 @@ async def send_show_direct(update: Update, ctx: Ctx, direct: DirectModel):
 
     if not msg_id:
         await update.effective_message.reply_text('خطا در دریافت پیام! ❌')
+    else:
+        await update.effective_message.edit_reply_markup()
 
 
 @require_user_data
