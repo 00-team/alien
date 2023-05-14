@@ -122,8 +122,18 @@ async def send_show_direct(update: Update, ctx: Ctx, direct: DirectModel):
         await update.effective_message.reply_text('خطا در دریافت پیام! ❌')
         return
 
+    repdir_mid = None
+
+    if direct.reply_to:
+        repdir = await get_direct(direct.reply_to, direct.sender_id)
+        logging.info('------------ REPDIR ---------------')
+        logging.info(repdir)
+        if repdir:
+            repdir_mid = repdir.message_id
+
     msg_id = await ctx.bot.copy_message(
         chat_id, direct.sender_id, direct.message_id,
+        reply_to_message_id=repdir_mid,
         reply_markup=InlineKeyboardMarkup([[
             InlineKeyboardButton(
                 'پاسخ ✍', callback_data=f'direct_reply#{direct.direct_id}'
