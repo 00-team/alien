@@ -15,7 +15,7 @@ class Users(BaseTable):
     gender = Column(Integer, nullable=False, server_default=text('0'))
     age = Column(Integer, nullable=False, server_default=text('20'))
     direct_msg_id = Column(Integer)
-    block_list = Column(JSON, server_default=text('"[]"'))
+    block_list = Column(JSON, server_default='[]')
 
 
 class Genders(int, Enum):
