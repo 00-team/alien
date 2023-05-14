@@ -145,6 +145,12 @@ async def send_not_seen_messages(update: Update, ctx: Ctx, _: UserModel):
     user_id = update.effective_user.id
     directs = await get_direct_notseen(user_id)
 
+    if not directs:
+        await update.effective_message.reply_text(
+            'پیامی یافت نشد! 🧊'
+        )
+        return
+
     for direct in directs:
         await send_show_direct(update, ctx, direct)
         time.sleep(5)
