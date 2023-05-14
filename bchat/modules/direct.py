@@ -122,7 +122,10 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     return ConversationHandler.END
 
 
-async def send_show_direct(update: Update, ctx: Ctx, direct: DirectModel):
+async def send_show_direct(
+    update: Update, ctx: Ctx,
+    direct: DirectModel, user_data: UserModel
+):
 
     chat_id = update.effective_message.chat_id
 
@@ -159,6 +162,15 @@ async def send_show_direct(update: Update, ctx: Ctx, direct: DirectModel):
 
     if not msg_id:
         await update.effective_message.reply_text('خطا در دریافت پیام! ❌')
+        return
+
+    if user_data.direct_msg_id:
+        try:
+            await ctx.bot.delete_message(chat_id, user_data.direct_msg_id)
+        except Exception as e:
+            logging.exception(e)
+        finally:
+            await update_user(user_data.user_id, direct_msg_id=None)
 
 
 @require_user_data
@@ -168,13 +180,13 @@ async def show_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     direct_id = update.callback_query.data.split('#')[-1]
 
     direct = await get_direct(int(direct_id))
-    await send_show_direct(update, ctx, direct)
+    await send_show_direct(update, ctx, direct, usr_data)
 
 
 @require_user_data
-async def send_not_seen_messages(update: Update, ctx: Ctx, _: UserModel):
+async def send_not_seen_messages(update: Update, ctx: Ctx, user_data: UserModel):
     if update.callback_query:
-        update.callback_query.answer()
+        await update.callback_query.answer()
 
     user_id = update.effective_user.id
     directs = await get_direct_notseen(user_id)
@@ -185,14 +197,8 @@ async def send_not_seen_messages(update: Update, ctx: Ctx, _: UserModel):
         )
         return
 
-    if update.callback_query:
-        try:
-            await update.effective_message.delete()
-        except Exception as e:
-            logging.exception(e)
-
     for direct in directs:
-        await send_show_direct(update, ctx, direct)
+        await send_show_direct(update, ctx, direct, user_data)
         time.sleep(1)
 
 
