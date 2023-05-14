@@ -8,9 +8,10 @@ from models.user import gender_pattern
 from modules import cancel_direct_message, cancel_edit_profile
 from modules import get_profile_text, handle_direct_message
 from modules import send_direct_message, send_not_seen_messages
-from modules import show_direct_message, user_edit_age, user_edit_gender
-from modules import user_edit_name, user_link, user_link_extra, user_profile
-from modules import user_set_age, user_set_gender, user_set_name
+from modules import show_direct_message, user_block, user_edit_age
+from modules import user_edit_gender, user_edit_name, user_link
+from modules import user_link_extra, user_profile, user_set_age
+from modules import user_set_gender, user_set_name
 from settings import HOME_DIR, KW_DRTNSEN, KW_MY_LINK, KW_PROFILE
 from settings import MAIN_KEYBOARD, database
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -146,6 +147,11 @@ def main():
     application.add_handler(CallbackQueryHandler(
         send_not_seen_messages,
         pattern='^show_direct#all$'
+    ))
+
+    application.add_handler(CallbackQueryHandler(
+        user_block,
+        pattern='^user_block#[0-9]+$'
     ))
 
     application.add_handler(CallbackQueryHandler(

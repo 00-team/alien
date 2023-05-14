@@ -50,7 +50,7 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
         return
 
     if send_type == 'direct_reply':
-        direct = await get_direct(send_id, user.id)
+        direct = await get_direct(send_id)
         if not direct:
             return
 
@@ -115,7 +115,6 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
 
 async def send_show_direct(update: Update, ctx: Ctx, direct: DirectModel):
 
-    user_id = update.effective_user.id
     chat_id = update.effective_message.chat_id
 
     if not direct:
@@ -125,9 +124,7 @@ async def send_show_direct(update: Update, ctx: Ctx, direct: DirectModel):
     repdir_mid = None
 
     if direct.reply_to:
-        repdir = await get_direct(direct.reply_to, direct.sender_id)
-        logging.info('------------ REPDIR ---------------')
-        logging.info(repdir)
+        repdir = await get_direct(direct.reply_to)
         if repdir:
             repdir_mid = repdir.message_id
 
@@ -149,7 +146,7 @@ async def send_show_direct(update: Update, ctx: Ctx, direct: DirectModel):
             direct.sender_id, 'پیام شما مشاهده شد. 🧉',
             reply_to_message_id=direct.message_id
         )
-        await update_direct(direct.direct_id, user_id, seen=True)
+        await update_direct(direct.direct_id, seen=True)
 
     if not msg_id:
         await update.effective_message.reply_text('خطا در دریافت پیام! ❌')
@@ -159,10 +156,9 @@ async def send_show_direct(update: Update, ctx: Ctx, direct: DirectModel):
 async def show_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     await update.callback_query.answer()
 
-    user_id = update.effective_user.id
     direct_id = update.callback_query.data.split('#')[-1]
 
-    direct = await get_direct(int(direct_id), user_id)
+    direct = await get_direct(int(direct_id))
     await send_show_direct(update, ctx, direct)
 
 

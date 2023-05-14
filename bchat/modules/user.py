@@ -76,6 +76,7 @@ async def user_link(update: Update, ctx: Ctx, user_data: UserModel):
 @require_user_data
 async def user_link_extra(update: Update, ctx: Ctx, user_data: UserModel):
     await update.callback_query.answer()
+
     platform = update.callback_query.data[10:]
     link = get_link(user_data.row_id, ctx.bot.username)
 
@@ -290,3 +291,9 @@ async def cancel_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
     ctx.user_data.pop('user_set_age_error_message_id', None)
 
     return ConversationHandler.END
+
+
+@require_user_data
+async def user_block(update: Update, ctx: Ctx, user_data: UserModel):
+    await update.callback_query.answer()
+    await update.effective_message.reply_text(update.callback_query.data)

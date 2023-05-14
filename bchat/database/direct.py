@@ -18,9 +18,8 @@ async def add_direct(user_id: int, sender_id: int, message_id: int, **kwds):
     return await database.execute(query)
 
 
-async def get_direct(direct_id: int, user_id: int) -> DirectModel | None:
+async def get_direct(direct_id: int) -> DirectModel | None:
     query = select(Direct).where(
-        Direct.user_id == user_id,
         Direct.direct_id == direct_id,
     )
 
@@ -32,11 +31,6 @@ async def get_direct(direct_id: int, user_id: int) -> DirectModel | None:
 
 
 async def get_direct_notseen_count(user_id: int) -> int:
-    # query = Q(Direct).filter(
-    #     Direct.user_id == user_id,
-    #     Direct.seen is False
-    # ).count()
-
     query = (
         'SELECT COUNT(direct_id) FROM direct '
         'WHERE user_id = :user_id AND seen is false'
@@ -59,12 +53,11 @@ async def get_direct_notseen(user_id: int) -> list[DirectModel]:
     return directs
 
 
-async def update_direct(direct_id: int, user_id: int, seen=True):
+async def update_direct(direct_id: int, **values):
     return await database.execute(
         update(Direct)
         .where(
-            Direct.user_id == user_id,
             Direct.direct_id == direct_id,
         )
-        .values(seen=seen)
+        .values(**values)
     )
