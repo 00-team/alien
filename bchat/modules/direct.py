@@ -86,7 +86,10 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
 
     user_b = await get_user(user_id=receiver_id)
     if user_b and user_b.direct_msg_id:
-        await ctx.bot.delete_message(receiver_id, user_b.direct_msg_id)
+        try:
+            await ctx.bot.delete_message(receiver_id, user_b.direct_msg_id)
+        except Exception as e:
+            logging.exception(e)
 
     msg = await ctx.bot.send_message(
         receiver_id,
@@ -104,11 +107,17 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     send_msg_id = ctx.user_data.pop('send_direct_msg_id', None)
 
     if send_msg_id:
-        await ctx.bot.delete_message(chat_id, send_msg_id)
+        try:
+            await ctx.bot.delete_message(chat_id, send_msg_id)
+        except Exception as e:
+            logging.exception(e)
 
     if error_msg_id:
         ctx.user_data.pop('handle_dirt_msg_err_msg_id', None)
-        await ctx.bot.delete_message(chat_id, error_msg_id)
+        try:
+            await ctx.bot.delete_message(chat_id, error_msg_id)
+        except Exception as e:
+            logging.exception(e)
 
     return ConversationHandler.END
 
@@ -177,7 +186,10 @@ async def send_not_seen_messages(update: Update, ctx: Ctx, _: UserModel):
         return
 
     if update.callback_query:
-        await update.effective_message.delete()
+        try:
+            await update.effective_message.delete()
+        except Exception as e:
+            logging.exception(e)
 
     for direct in directs:
         await send_show_direct(update, ctx, direct)
@@ -193,9 +205,15 @@ async def cancel_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     error_msg_id = ctx.user_data.pop('handle_dirt_msg_err_msg_id', None)
 
     if msg_id:
-        await ctx.bot.delete_message(chat_id, msg_id)
+        try:
+            await ctx.bot.delete_message(chat_id, msg_id)
+        except Exception as e:
+            logging.exception(e)
 
     if error_msg_id:
-        await ctx.bot.delete_message(chat_id, error_msg_id)
+        try:
+            await ctx.bot.delete_message(chat_id, error_msg_id)
+        except Exception as e:
+            logging.exception(e)
 
     return ConversationHandler.END

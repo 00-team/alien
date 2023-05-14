@@ -181,7 +181,10 @@ async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
         if age < AGE_RANGE[0] or age > AGE_RANGE[1]:
             raise ValueError('invalid age rage')
     except Exception:
-        await update.effective_message.delete()
+        try:
+            await update.effective_message.delete()
+        except Exception as e:
+            logging.exception(e)
 
         if error_msg_id is None:
             em = await update.effective_message.reply_text(
@@ -205,13 +208,19 @@ async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
             caption=get_profile_text(user_data, ctx.bot.username),
             reply_markup=profile_keyboard
         )
-        await update.effective_message.delete()
+        try:
+            await update.effective_message.delete()
+        except Exception as e:
+            logging.exception(e)
     else:
         await update.effective_message.reply_text('سن شما ثبت شد. ✅')
 
     if error_msg_id:
         ctx.user_data.pop('user_set_age_error_message_id', None)
-        await ctx.bot.delete_message(chat_id, error_msg_id)
+        try:
+            await ctx.bot.delete_message(chat_id, error_msg_id)
+        except Exception as e:
+            logging.exception(e)
 
     return ConversationHandler.END
 
@@ -245,7 +254,10 @@ async def user_set_name(update: Update, ctx: Ctx, user_data: UserModel):
         if name_len < NAME_RANGE[0] or name_len > NAME_RANGE[1]:
             raise ValueError('invalid name length')
     except Exception:
-        await update.effective_message.delete()
+        try:
+            await update.effective_message.delete()
+        except Exception as e:
+            logging.exception(e)
 
         if error_msg_id is None:
             em = await update.effective_message.reply_text(
@@ -269,13 +281,19 @@ async def user_set_name(update: Update, ctx: Ctx, user_data: UserModel):
             caption=get_profile_text(user_data, ctx.bot.username),
             reply_markup=profile_keyboard
         )
-        await update.effective_message.delete()
+        try:
+            await update.effective_message.delete()
+        except Exception as e:
+            logging.exception(e)
     else:
         await update.effective_message.reply_text('نام شما ثبت شد. ✅')
 
     if error_msg_id:
         ctx.user_data.pop('user_set_name_error_message_id', None)
-        await ctx.bot.delete_message(chat_id, error_msg_id)
+        try:
+            await ctx.bot.delete_message(chat_id, error_msg_id)
+        except Exception as e:
+            logging.exception(e)
 
     return ConversationHandler.END
 
