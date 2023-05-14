@@ -40,7 +40,7 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
         logging.info(f'user started with a code {code}')
         code_row_id = toggle_code(code)
 
-        """
+        # """ """
 
         if code_row_id == user_data.row_id:
             await update.effective_message.reply_text(
@@ -49,8 +49,6 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
                 'چه کاری برات انجام بدم؟'
             )
             return
-
-        """
 
         code_user_data = await get_user(row_id=code_row_id)
         if code_user_data is None:
