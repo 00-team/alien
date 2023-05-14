@@ -151,7 +151,7 @@ def main():
 
     application.add_handler(CallbackQueryHandler(
         user_block,
-        pattern='^user_block#[0-9]+$'
+        pattern='^(un|)block_user#[0-9]+$'
     ))
 
     application.add_handler(CallbackQueryHandler(
