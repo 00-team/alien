@@ -61,26 +61,16 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
             callback_data='show_direct#all'
         ))
 
-    text = f'شما یک پیام جدید دارید!\n\n {nseen_count} پیام خوانده نشده.\n'
-    edited = False
-
     user_b = await get_user(user_id=to_user_id)
     if user_b and user_b.direct_msg_id:
-        res = await ctx.bot.edit_message_text(
-            chat_id=to_user_id,
-            message_id=user_b.direct_msg_id,
-            text=text,
-            reply_markup=InlineKeyboardMarkup([keyboard])
-        )
-        logging.info(res)
-        edited = True
+        await ctx.bot.delete_message(to_user_id, user_b.direct_msg_id)
 
-    if not edited:
-        msg = await ctx.bot.send_message(
-            to_user_id, text,
-            reply_markup=InlineKeyboardMarkup([keyboard])
-        )
-        await update_user(to_user_id, direct_msg_id=msg.id)
+    msg = await ctx.bot.send_message(
+        to_user_id,
+        f'شما یک پیام جدید دارید!\n\n {nseen_count} پیام خوانده نشده.\n.',
+        reply_markup=InlineKeyboardMarkup([keyboard])
+    )
+    await update_user(to_user_id, direct_msg_id=msg.id)
 
     await update.effective_message.reply_text(
         'پیام شما به صورت ناشناس ارسال شد. ✅'
