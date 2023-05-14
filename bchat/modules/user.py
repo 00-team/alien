@@ -1,5 +1,7 @@
 
-from database import update_user
+import logging
+
+from database import get_user, update_user
 from dependencies import require_user_data
 from models import GENDER_DISPLAY, Genders, UserModel
 from settings import AGE_RANGE, NAME_RANGE
@@ -295,5 +297,11 @@ async def cancel_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
 
 @require_user_data
 async def user_block(update: Update, ctx: Ctx, user_data: UserModel):
+
     await update.callback_query.answer()
+
+    logging.info(user_data)
+
+    # await get_user(user_id=update.effective_user.id)
+
     await update.effective_message.reply_text(update.callback_query.data)
