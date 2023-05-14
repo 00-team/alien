@@ -7,11 +7,12 @@ from models import UserModel
 from models.user import gender_pattern
 from modules import cancel_direct_message, cancel_edit_profile
 from modules import get_profile_text, handle_direct_message
-from modules import send_direct_message, show_direct_message, user_edit_age
-from modules import user_edit_gender, user_edit_name, user_link
-from modules import user_link_extra, user_profile, user_set_age
-from modules import user_set_gender, user_set_name
-from settings import HOME_DIR, KW_MY_LINK, KW_PROFILE, MAIN_KEYBOARD, database
+from modules import send_direct_message, send_not_seen_messages
+from modules import show_direct_message, user_edit_age, user_edit_gender
+from modules import user_edit_name, user_link, user_link_extra, user_profile
+from modules import user_set_age, user_set_gender, user_set_name
+from settings import HOME_DIR, KW_DRTNSEN, KW_MY_LINK, KW_PROFILE
+from settings import MAIN_KEYBOARD, database
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler
@@ -132,6 +133,21 @@ def main():
         user_link
     ))
 
+    application.add_handler(MessageHandler(
+        filters.Text([KW_DRTNSEN]),
+        send_not_seen_messages
+    ))
+
+    application.add_handler(CallbackQueryHandler(
+        show_direct_message,
+        pattern='^show_direct#[0-9]+$'
+    ))
+
+    application.add_handler(CallbackQueryHandler(
+        send_not_seen_messages,
+        pattern='^show_direct#all$'
+    ))
+
     application.add_handler(CallbackQueryHandler(
         user_link_extra,
         pattern='^user_link_(.*)$'
@@ -238,11 +254,6 @@ def main():
                 pattern='^cancel_direct_message$'
             )
         ],
-    ))
-
-    application.add_handler(CallbackQueryHandler(
-        show_direct_message,
-        pattern='^show_direct#(.*)$'
     ))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)

@@ -16,11 +16,13 @@ AGE_RANGE = [5, 99]
 NAME_RANGE = [3, 15]
 KW_PROFILE = 'پروفایل من 👤'
 KW_MY_LINK = 'لینک ناشناس من 🔗'
+KW_DRTNSEN = 'پیام های خوانده نشده 📬'
 
 
 MAIN_KEYBOARD = [
     [KW_PROFILE],
-    [KW_MY_LINK]
+    [KW_MY_LINK],
+    [KW_DRTNSEN],
 ]
 
 metadata = MetaData()

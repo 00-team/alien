@@ -90,52 +90,64 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     return ConversationHandler.END
 
 
+async def send_show_direct(update: Update, ctx: Ctx, direct: DirectModel):
+
+    user_id = update.effective_user.id
+    chat_id = update.effective_message.chat_id
+
+    if not direct:
+        await update.effective_message.reply_text('خطا در دریافت پیام! ❌')
+        return
+
+    msg_id = await ctx.bot.copy_message(
+        chat_id, direct.sender_id, direct.message_id,
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton(
+                'پاسخ ✍', callback_data='direct_reply#xx'
+            ),
+            InlineKeyboardButton(
+                'بلاک ⛔', callback_data='block_user#xx'
+            ),
+        ]])
+    )
+
+    if msg_id and not direct.seen:
+        await ctx.bot.send_message(
+            direct.sender_id, 'پیام شما مشاهده شد. 🧉',
+            reply_to_message_id=direct.message_id
+        )
+        await update_direct(direct.direct_id, user_id, seen=True)
+
+    if not msg_id:
+        await update.effective_message.reply_text('خطا در دریافت پیام! ❌')
+
+
 @require_user_data
 async def show_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     await update.callback_query.answer()
 
-    chat_id = update.effective_message.chat_id
     user_id = update.effective_user.id
 
-    async def send(d: DirectModel):
-        if not d:
-            await update.effective_message.reply_text('خطا در دریافت پیام! ❌')
-            return
-
-        msg_id = await ctx.bot.copy_message(
-            chat_id, d.sender_id, d.message_id,
-            reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton(
-                    'پاسخ ✍', callback_data='direct_reply#xx'
-                ),
-                InlineKeyboardButton(
-                    'بلاک ⛔', callback_data='block_user#xx'
-                ),
-            ]])
-        )
-
-        if msg_id and not d.seen:
-            await ctx.bot.send_message(
-                d.sender_id, 'پیام شما مشاهده شد. 🧉',
-                reply_to_message_id=d.message_id
-            )
-            await update_direct(d.direct_id, user_id, seen=True)
-
-        if not msg_id:
-            await update.effective_message.reply_text('خطا در دریافت پیام! ❌')
-
     direct_id = update.callback_query.data.split('#')[-1]
-    if direct_id == 'all':
-        directs = await get_direct_notseen(user_id)
-        logging.info('ALL')
-        logging.info(directs)
-        for direct in directs:
-            await send(direct)
-            time.sleep(5)
+    # if direct_id == 'all':
+    #     directs = await get_direct_notseen(user_id)
+    #     for direct in directs:
+    #         await send_show_direct(update, ctx, direct)
+    #         time.sleep(5)
 
-    else:
-        direct = await get_direct(int(direct_id), user_id)
-        await send(direct)
+    # else:
+    direct = await get_direct(int(direct_id), user_id)
+    await send_show_direct(update, ctx, direct)
+
+
+@require_user_data
+async def send_not_seen_messages(update: Update, ctx: Ctx, _: UserModel):
+    user_id = update.effective_user.id
+    directs = await get_direct_notseen(user_id)
+
+    for direct in directs:
+        await send_show_direct(update, ctx, direct)
+        time.sleep(5)
 
 
 @require_user_data
