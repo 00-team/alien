@@ -14,6 +14,7 @@ class Users(BaseTable):
     name = Column(String, nullable=False)
     gender = Column(Integer, nullable=False, server_default=text('0'))
     age = Column(Integer, nullable=False, server_default=text('20'))
+    direct_msg_id = Column(Integer)
 
 
 class Genders(int, Enum):
@@ -28,6 +29,7 @@ class UserModel(BaseModel):
     gender: Genders
     name: str
     age: int
+    direct_msg_id: int = None
 
 
 GENDER_DISPLAY = {
