@@ -8,7 +8,7 @@ from models.user import gender_pattern
 from modules import cancel_direct_message, cancel_edit_profile
 from modules import get_profile_text, handle_direct_message
 from modules import send_direct_message, send_not_seen_messages
-from modules import show_direct_message, user_block, user_edit_age
+from modules import show_direct_message, toggle_user_block, user_edit_age
 from modules import user_edit_gender, user_edit_name, user_link
 from modules import user_link_extra, user_profile, user_set_age
 from modules import user_set_gender, user_set_name
@@ -150,8 +150,8 @@ def main():
     ))
 
     application.add_handler(CallbackQueryHandler(
-        user_block,
-        pattern='^(un|)block_user#[0-9]+$'
+        toggle_user_block,
+        pattern='^toggle_user_block#[0-9]+$'
     ))
 
     application.add_handler(CallbackQueryHandler(

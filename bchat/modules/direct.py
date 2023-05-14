@@ -136,7 +136,7 @@ async def send_show_direct(update: Update, ctx: Ctx, direct: DirectModel):
                 'پاسخ ✍', callback_data=f'direct_reply#{direct.direct_id}'
             ),
             InlineKeyboardButton(
-                'بلاک ⛔', callback_data=f'block_user#{direct.sender_id}'
+                'بلاک ⛔', callback_data=f'toggle_user_block#{direct.sender_id}'
             ),
         ]])
     )

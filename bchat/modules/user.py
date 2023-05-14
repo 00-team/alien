@@ -296,15 +296,21 @@ async def cancel_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
 
 
 @require_user_data
-async def user_block(update: Update, ctx: Ctx, user_data: UserModel):
+async def toggle_user_block(update: Update, ctx: Ctx, user_data: UserModel):
 
     await update.callback_query.answer()
 
-    logging.info(user_data)
+    uid = int(update.callback_query.data.split('#')[-1])
 
-    user_data.block_list.append(12)
+    if uid in user_data.block_list:
+        user_data.block_list.remove(uid)
+        await update.effective_message.reply_text(
+            'کاربر آزادسازی گردید. 🟢'
+        )
+    else:
+        user_data.block_list.append(uid)
+        await update.effective_message.reply_text(
+            'کاربر بلاک شد. 🔴'
+        )
+
     await update_user(user_data.user_id, block_list=user_data.block_list)
-
-    # await get_user(user_id=update.effective_user.id)
-
-    await update.effective_message.reply_text(update.callback_query.data)
