@@ -237,7 +237,7 @@ def main():
         entry_points=[
             CallbackQueryHandler(
                 send_direct_message,
-                pattern='^send_direct_message#(.*)$'
+                pattern='^(send_direct_message|direct_reply)#(.*)$'
             )
         ],
         states={

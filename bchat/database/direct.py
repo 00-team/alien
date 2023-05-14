@@ -8,11 +8,12 @@ from sqlalchemy import insert, select, update
 # from sqlalchemy.orm import Query as Q
 
 
-async def add_direct(user_id: int, sender_id: int, message_id: int):
+async def add_direct(user_id: int, sender_id: int, message_id: int, **kwds):
     query = insert(Direct).values(
         user_id=user_id,
         sender_id=sender_id,
         message_id=message_id,
+        **kwds
     )
     return await database.execute(query)
 

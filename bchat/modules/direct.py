@@ -18,7 +18,8 @@ Ctx = ContextTypes.DEFAULT_TYPE
 async def send_direct_message(update: Update, ctx: Ctx, user_data: UserModel):
     await update.callback_query.answer()
 
-    uid = int(update.callback_query.data.split('#')[-1])
+    send_type, send_id = update.callback_query.data.split('#')
+    send_id = int(send_id)
 
     msg = await update.effective_message.reply_text(
         'پیام خود را ارسال کنید:',
@@ -27,7 +28,9 @@ async def send_direct_message(update: Update, ctx: Ctx, user_data: UserModel):
         )]])
     )
 
-    ctx.user_data['to_user_id'] = uid
+    ctx.user_data['direct_send_type'] = send_type
+    ctx.user_data['direct_send_id'] = send_id
+
     ctx.user_data['send_direct_msg_id'] = msg.id
 
     return 'GET_MESSAGE'
@@ -36,21 +39,41 @@ async def send_direct_message(update: Update, ctx: Ctx, user_data: UserModel):
 @require_user_data
 async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     error_msg_id = ctx.user_data.get('handle_dirt_msg_err_msg_id')
+    user = update.effective_user
+    msg = update.effective_message
 
-    to_user_id = ctx.user_data.get('to_user_id')
-    if to_user_id is None:
+    send_type = ctx.user_data.pop('direct_send_type', None)
+    send_id = ctx.user_data.pop('direct_send_id', None)
+    receiver_id = None
+
+    if send_type is None or send_id is None:
         return
 
-    direct_id = await add_direct(
-        to_user_id,
-        update.effective_user.id,
-        update.effective_message.id
-    )
+    if send_type == 'direct_reply':
+        direct = await get_direct(send_id, user.id)
+        if not direct:
+            return
 
-    if not direct_id:
+        direct_id = await add_direct(
+            direct.sender_id,
+            user.id,
+            msg.id,
+            reply_to=direct.direct_id
+        )
+        receiver_id = direct.sender_id
+
+    elif send_type == 'send_direct_message':
+        direct_id = await add_direct(
+            send_id,
+            update.effective_user.id,
+            update.effective_message.id
+        )
+        receiver_id = send_id
+
+    if not direct_id or not receiver_id:
         return
 
-    nseen_count = await get_direct_notseen_count(to_user_id)
+    nseen_count = await get_direct_notseen_count(receiver_id)
     keyboard = [InlineKeyboardButton(
         'مشاهده 👀', callback_data=f'show_direct#{direct_id}'
     )]
@@ -61,16 +84,16 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
             callback_data='show_direct#all'
         ))
 
-    user_b = await get_user(user_id=to_user_id)
+    user_b = await get_user(user_id=receiver_id)
     if user_b and user_b.direct_msg_id:
-        await ctx.bot.delete_message(to_user_id, user_b.direct_msg_id)
+        await ctx.bot.delete_message(receiver_id, user_b.direct_msg_id)
 
     msg = await ctx.bot.send_message(
-        to_user_id,
+        receiver_id,
         f'شما یک پیام جدید دارید!\n\n {nseen_count} پیام خوانده نشده.\n.',
         reply_markup=InlineKeyboardMarkup([keyboard])
     )
-    await update_user(to_user_id, direct_msg_id=msg.id)
+    await update_user(receiver_id, direct_msg_id=msg.id)
 
     await update.effective_message.reply_text(
         'پیام شما به صورت ناشناس ارسال شد. ✅'
@@ -103,10 +126,10 @@ async def send_show_direct(update: Update, ctx: Ctx, direct: DirectModel):
         chat_id, direct.sender_id, direct.message_id,
         reply_markup=InlineKeyboardMarkup([[
             InlineKeyboardButton(
-                'پاسخ ✍', callback_data='direct_reply#xx'
+                'پاسخ ✍', callback_data=f'direct_reply#{direct.direct_id}'
             ),
             InlineKeyboardButton(
-                'بلاک ⛔', callback_data='block_user#xx'
+                'بلاک ⛔', callback_data=f'block_user#{direct.sender_id}'
             ),
         ]])
     )
@@ -127,15 +150,8 @@ async def show_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     await update.callback_query.answer()
 
     user_id = update.effective_user.id
-
     direct_id = update.callback_query.data.split('#')[-1]
-    # if direct_id == 'all':
-    #     directs = await get_direct_notseen(user_id)
-    #     for direct in directs:
-    #         await send_show_direct(update, ctx, direct)
-    #         time.sleep(5)
 
-    # else:
     direct = await get_direct(int(direct_id), user_id)
     await send_show_direct(update, ctx, direct)
 
