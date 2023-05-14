@@ -150,8 +150,6 @@ async def send_show_direct(update: Update, ctx: Ctx, direct: DirectModel):
 
     if not msg_id:
         await update.effective_message.reply_text('خطا در دریافت پیام! ❌')
-    else:
-        await update.effective_message.edit_reply_markup()
 
 
 @require_user_data
@@ -166,6 +164,9 @@ async def show_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
 
 @require_user_data
 async def send_not_seen_messages(update: Update, ctx: Ctx, _: UserModel):
+    if update.callback_query:
+        update.callback_query.answer()
+
     user_id = update.effective_user.id
     directs = await get_direct_notseen(user_id)
 
@@ -174,6 +175,9 @@ async def send_not_seen_messages(update: Update, ctx: Ctx, _: UserModel):
             'پیامی یافت نشد! 🧊'
         )
         return
+
+    if update.callback_query:
+        await update.effective_message.delete()
 
     for direct in directs:
         await send_show_direct(update, ctx, direct)
