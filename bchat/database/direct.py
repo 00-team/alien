@@ -47,7 +47,7 @@ async def get_direct_notseen_count(user_id: int) -> int:
 async def get_direct_notseen(user_id: int) -> list[DirectModel]:
     query = select(Direct).where(
         Direct.user_id == user_id,
-        # Direct.seen is False
+        Direct.seen == False
     ).limit(10)
 
     directs = []
