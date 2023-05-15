@@ -151,7 +151,11 @@ async def block(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text('you cant block an admin :/')
             return
 
-        if blocked_users.pop(block_id, False):
+        logging.info(f'{block_id in blocked_users=}')
+        p = blocked_users.pop(block_id, False)
+        logging.info(f'pop return {p}')
+
+        if p:
             await update.message.reply_text((
                 f'user <{block_id}> was Unblocked 🔓\n\n'
                 'see all blocked users with /block 🧊'
