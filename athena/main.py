@@ -1,6 +1,4 @@
 
-
-import json
 import logging
 import sys
 from time import sleep
@@ -138,8 +136,6 @@ async def forward_to_channel_job(ctx: ContextTypes.DEFAULT_TYPE):
 
 @require_admin
 async def block(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
-    logging.info(json.dumps(blocked_users))
-
     if ctx.args:
         try:
             block_id = int(ctx.args[0])
@@ -151,11 +147,9 @@ async def block(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text('you cant block an admin :/')
             return
 
-        logging.info(f'{block_id in blocked_users=}')
-        p = blocked_users.pop(block_id, False)
-        logging.info(f'pop return {p}')
+        block_id = str(block_id)
 
-        if p:
+        if blocked_users.pop(block_id, False):
             await update.message.reply_text((
                 f'user <{block_id}> was Unblocked 🔓\n\n'
                 'see all blocked users with /block 🧊'
@@ -183,7 +177,7 @@ async def send_message(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     msg = update.message
     user = msg.from_user
 
-    if user.id in blocked_users:
+    if str(user.id) in blocked_users:
         return
 
     if (
