@@ -1,5 +1,6 @@
 
 
+import json
 import logging
 import sys
 from time import sleep
@@ -137,6 +138,8 @@ async def forward_to_channel_job(ctx: ContextTypes.DEFAULT_TYPE):
 
 @require_admin
 async def block(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    logging.info(json.dumps(blocked_users))
+
     if ctx.args:
         try:
             block_id = int(ctx.args[0])
