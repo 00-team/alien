@@ -364,7 +364,7 @@ async def show_saved_users(update: Update, ctx: Ctx, user_data: UserModel):
                 )
             ),
             InlineKeyboardButton(
-                'نمایش 🌊',
+                data['name'],
                 url=f't.me/{ctx.bot.username}?start={data["codename"]}'
             )
         ])
