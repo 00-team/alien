@@ -23,9 +23,8 @@ def require_user_data(func):
         user_data = await get_user(user.id)
 
         if user_data is None:
-            row_id, codename = await add_user(user.id, user.full_name)
+            codename = await add_user(user.id, user.full_name)
             user_data = UserModel(
-                row_id=row_id,
                 user_id=user.id,
                 name=user.full_name,
                 age=20,

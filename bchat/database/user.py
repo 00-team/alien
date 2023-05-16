@@ -24,7 +24,8 @@ async def add_user(user_id: int, name: str):
         name=name,
         codename=random_code
     )
-    return await database.execute(query), random_code
+    await database.execute(query)
+    return random_code
 
 
 async def get_user(user_id=None, codename=None) -> None | UserModel:
@@ -67,8 +68,10 @@ async def update_user_code(user_id: int, codename=None):
                 codename = rc
                 break
 
-    return await database.execute(
+    await database.execute(
         update(Users)
         .where(Users.user_id == user_id)
         .values(codename=codename)
-    ), codename
+    )
+
+    return codename

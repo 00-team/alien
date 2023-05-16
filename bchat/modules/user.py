@@ -322,17 +322,81 @@ async def toggle_user_block(update: Update, ctx: Ctx, user_data: UserModel):
 
     await update.callback_query.answer()
 
-    uid = int(update.callback_query.data.split('#')[-1])
+    uid = update.callback_query.data.split('#')[-1]
+    target_user = await get_user(int(uid))
+    if not target_user:
+        await update.effective_message.reply_text('کاربر پیدا نشد. ❌')
+        await update.effective_message.edit_reply_markup()
+        return
 
-    if uid in user_data.block_list:
-        user_data.block_list.remove(uid)
+    if user_data.block_list.pop(uid, False):
         await update.effective_message.reply_text(
             'کاربر آزادسازی گردید. 🟢'
         )
     else:
-        user_data.block_list.append(uid)
+        user_data.block_list[uid] = {
+            'codename': target_user.codename,
+            'name': target_user.name,
+        }
         await update.effective_message.reply_text(
             'کاربر بلاک شد. 🔴'
         )
 
     await update_user(user_data.user_id, block_list=user_data.block_list)
+
+
+@require_user_data
+async def show_saved_users(update: Update, ctx: Ctx, user_data: UserModel):
+
+    if not user_data.saved_list:
+        await update.effective_message.reply_text(
+            'شما کاربری را ذخیر نکرده اید.'
+        )
+        return
+
+    keyboard = []
+    for uid, data in user_data.saved_list.items():
+        keyboard.append([
+            InlineKeyboardButton(
+                'حذف کاربر ❌',
+                callback_data=(
+                    f'remove_saved_user#{uid}'
+                )
+            ),
+            InlineKeyboardButton(
+                'نمایش 🌊',
+                url=f't.me/{ctx.bot.username}?start={data["codename"]}'
+            )
+        ])
+
+    await update.effective_message.reply_text(
+        'کاربران ذخیره شده شما.',
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+
+@require_user_data
+async def toggle_saved_user(update: Update, ctx: Ctx, user_data: UserModel):
+    await update.callback_query.answer()
+
+    uid = update.callback_query.data.split('#')[-1]
+    target_user = await get_user(int(uid))
+    if not target_user:
+        await update.effective_message.reply_text('کاربر پیدا نشد. ❌')
+        await update.effective_message.edit_reply_markup()
+        return
+
+    if user_data.saved_list.pop(uid, False):
+        await update.effective_message.reply_text(
+            'کاربر از لیست حذف شد. 🔴'
+        )
+    else:
+        user_data.saved_list[uid] = {
+            'codename': target_user.codename,
+            'name': target_user.name,
+        }
+        await update.effective_message.reply_text(
+            'کاربر ذخیره شد. ⭐'
+        )
+
+    await update_user(user_data.user_id, saved_list=user_data.saved_list)

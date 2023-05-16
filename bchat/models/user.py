@@ -9,15 +9,15 @@ from sqlalchemy import JSON, Column, Integer, String, text
 class Users(BaseTable):
     __tablename__ = 'users'
 
-    row_id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    user_id = Column(Integer, unique=True, index=True, nullable=False)
+    # row_id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    user_id = Column(Integer, primary_key=True, unique=True, index=True)
+    codename = Column(String, nullable=False, index=True, unique=True)
     name = Column(String, nullable=False)
     gender = Column(Integer, nullable=False, server_default=text('0'))
     age = Column(Integer, nullable=False, server_default=text('20'))
     direct_msg_id = Column(Integer)
-    block_list = Column(JSON, server_default='[]')
-    saved_list = Column(JSON, server_default='[]')
-    codename = Column(String, index=True)
+    block_list = Column(JSON, server_default='{}')
+    saved_list = Column(JSON, server_default='{}')
 
 
 class Genders(int, Enum):
@@ -27,15 +27,14 @@ class Genders(int, Enum):
 
 
 class UserModel(BaseModel):
-    row_id: int
     user_id: int
+    codename: str
     gender: Genders
     name: str
     age: int
     direct_msg_id: int = None
-    block_list: list[int] = []
-    saved_list: list[int] = []
-    codename: str = None
+    block_list: dict = {}
+    saved_list: dict = {}
 
 
 GENDER_DISPLAY = {

@@ -8,11 +8,11 @@ from models.user import gender_pattern
 from modules import cancel_direct_message, cancel_edit_profile
 from modules import get_profile_text, handle_direct_message
 from modules import send_direct_message, send_not_seen_messages
-from modules import show_direct_message, toggle_user_block, user_edit_age
-from modules import user_edit_gender, user_edit_name, user_link
-from modules import user_link_extra, user_profile, user_set_age
-from modules import user_set_gender, user_set_name
-from settings import HOME_DIR, KW_DRTNSEN, KW_MY_LINK, KW_PROFILE
+from modules import show_direct_message, show_saved_users, toggle_saved_user
+from modules import toggle_user_block, user_edit_age, user_edit_gender
+from modules import user_edit_name, user_link, user_link_extra, user_profile
+from modules import user_set_age, user_set_gender, user_set_name
+from settings import HOME_DIR, KW_DRTNSEN, KW_MY_LINK, KW_PROFILE, KW_SAVELST
 from settings import MAIN_KEYBOARD, database
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardMarkup, Update
@@ -64,22 +64,44 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
 
         text = get_profile_text(code_user_data, ctx.bot.username)
 
-        text += (
+        trail_text = (
             f'\n\n می تونی برای {code_user_data.name} پیام ناشناس بفرستی'
             ' و هر حرف یا انتقادی که تو دلت هست رو بگی چون پیامت به صورت '
             'کاملا ناشناس ارسال میشه!\n'
         )
 
-        await update.effective_message.reply_photo(
-            file_id, text,
-            reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton(
-                    'ارسال پیام ✉',
-                    callback_data=(
-                        f'send_direct_message#{code_user_data.user_id}'
-                    )
+        keyboard = []
+        if str(code_user_data.user_id) in user_data.saved_list:
+            keyboard.append(InlineKeyboardButton(
+                'حذف کاربر ❌',
+                callback_data=(
+                    f'remove_saved_user#{code_user_data.user_id}'
                 )
-            ]])
+            ))
+        else:
+            if len(user_data.saved_list.keys()) < 10:
+                keyboard.append(InlineKeyboardButton(
+                    'ذخیر کاربر ⭐',
+                    callback_data=(
+                        f'save_user#{code_user_data.user_id}'
+                    )
+                ))
+
+        if str(user_data.user_id) not in code_user_data.block_list:
+            keyboard.append(InlineKeyboardButton(
+                'ارسال پیام ✉',
+                callback_data=(
+                    f'send_direct_message#{code_user_data.user_id}'
+                )
+            ))
+        else:
+            trail_text = (
+                '\n\nاین کاربر شما را بلاک کرده. ⛔'
+            )
+
+        await update.effective_message.reply_photo(
+            file_id, text + trail_text,
+            reply_markup=InlineKeyboardMarkup([keyboard]) if keyboard else None
         )
 
         return
@@ -139,6 +161,16 @@ def main():
     application.add_handler(CallbackQueryHandler(
         show_direct_message,
         pattern='^show_direct#[0-9]+$'
+    ))
+
+    application.add_handler(CallbackQueryHandler(
+        toggle_saved_user,
+        pattern='^(remove_saved_user|save_user)#[0-9]+$'
+    ))
+
+    application.add_handler(MessageHandler(
+        filters.Text([KW_SAVELST]),
+        show_saved_users,
     ))
 
     application.add_handler(CallbackQueryHandler(
