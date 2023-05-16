@@ -7,7 +7,7 @@ from models import GENDER_DISPLAY, Genders, UserModel
 from settings import AGE_RANGE, NAME_RANGE
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes, ConversationHandler
-from utils import config, toggle_code
+from utils import config
 
 Ctx = ContextTypes.DEFAULT_TYPE
 profile_keyboard = InlineKeyboardMarkup([
@@ -26,26 +26,30 @@ profile_keyboard = InlineKeyboardMarkup([
         InlineKeyboardButton(
             'تغییر عکس پروفایل 🖼', callback_data='coming_soon'
         ),
+        InlineKeyboardButton(
+            'تغییر کد', callback_data='coming_soon'
+        ),
     ]
 ])
 
 
-def get_link(row_id, bot_username):
-    return f't.me/{bot_username}?start={toggle_code(row_id)}'
+def get_link(codename, bot_username):
+    return f't.me/{bot_username}?start={codename}'
 
 
 def get_profile_text(user_data: UserModel, bot_username):
     return (
         f'نام: {user_data.name}\n'
         f'جنسیت: {GENDER_DISPLAY[user_data.gender]}\n'
-        f'سن: {user_data.age}\n\n'
-        f'لینک ناشناس: {get_link(user_data.row_id, bot_username)}\n\n'
+        f'سن: {user_data.age}\n'
+        f'کد: {user_data.codename}\n\n'
+        f'لینک ناشناس: {get_link(user_data.codename, bot_username)}\n\n'
     )
 
 
 @require_user_data
 async def user_link(update: Update, ctx: Ctx, user_data: UserModel):
-    link = get_link(user_data.row_id, ctx.bot.username)
+    link = get_link(user_data.codename, ctx.bot.username)
 
     await update.effective_message.reply_text(
         f'سلام {user_data.name} هستم ✋😉\n\n'
@@ -80,7 +84,7 @@ async def user_link_extra(update: Update, ctx: Ctx, user_data: UserModel):
     await update.callback_query.answer()
 
     platform = update.callback_query.data[10:]
-    link = get_link(user_data.row_id, ctx.bot.username)
+    link = get_link(user_data.codename, ctx.bot.username)
 
     if platform == 'twitter':
         file_id = config['user_link_twitter_video']

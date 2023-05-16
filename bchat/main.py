@@ -19,7 +19,7 @@ from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler
 from telegram.ext import ContextTypes, ConversationHandler, MessageHandler
 from telegram.ext import filters
-from utils import config, toggle_code
+from utils import config
 
 from gshare import get_error_handler, setup_logging
 
@@ -36,13 +36,10 @@ Ctx = ContextTypes.DEFAULT_TYPE
 @require_user_data
 async def start(update: Update, ctx: Ctx, user_data: UserModel):
     if ctx.args:
-        code = ctx.args[0]
-        logging.info(f'user started with a code {code}')
-        code_row_id = toggle_code(code)
+        codename = ctx.args[0]
+        logging.info(f'user started with a code {codename}')
 
-        # """ """
-
-        if code_row_id == user_data.row_id:
+        if codename == user_data.codename:
             await update.effective_message.reply_text(
                 'اینکه آدم گاهی با خودش حرف بزنه خوبه ، '
                 'ولی اینجا نمیتونی به خودت پیام ناشناس بفرستی ! :)\n\n'
@@ -50,10 +47,10 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
             )
             return
 
-        code_user_data = await get_user(row_id=code_row_id)
+        code_user_data = await get_user(codename=codename)
         if code_user_data is None:
             await update.effective_message.reply_text(
-                f'کاربری با کد {code} پیدا نشد. ❌'
+                f'کاربری با کد {codename} پیدا نشد. ❌'
             )
             return
 
@@ -78,7 +75,9 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton(
                     'ارسال پیام ✉',
-                    callback_data=f'send_direct_message#{code_user_data.user_id}'
+                    callback_data=(
+                        f'send_direct_message#{code_user_data.user_id}'
+                    )
                 )
             ]])
         )

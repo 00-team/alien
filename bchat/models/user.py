@@ -16,6 +16,8 @@ class Users(BaseTable):
     age = Column(Integer, nullable=False, server_default=text('20'))
     direct_msg_id = Column(Integer)
     block_list = Column(JSON, server_default='[]')
+    saved_list = Column(JSON, server_default='[]')
+    codename = Column(String, index=True)
 
 
 class Genders(int, Enum):
@@ -32,6 +34,8 @@ class UserModel(BaseModel):
     age: int
     direct_msg_id: int = None
     block_list: list[int] = []
+    saved_list: list[int] = []
+    codename: str = None
 
 
 GENDER_DISPLAY = {

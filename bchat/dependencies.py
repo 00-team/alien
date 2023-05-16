@@ -1,6 +1,6 @@
 
 
-from database import add_user, get_user
+from database import add_user, get_user, update_user_code
 from models import UserModel
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -23,14 +23,20 @@ def require_user_data(func):
         user_data = await get_user(user.id)
 
         if user_data is None:
-            row_id = await add_user(user.id, user.full_name)
+            row_id, codename = await add_user(user.id, user.full_name)
             user_data = UserModel(
                 row_id=row_id,
                 user_id=user.id,
                 name=user.full_name,
                 age=20,
-                gender=0
+                gender=0,
+                codename=codename,
             )
+
+        if not user_data.codename:
+            res, coedname = await update_user_code(user_data.user_id)
+            user_data.codename = codename
+            print(res)
 
         return await func(update, ctx, user_data)
 
