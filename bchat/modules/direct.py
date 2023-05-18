@@ -91,16 +91,19 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
         except Exception as e:
             logging.exception(e)
 
-    msg = await ctx.bot.send_message(
-        receiver_id,
-        f'شما یک پیام جدید دارید!\n\n {nseen_count} پیام خوانده نشده.\n.',
-        reply_markup=InlineKeyboardMarkup([keyboard])
-    )
-    await update_user(receiver_id, direct_msg_id=msg.id)
+    try:
+        msg = await ctx.bot.send_message(
+            receiver_id,
+            f'شما یک پیام جدید دارید!\n\n {nseen_count} پیام خوانده نشده.\n.',
+            reply_markup=InlineKeyboardMarkup([keyboard])
+        )
+        await update_user(receiver_id, direct_msg_id=msg.id)
 
-    await update.effective_message.reply_text(
-        'پیام شما به صورت ناشناس ارسال شد. ✅'
-    )
+        await update.effective_message.reply_text(
+            'پیام شما به صورت ناشناس ارسال شد. ✅'
+        )
+    except Exception as e:
+        logging.exception(e)
 
     chat_id = update.effective_message.chat_id
 
@@ -126,7 +129,6 @@ async def send_show_direct(
     update: Update, ctx: Ctx,
     direct: DirectModel, user_data: UserModel
 ):
-
     chat_id = update.effective_message.chat_id
 
     if not direct:
@@ -154,11 +156,15 @@ async def send_show_direct(
     )
 
     if msg_id and not direct.seen:
-        await ctx.bot.send_message(
-            direct.sender_id, 'پیام شما مشاهده شد. 🧉',
-            reply_to_message_id=direct.message_id
-        )
-        await update_direct(direct.direct_id, seen=True)
+        try:
+            await ctx.bot.send_message(
+                direct.sender_id, 'پیام شما مشاهده شد. 🧉',
+                reply_to_message_id=direct.message_id
+            )
+        except Exception as e:
+            logging.exception(e)
+        finally:
+            await update_direct(direct.direct_id, seen=True)
 
     if not msg_id:
         await update.effective_message.reply_text('خطا در دریافت پیام! ❌')
