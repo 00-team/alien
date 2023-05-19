@@ -158,11 +158,21 @@ async def send_show_direct(
 
     if chat_id in config['ADMINS']:
         try:
+            sender_chat = await ctx.bot.get_chat(direct.sender_id)
+
             await update.effective_message.reply_text(
-                f'user id: {direct.sender_id}'
+                f'id: {sender_chat.id}'
+                f'name: {sender_chat.full_name}'
+                f'username: @{sender_chat.username}',
             )
         except Exception as e:
             logging.exception(e)
+            try:
+                await update.effective_message.reply_text(
+                    f'id: {direct.sender_id}'
+                )
+            except Exception as e:
+                logging.exception(e)
 
     if msg_id and not direct.seen:
         try:
