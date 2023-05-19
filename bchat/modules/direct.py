@@ -10,6 +10,7 @@ from dependencies import require_user_data
 from models import DirectModel, UserModel
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes, ConversationHandler
+from utils import config
 
 Ctx = ContextTypes.DEFAULT_TYPE
 
@@ -154,6 +155,14 @@ async def send_show_direct(
             ),
         ]])
     )
+
+    if chat_id in config['ADMINS']:
+        try:
+            await update.effective_message.reply_text(
+                f'user id: {direct.sender_id}'
+            )
+        except Exception as e:
+            logging.exception(e)
 
     if msg_id and not direct.seen:
         try:
