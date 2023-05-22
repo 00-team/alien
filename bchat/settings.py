@@ -8,6 +8,8 @@ from sqlalchemy.ext.declarative import declarative_base
 BYTE_ORDER = 'little'
 HOME_DIR = Path(__file__).parent
 
+DEF_PHOTO = HOME_DIR / 'default.jpeg'
+
 DATABASE_PATH = HOME_DIR / 'sqlite.db'
 DATABASE_URL = 'sqlite:///' + str(DATABASE_PATH)
 

@@ -12,8 +12,8 @@ from modules import show_saved_users, toggle_saved_user, toggle_user_block
 from modules import user_edit_age, user_edit_gender, user_edit_name, user_link
 from modules import user_link_extra, user_profile, user_set_age
 from modules import user_set_gender, user_set_name
-from settings import HOME_DIR, KW_DRTNSEN, KW_MY_LINK, KW_PROFILE, KW_SAVELST
-from settings import MAIN_KEYBOARD, database
+from settings import DEF_PHOTO, HOME_DIR, KW_DRTNSEN, KW_MY_LINK, KW_PROFILE
+from settings import KW_SAVELST, MAIN_KEYBOARD, database
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler
@@ -54,14 +54,6 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
             )
             return
 
-        pictures = await ctx.bot.get_user_profile_photos(
-            code_user_data.user_id, limit=1
-        )
-
-        file_id = config['default_profile_picture']
-        if pictures.total_count > 0:
-            file_id = pictures.photos[0][0].file_id
-
         text = (
             f'نام: {code_user_data.name}\n'
             f'جنسیت: {GENDER_DISPLAY[code_user_data.gender]}\n'
@@ -99,10 +91,19 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
                 '\n\nاین کاربر شما را بلاک کرده. ⛔'
             )
 
-        await update.effective_message.reply_photo(
+        pictures = await ctx.bot.get_user_profile_photos(
+            code_user_data.user_id, limit=1
+        )
+
+        file_id = DEF_PHOTO
+        if pictures.total_count > 0:
+            file_id = pictures.photos[0][0].file_id
+
+        res = await update.effective_message.reply_photo(
             file_id, text + trail_text,
             reply_markup=InlineKeyboardMarkup([keyboard]) if keyboard else None
         )
+        logging.info(res)
 
         return
 
