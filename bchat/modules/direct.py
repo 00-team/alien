@@ -9,6 +9,7 @@ from database import update_user
 from dependencies import require_user_data
 from models import DirectModel, UserModel
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.error import BadRequest, Forbidden
 from telegram.ext import ContextTypes, ConversationHandler
 from utils import config
 
@@ -202,6 +203,8 @@ async def send_show_direct(
     if user_data.direct_msg_id:
         try:
             await ctx.bot.delete_message(chat_id, user_data.direct_msg_id)
+        except (BadRequest, Forbidden) as e:
+            logging.warn(e)
         except Exception as e:
             logging.exception(e)
         finally:
