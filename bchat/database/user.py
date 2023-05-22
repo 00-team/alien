@@ -75,3 +75,9 @@ async def update_user_code(user_id: int, codename=None):
     )
 
     return codename
+
+
+async def get_user_count() -> int:
+    query = 'SELECT COUNT(user_id) FROM users '
+
+    return (await database.fetch_one(query))[0]

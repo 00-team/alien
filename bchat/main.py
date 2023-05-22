@@ -12,6 +12,7 @@ from modules import show_saved_users, toggle_saved_user, toggle_user_block
 from modules import user_edit_age, user_edit_gender, user_edit_name, user_link
 from modules import user_link_extra, user_profile, user_set_age
 from modules import user_set_gender, user_set_name
+from modules.admin import stats
 from settings import DEF_PHOTO, HOME_DIR, KW_DRTNSEN, KW_MY_LINK, KW_PROFILE
 from settings import KW_SAVELST, MAIN_KEYBOARD, database
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -144,6 +145,7 @@ def main():
     # ))
 
     application.add_handler(CommandHandler(['start', 'restart'], start))
+    application.add_handler(CommandHandler(['stats'], stats))
 
     application.add_handler(MessageHandler(
         filters.Text([KW_PROFILE]),

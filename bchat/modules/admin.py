@@ -1,5 +1,6 @@
 
 
+from database import get_user_count
 from dependencies import require_admin
 from telegram import Update
 
@@ -23,3 +24,11 @@ async def get_file_id(update: Update, ctx):
             'animation: \n'
             f'<pre>{update.message.animation.file_id}</pre>'
         )
+
+
+@require_admin
+async def stats(update: Update, ctx):
+    users = await get_user_count()
+    await update.effective_message.reply_text(
+        f'total users: {users}'
+    )
