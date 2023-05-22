@@ -21,9 +21,19 @@ async def send_direct_message(update: Update, ctx: Ctx, user_data: UserModel):
 
     send_type, send_id = update.callback_query.data.split('#')
     send_id = int(send_id)
+    reply_to_msg_id = None
+    text = 'پیام خود را ارسال کنید:'
+
+    if send_type == 'direct_reply':
+        reply_to_msg_id = update.effective_message.id
+        text = (
+            '☝️ در حال پاسخ دادن به فرستنده این '
+            'پیام هستی ... ؛ منتظریم بفرستی :)'
+        )
 
     msg = await update.effective_message.reply_text(
-        'پیام خود را ارسال کنید:',
+        text,
+        reply_to_message_id=reply_to_msg_id,
         reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
             'لغو ❌', callback_data='cancel_direct_message'
         )]])
