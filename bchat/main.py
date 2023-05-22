@@ -4,14 +4,14 @@ import logging
 from database import get_user
 from dependencies import require_user_data
 from models import UserModel
-from models.user import gender_pattern
+from models.user import GENDER_DISPLAY, gender_pattern
 from modules import cancel_direct_message, cancel_edit_profile
-from modules import get_profile_text, handle_direct_message
-from modules import send_direct_message, send_not_seen_messages
-from modules import show_direct_message, show_saved_users, toggle_saved_user
-from modules import toggle_user_block, user_edit_age, user_edit_gender
-from modules import user_edit_name, user_link, user_link_extra, user_profile
-from modules import user_set_age, user_set_gender, user_set_name
+from modules import handle_direct_message, send_direct_message
+from modules import send_not_seen_messages, show_direct_message
+from modules import show_saved_users, toggle_saved_user, toggle_user_block
+from modules import user_edit_age, user_edit_gender, user_edit_name, user_link
+from modules import user_link_extra, user_profile, user_set_age
+from modules import user_set_gender, user_set_name
 from settings import HOME_DIR, KW_DRTNSEN, KW_MY_LINK, KW_PROFILE, KW_SAVELST
 from settings import MAIN_KEYBOARD, database
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -62,13 +62,13 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
         if pictures.total_count > 0:
             file_id = pictures.photos[0][0].file_id
 
-        text = get_profile_text(code_user_data, ctx.bot.username)
-
-        trail_text = (
-            f'\n\n می تونی برای {code_user_data.name} پیام ناشناس بفرستی'
-            ' و هر حرف یا انتقادی که تو دلت هست رو بگی چون پیامت به صورت '
-            'کاملا ناشناس ارسال میشه!\n'
+        text = (
+            f'نام: {code_user_data.name}\n'
+            f'جنسیت: {GENDER_DISPLAY[code_user_data.gender]}\n'
+            f'سن: {user_data.age}\n'
         )
+
+        trail_text = '\n\n👇 دکمه ارسال پیام رو بزن و بعدش پیامت رو ارسال کن.'
 
         keyboard = []
         if str(code_user_data.user_id) in user_data.saved_list:
