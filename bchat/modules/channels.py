@@ -6,7 +6,9 @@ from database import get_user
 from dependencies import require_admin
 from settings import HOME_DIR
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.error import NetworkError, TelegramError
 from telegram.ext import ContextTypes, ConversationHandler
+from utils import config
 
 from gshare import DbDict
 
@@ -101,7 +103,6 @@ async def rq_channel_query(update: Update, ctx: Ctx):
     query = update.callback_query
     await query.answer()
 
-    logging.info(f'{query.data=}\n{query.message=}')
     if not query.data or not query.message:
         return
 
@@ -111,7 +112,6 @@ async def rq_channel_query(update: Update, ctx: Ctx):
         return
 
     action, cid = data
-    logging.info(f'{cid=}\n{action=}')
 
     if cid not in rq_channels:
         return
@@ -140,6 +140,11 @@ async def rq_channel_query(update: Update, ctx: Ctx):
 @require_admin
 async def rq_channel_set_limit(update: Update, ctx: Ctx):
     cid = ctx.user_data.pop('rq_channel_id', None)
+
+    if update.message.text == '/cancel':
+        await update.effective_message.reply_text('Canceled.')
+        return ConversationHandler.END
+
     if cid in rq_channels:
         try:
             rq_channels[cid]['limit'] = int(update.message.text)
@@ -157,3 +162,55 @@ async def channel_list(update: Update, ctx: Ctx):
         'list of all channels',
         reply_markup=await get_keyboard_chats(ctx)
     )
+
+
+def require_joined(func):
+    async def decorator(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+        if not update.effective_message or not update.effective_user:
+            return
+
+        not_joined = []
+        user = update.effective_user
+
+        if user.is_bot:
+            return
+
+        if user.id in config['ADMINS']:
+            await func(update, ctx)
+            return
+
+        for cid, cval in rq_channels.items():
+            cid = int(cid)
+            if not cval['enable']:
+                continue
+
+            try:
+                member = await ctx.bot.get_chat_member(cid, user.id)
+
+                if member.status in ['left', 'kicked']:
+                    chat = await ctx.bot.get_chat(cid)
+                    if not chat.invite_link:
+                        continue
+                    not_joined.append([
+                        InlineKeyboardButton(
+                            chat.title, url=chat.invite_link
+                        )
+                    ])
+
+            except NetworkError:
+                continue
+            except TelegramError as e:
+                logging.exception(e)
+                # channel_remove(chat_id)
+                continue
+
+        if not_joined:
+            await update.message.reply_text(
+                'اول مطمئن شوید که در کانال های زیر عضو شدید.',
+                reply_markup=InlineKeyboardMarkup(not_joined)
+            )
+
+        else:
+            await func(update, ctx)
+
+    return decorator

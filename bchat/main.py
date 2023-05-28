@@ -237,7 +237,7 @@ def main():
         },
         fallbacks=[
             CommandHandler(
-                ['cancel'], cancel,
+                'cancel', cancel,
             ),
         ],
     ))

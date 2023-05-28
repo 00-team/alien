@@ -13,6 +13,8 @@ from telegram.error import BadRequest, Forbidden
 from telegram.ext import ContextTypes, ConversationHandler
 from utils import config
 
+from .channels import require_joined
+
 Ctx = ContextTypes.DEFAULT_TYPE
 
 
@@ -211,6 +213,7 @@ async def send_show_direct(
             await update_user(user_data.user_id, direct_msg_id=None)
 
 
+@require_joined
 @require_user_data
 async def show_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     await update.callback_query.answer()
@@ -221,6 +224,7 @@ async def show_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     await send_show_direct(update, ctx, direct, usr_data)
 
 
+@require_joined
 @require_user_data
 async def send_not_seen_messages(update: Update, ctx: Ctx, user_data: UserModel):
     if update.callback_query:
