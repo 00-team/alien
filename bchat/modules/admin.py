@@ -13,19 +13,19 @@ async def get_file_id(update: Update, ctx: Ctx):
     if update.message.photo:
         await update.message.reply_html(
             'photo: \n'
-            f'<pre>{update.message.photo[0].file_id}</pre>'
+            f'<code>{update.message.photo[0].file_id}</code>'
         )
 
     if update.message.video:
         await update.message.reply_html(
             'video: \n'
-            f'<pre>{update.message.video.file_id}</pre>'
+            f'<code>{update.message.video.file_id}</code>'
         )
 
     if update.message.animation:
         await update.message.reply_html(
             'animation: \n'
-            f'<pre>{update.message.animation.file_id}</pre>'
+            f'<code>{update.message.animation.file_id}</code>'
         )
 
 
@@ -40,16 +40,16 @@ async def get_user_score(update: Update, ctx: Ctx):
 
     user_data = await get_user(None, ctx.args[0])
     if user_data is None:
-        await update.effective_message.reply_html(
-            f'Error ❌\nuser with code <pre>{ctx.args[0]}</pre> was not found'
+        await update.effective_message.reply_text(
+            f'Error ❌\nuser with code {ctx.args[0]} was not found'
         )
         return
 
     await update.effective_message.reply_html(
         'User: \n'
-        f'\tid: {user_data.user_id}\n'
-        f'\tname: {user_data.name}\n'
-        f'\tinvite score: <pre>{user_data.invite_score}</pre>'
+        f'    id: <code>{user_data.user_id}</code>\n'
+        f'    name: {user_data.name}\n'
+        f'    invite score: {user_data.invite_score}\n🐧'
     )
 
     if len(ctx.args) == 3 and ctx.args[1] == 'set':
@@ -59,12 +59,12 @@ async def get_user_score(update: Update, ctx: Ctx):
                 user_data.user_id,
                 invite_score=new_score
             )
-            await update.effective_message.reply_html(
-                f'Ok ✅\nuser invite score was set to: <pre>{new_score}</pre>'
+            await update.effective_message.reply_text(
+                f'Ok ✅\nuser invite score was set to: {new_score} 🤡'
             )
         except Exception:
-            await update.effective_message.reply_html(
-                f'Error ❌\ninvalid invite score: <pre>{ctx.args[2]}</pre>'
+            await update.effective_message.reply_text(
+                f'Error ❌\ninvalid invite score: {ctx.args[2]}'
             )
 
 
