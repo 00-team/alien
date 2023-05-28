@@ -3,7 +3,7 @@
 from database import get_user, get_user_count, update_user
 from dependencies import require_admin
 from telegram import Update
-from telegram.ext import ContextTypes
+from telegram.ext import ContextTypes, ConversationHandler
 
 Ctx = ContextTypes.DEFAULT_TYPE
 
@@ -74,3 +74,9 @@ async def stats(update: Update, ctx: Ctx):
     await update.effective_message.reply_text(
         f'total users: {users}'
     )
+
+
+@require_admin
+async def cancel(update: Update, ctx: Ctx):
+    await update.effective_message.reply_text('canceled.')
+    return ConversationHandler.END

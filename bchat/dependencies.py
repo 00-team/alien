@@ -20,6 +20,9 @@ def require_admin(func):
 def require_user_data(func):
     async def decorator(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         user = update.effective_user
+        if user.is_bot:
+            return
+
         user_data = await get_user(user.id)
 
         if user_data is None:

@@ -12,14 +12,16 @@ from modules import show_saved_users, toggle_saved_user, toggle_user_block
 from modules import user_edit_age, user_edit_gender, user_edit_name, user_link
 from modules import user_link_extra, user_profile, user_set_age
 from modules import user_set_gender, user_set_name
-from modules.admin import get_user_score, stats
+from modules.admin import cancel, get_user_score, stats
+from modules.channels import chat_member_update, my_chat_update
+from modules.channels import rq_channel_query, rq_channel_set_limit
 from settings import DEF_PHOTO, HOME_DIR, KW_DRTNSEN, KW_MY_LINK, KW_PROFILE
 from settings import KW_SAVELST, MAIN_KEYBOARD, database
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardMarkup, Update
-from telegram.ext import Application, CallbackQueryHandler, CommandHandler
-from telegram.ext import ContextTypes, ConversationHandler, MessageHandler
-from telegram.ext import filters
+from telegram.ext import Application, CallbackQueryHandler, ChatMemberHandler
+from telegram.ext import CommandHandler, ContextTypes, ConversationHandler
+from telegram.ext import MessageHandler, filters
 from utils import config
 
 from gshare import get_error_handler, setup_logging
@@ -144,6 +146,13 @@ def main():
     application.post_init = post_init
     application.post_shutdown = post_shutdown
 
+    application.add_handler(ChatMemberHandler(
+        chat_member_update, ChatMemberHandler.CHAT_MEMBER
+    ))
+    application.add_handler(ChatMemberHandler(
+        my_chat_update, ChatMemberHandler.MY_CHAT_MEMBER
+    ))
+
     # application.add_handler(MessageHandler(
     #     filters.VIDEO | filters.PHOTO | filters.ANIMATION,
     #     get_file_id
@@ -174,6 +183,11 @@ def main():
     ))
 
     application.add_handler(CallbackQueryHandler(
+        rq_channel_query,
+        pattern='^(toggle_rq_channel|leave_rq_channel)#[0-9]+$'
+    ))
+
+    application.add_handler(CallbackQueryHandler(
         toggle_saved_user,
         pattern='^(remove_saved_user|save_user)#[0-9]+$'
     ))
@@ -201,6 +215,30 @@ def main():
     application.add_handler(CallbackQueryHandler(
         coming_soon,
         pattern='^coming_soon$'
+    ))
+
+    # set rq channel limit
+    application.add_handler(ConversationHandler(
+        per_message=False,
+        entry_points=[
+            CallbackQueryHandler(
+                rq_channel_query,
+                pattern='^set_rq_channel_limit#[0-9]+$'
+            ),
+        ],
+        states={
+            'EDIT_RQ_CH_LIMIT': [
+                MessageHandler(
+                    filters.ChatType.PRIVATE,
+                    rq_channel_set_limit,
+                )
+            ],
+        },
+        fallbacks=[
+            CommandHandler(
+                ['cancel'], cancel,
+            ),
+        ],
     ))
 
     # edit gender
