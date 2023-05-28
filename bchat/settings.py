@@ -14,6 +14,7 @@ DATABASE_PATH = HOME_DIR / 'sqlite.db'
 DATABASE_URL = 'sqlite:///' + str(DATABASE_PATH)
 
 
+CODE_CHANGE_COST = 40
 AGE_RANGE = [5, 99]
 NAME_RANGE = [3, 15]
 KW_PROFILE = 'پروفایل من 👤'

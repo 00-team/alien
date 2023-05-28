@@ -1,10 +1,11 @@
 
 import logging
+import string
 
 from database import get_user, update_user
 from dependencies import require_user_data
 from models import GENDER_DISPLAY, Genders, UserModel
-from settings import AGE_RANGE, NAME_RANGE
+from settings import AGE_RANGE, CODE_CHANGE_COST, NAME_RANGE
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes, ConversationHandler
@@ -28,7 +29,7 @@ profile_keyboard = InlineKeyboardMarkup([
             'تغییر عکس پروفایل 🖼', callback_data='coming_soon'
         ),
         InlineKeyboardButton(
-            'تغییر کد', callback_data='coming_soon'
+            'تغییر کد 🔥', callback_data='user_edit_code'
         ),
     ]
 ])
@@ -301,6 +302,110 @@ async def user_set_name(update: Update, ctx: Ctx, user_data: UserModel):
 
     if error_msg_id:
         ctx.user_data.pop('user_set_name_error_message_id', None)
+        try:
+            await ctx.bot.delete_message(chat_id, error_msg_id)
+        except Exception as e:
+            logging.exception(e)
+
+    return ConversationHandler.END
+
+
+''' edit code '''
+
+
+@require_user_data
+async def user_edit_code(update: Update, ctx: Ctx, user_data: UserModel):
+    await update.callback_query.answer()
+
+    ava_score = user_data.total_score - user_data.used_score
+    if ava_score < CODE_CHANGE_COST:
+        await update.effective_message.reply_text(
+            f'حداقل امتیاز برای تغییر کد {CODE_CHANGE_COST} می باشد. ❌\n'
+            f'امتیاز قابل استفاده شما: {ava_score}'
+        )
+        return ConversationHandler.END
+
+    await update.effective_message.edit_caption(
+        'کد مدنظر خود را ارسال کنید:',
+        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
+            'لغو ❌', callback_data='cancel_edit_profile'
+        )]])
+    )
+
+    ctx.user_data['user_profile_message_id'] = update.effective_message.id
+
+    return 'EDIT_CODE'
+
+
+@require_user_data
+async def user_set_code(update: Update, ctx: Ctx, user_data: UserModel):
+
+    chat_id = update.effective_message.chat_id
+    error_msg_id = ctx.user_data.get('user_set_code_error_message_id')
+
+    ava_score = user_data.total_score - user_data.used_score
+    if ava_score < CODE_CHANGE_COST:
+        await update.effective_message.reply_text(
+            'حداقل امتیاز برای تغییر کد 40 می باشد. ❌\n'
+            f'امتیاز قابل استفاده شما: {ava_score}'
+        )
+        return ConversationHandler.END
+
+    try:
+        code = update.effective_message.text
+        if len(code) > 25:
+            raise ValueError('خطا! حداکثر طول کد 25 می باشد. ❌')
+
+        for c in code:
+            if c not in string.ascii_letters + string.digits + '_':
+                raise ValueError(
+                    'خطا! فقط حروف و اعداد انگلیسی قابل قبول می باشد. ❌'
+                )
+
+        others = await get_user(codename=code)
+
+        if others:
+            raise ValueError('خطا! این کد قبلا استفاده شده. ❌')
+    except ValueError as e:
+        try:
+            await update.effective_message.delete()
+        except Exception as exr:
+            logging.exception(exr)
+
+        if error_msg_id is None:
+            em = await update.effective_message.reply_text(str(e))
+            ctx.user_data['user_set_code_error_message_id'] = em.id
+        else:
+            await ctx.bot.edit_message_text(str(e), chat_id, error_msg_id)
+
+        return
+
+    msg_id = ctx.user_data.pop('user_profile_message_id', None)
+
+    await update_user(
+        user_data.user_id,
+        codename=code,
+        used_score=user_data.used_score + CODE_CHANGE_COST
+    )
+    user_data.codename = code
+
+    if msg_id:
+        await ctx.bot.edit_message_caption(
+            chat_id,
+            message_id=msg_id,
+            caption=get_profile_text(user_data, ctx.bot.username),
+            parse_mode=ParseMode.HTML,
+            reply_markup=profile_keyboard
+        )
+        try:
+            await update.effective_message.delete()
+        except Exception as e:
+            logging.exception(e)
+    else:
+        await update.effective_message.reply_text('کد شما ثبت شد. ✅')
+
+    if error_msg_id:
+        ctx.user_data.pop('user_set_code_error_message_id', None)
         try:
             await ctx.bot.delete_message(chat_id, error_msg_id)
         except Exception as e:

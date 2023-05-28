@@ -15,6 +15,7 @@ from modules import user_set_gender, user_set_name
 from modules.admin import cancel, get_user_score, help_cmd, stats
 from modules.channels import channel_list, chat_member_update, my_chat_update
 from modules.channels import rq_channel_query, rq_channel_set_limit
+from modules.user import user_edit_code, user_set_code
 from settings import DEF_PHOTO, HOME_DIR, KW_DRTNSEN, KW_MY_LINK, KW_PROFILE
 from settings import KW_SAVELST, MAIN_KEYBOARD, database
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -305,6 +306,31 @@ def main():
                 MessageHandler(
                     filters.ChatType.PRIVATE,
                     user_set_name,
+                )
+            ],
+        },
+        fallbacks=[
+            CallbackQueryHandler(
+                cancel_edit_profile,
+                pattern='^cancel_edit_profile$'
+            )
+        ],
+    ))
+
+    # edit code
+    application.add_handler(ConversationHandler(
+        per_message=False,
+        entry_points=[
+            CallbackQueryHandler(
+                user_edit_code,
+                pattern='^user_edit_code$'
+            )
+        ],
+        states={
+            'EDIT_CODE': [
+                MessageHandler(
+                    filters.ChatType.PRIVATE,
+                    user_set_code,
                 )
             ],
         },

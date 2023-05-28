@@ -53,16 +53,20 @@ async def get_user_score(update: Update, ctx: Ctx):
         f'    used  score: {user_data.used_score}\n🐧'
     )
 
-    if len(ctx.args) == 3 and ctx.args[1] == 'set':
+    if len(ctx.args) >= 3 and ctx.args[1] == 'set':
         try:
-            new_score = min(int(ctx.args[2]), user_data.total_score)
-            await update_user(
-                user_data.user_id,
-                used_score=new_score
-            )
+            if len(ctx.args) > 3 and ctx.args[3] == 'total':
+                await update_user(
+                    user_data.user_id, total_score=int(ctx.args[2])
+                )
+            else:
+                new_score = min(int(ctx.args[2]), user_data.total_score)
+                await update_user(
+                    user_data.user_id,
+                    used_score=new_score
+                )
             await update.effective_message.reply_text(
-                'Ok ✅\nuser used score was set to: '
-                f'{new_score}/{user_data.total_score} 🤡'
+                'Ok ✅\nuser score was updated'
             )
         except Exception:
             await update.effective_message.reply_text(
@@ -85,6 +89,7 @@ async def help_cmd(update: Update, ctx: Ctx):
         '/stats -> user count\n'
         '/user_score <code> -> get the user score\n'
         '/user_score <code> set 12 -> set the user used score\n'
+        '/user_score <code> set 12 total -> set the user total score\n'
         '/channels -> get list of channels'
     )
 
