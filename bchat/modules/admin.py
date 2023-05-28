@@ -49,8 +49,8 @@ async def get_user_score(update: Update, ctx: Ctx):
         'User: \n'
         f'    id: <code>{user_data.user_id}</code>\n'
         f'    name: {user_data.name}\n'
-        f'    total score: {user_data.total_score}\n🐧'
-        f'    used  score: {user_data.used_score}\n🐧'
+        f'    total score: {user_data.total_score}\n'
+        f'    used  score: {user_data.used_score}'
     )
 
     if len(ctx.args) >= 3 and ctx.args[1] == 'set':
