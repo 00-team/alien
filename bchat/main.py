@@ -174,6 +174,10 @@ def main():
         filters.Text([KW_MY_LINK]),
         user_link
     ))
+    application.add_handler(CallbackQueryHandler(
+        user_link,
+        pattern='^user_link$'
+    ))
 
     application.add_handler(MessageHandler(
         filters.Text([KW_DRTNSEN]),

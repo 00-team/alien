@@ -5,7 +5,7 @@ import string
 from database import get_user, update_user
 from dependencies import require_user_data
 from models import GENDER_DISPLAY, Genders, UserModel
-from settings import AGE_RANGE, CODE_CHANGE_COST, NAME_RANGE
+from settings import AGE_RANGE, CODE_CHANGE_COST, NAME_CHANGE_COST, NAME_RANGE
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes, ConversationHandler
@@ -242,8 +242,28 @@ async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
 @require_user_data
 async def user_edit_name(update: Update, ctx: Ctx, user_data: UserModel):
     await update.callback_query.answer()
+    ava_score = user_data.total_score - user_data.used_score
+
+    if ava_score < NAME_CHANGE_COST:
+        await update.effective_message.reply_text(
+            (
+                'حداقل امتیاز برای تغییر نام '
+                f'{NAME_CHANGE_COST} امتیاز می باشد. ❌\n'
+                'هر فردی که به شما پیام ناشناس ارسال '
+                'کند 1 امتیاز محاسبه میشود.\n'
+                f'امتیاز قابل استفاده شما: {ava_score}'
+            ),
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton(
+                    'جمع آوری امتیاز 🌟',
+                    callback_data='user_link'
+                )
+            ]])
+        )
+        return ConversationHandler.END
 
     await update.effective_message.edit_caption(
+        f'برای تغییر نام {NAME_CHANGE_COST} امتیاز از حساب شما کسر می شود.\n\n'
         'نام خود را ارسال کنید.',
         reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
             'لغو ❌', callback_data='cancel_edit_profile'
@@ -258,6 +278,22 @@ async def user_edit_name(update: Update, ctx: Ctx, user_data: UserModel):
 @require_user_data
 async def user_set_name(update: Update, ctx: Ctx, user_data: UserModel):
     error_msg_id = ctx.user_data.get('user_set_name_error_message_id')
+    ava_score = user_data.total_score - user_data.used_score
+
+    if ava_score < NAME_CHANGE_COST:
+        await update.effective_message.reply_text((
+            'حداقل امتیاز برای تغییر نام '
+            f'{NAME_CHANGE_COST} امتیاز می باشد. ❌\n'
+            'هر فردی که به شما پیام ناشناس ارسال کند 1 امتیاز محاسبه میشود.\n'
+            f'امتیاز قابل استفاده شما: {ava_score}'),
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton(
+                    'جمع آوری امتیاز 🌟',
+                    callback_data='user_link'
+                )
+            ]])
+        )
+        return ConversationHandler.END
 
     try:
         name = update.effective_message.text
@@ -281,8 +317,13 @@ async def user_set_name(update: Update, ctx: Ctx, user_data: UserModel):
 
     msg_id = ctx.user_data.pop('user_profile_message_id', None)
 
-    await update_user(user_data.user_id, name=name)
+    await update_user(
+        user_data.user_id, name=name,
+        used_score=user_data.used_score + NAME_CHANGE_COST
+    )
     user_data.name = name
+    user_data.used_score += NAME_CHANGE_COST
+
     chat_id = update.effective_message.chat_id
 
     if msg_id:
@@ -316,16 +357,19 @@ async def user_set_name(update: Update, ctx: Ctx, user_data: UserModel):
 @require_user_data
 async def user_edit_code(update: Update, ctx: Ctx, user_data: UserModel):
     await update.callback_query.answer()
-
     ava_score = user_data.total_score - user_data.used_score
+
     if ava_score < CODE_CHANGE_COST:
         await update.effective_message.reply_text(
-            f'حداقل امتیاز برای تغییر کد {CODE_CHANGE_COST} می باشد. ❌\n'
+            'حداقل امتیاز برای تغییر کد '
+            f'{CODE_CHANGE_COST} امتیاز می باشد. ❌\n'
+            'هر فردی که به شما پیام ناشناس ارسال کند 1 امتیاز محاسبه میشود.\n'
             f'امتیاز قابل استفاده شما: {ava_score}'
         )
         return ConversationHandler.END
 
     await update.effective_message.edit_caption(
+        f'برای تغییر کد {CODE_CHANGE_COST} امتیاز از حساب شما کسر می شود.\n\n'
         'کد مدنظر خود را ارسال کنید:',
         reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
             'لغو ❌', callback_data='cancel_edit_profile'
@@ -342,11 +386,11 @@ async def user_set_code(update: Update, ctx: Ctx, user_data: UserModel):
 
     chat_id = update.effective_message.chat_id
     error_msg_id = ctx.user_data.get('user_set_code_error_message_id')
-
     ava_score = user_data.total_score - user_data.used_score
+
     if ava_score < CODE_CHANGE_COST:
         await update.effective_message.reply_text(
-            'حداقل امتیاز برای تغییر کد 40 می باشد. ❌\n'
+            f'حداقل امتیاز برای تغییر کد {CODE_CHANGE_COST} می باشد. ❌\n'
             f'امتیاز قابل استفاده شما: {ava_score}'
         )
         return ConversationHandler.END
