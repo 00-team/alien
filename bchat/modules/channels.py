@@ -205,7 +205,7 @@ def require_joined(func):
                 continue
 
         if not_joined:
-            await update.message.reply_text(
+            await update.effective_message.reply_text(
                 'اول مطمئن شوید که در کانال های زیر عضو شدید.',
                 reply_markup=InlineKeyboardMarkup(not_joined)
             )
