@@ -59,7 +59,7 @@ if check_diff "bchat/bchat.service"; then
     echo $SPACER
 fi
 
-if check_diff "bchat/database/*"; then
+if check_diff "bchat/models/*"; then
     echo "$EG Updateing the bchat database"
     cd bchat
     alembic revision --autogenerate
