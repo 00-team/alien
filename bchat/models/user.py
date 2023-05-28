@@ -18,6 +18,7 @@ class Users(BaseTable):
     direct_msg_id = Column(Integer)
     block_list = Column(JSON, server_default='{}')
     saved_list = Column(JSON, server_default='{}')
+    invite_score = Column(Integer, server_default=text('0'))
 
 
 class Genders(int, Enum):
