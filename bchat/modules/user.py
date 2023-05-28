@@ -44,7 +44,7 @@ def get_profile_text(user_data: UserModel, bot_username):
         f'جنسیت: {GENDER_DISPLAY[user_data.gender]}\n'
         f'سن: {user_data.age}\n'
         f'کد: `{user_data.codename}`\n'
-        f'کاربران دعوت شده: `{user_data.invite_score}`\n\n'
+        f'کاربران دعوت شده: <pre>{user_data.invite_score}</pre>\n\n'
         f'لینک ناشناس: {get_link(user_data.codename, bot_username)}\n\n'
     )
 
@@ -117,7 +117,7 @@ async def user_profile(update: Update, ctx: Ctx, user_data: UserModel):
 
     await update.message.reply_photo(
         file_id, get_profile_text(user_data, ctx.bot.username),
-        parse_mode=ParseMode.MARKDOWN_V2,
+        parse_mode=ParseMode.HTML,
         reply_markup=profile_keyboard
     )
 
@@ -157,7 +157,7 @@ async def user_set_gender(update: Update, ctx: Ctx, user_data: UserModel):
 
     await update.effective_message.edit_caption(
         get_profile_text(user_data, ctx.bot.username),
-        parse_mode=ParseMode.MARKDOWN_V2,
+        parse_mode=ParseMode.HTML,
         reply_markup=profile_keyboard
     )
 
@@ -214,7 +214,7 @@ async def user_set_age(update: Update, ctx: Ctx, user_data: UserModel):
             chat_id,
             message_id=msg_id,
             caption=get_profile_text(user_data, ctx.bot.username),
-            parse_mode=ParseMode.MARKDOWN_V2,
+            parse_mode=ParseMode.HTML,
             reply_markup=profile_keyboard
         )
         try:
@@ -288,7 +288,7 @@ async def user_set_name(update: Update, ctx: Ctx, user_data: UserModel):
             chat_id,
             message_id=msg_id,
             caption=get_profile_text(user_data, ctx.bot.username),
-            parse_mode=ParseMode.MARKDOWN_V2,
+            parse_mode=ParseMode.HTML,
             reply_markup=profile_keyboard
         )
         try:
@@ -314,7 +314,7 @@ async def cancel_edit_profile(update: Update, ctx: Ctx, user_data: UserModel):
 
     await update.effective_message.edit_caption(
         get_profile_text(user_data, ctx.bot.username),
-        parse_mode=ParseMode.MARKDOWN_V2,
+        parse_mode=ParseMode.HTML,
         reply_markup=profile_keyboard
     )
 
