@@ -130,7 +130,7 @@ async def rq_channel_query(update: Update, ctx: Ctx):
     else:
         return
 
-    await query.edit_message_reply_markup(await get_keyboard_chats(ctx.bot))
+    await query.edit_message_reply_markup(await get_keyboard_chats(ctx))
 
 
 @require_admin
@@ -151,5 +151,5 @@ async def rq_channel_set_limit(update: Update, ctx: Ctx):
 async def channel_list(update: Update, ctx: Ctx):
     await update.message.reply_text(
         'list of all channels',
-        reply_markup=await get_keyboard_chats(ctx.bot)
+        reply_markup=await get_keyboard_chats(ctx)
     )
