@@ -388,6 +388,7 @@ async def user_set_code(update: Update, ctx: Ctx, user_data: UserModel):
         used_score=user_data.used_score + CODE_CHANGE_COST
     )
     user_data.codename = code
+    user_data.used_score += CODE_CHANGE_COST
 
     if msg_id:
         await ctx.bot.edit_message_caption(
