@@ -36,6 +36,8 @@ class UserModel(BaseModel):
     direct_msg_id: int = None
     block_list: dict = {}
     saved_list: dict = {}
+    invite_score: int = 0
+    new_user: bool = False
 
 
 GENDER_DISPLAY = {

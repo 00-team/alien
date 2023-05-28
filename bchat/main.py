@@ -1,7 +1,7 @@
 
 import logging
 
-from database import get_user
+from database import get_user, update_user
 from dependencies import require_user_data
 from models import UserModel
 from models.user import GENDER_DISPLAY, gender_pattern
@@ -55,6 +55,12 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
             )
             return
 
+        if user_data.new_user:
+            await update_user(
+                code_user_data.user_id,
+                invite_score=code_user_data.invite_score + 1
+            )
+
         text = (
             f'نام: {code_user_data.name}\n'
             f'جنسیت: {GENDER_DISPLAY[code_user_data.gender]}\n'
@@ -100,11 +106,10 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
         if pictures.total_count > 0:
             file_id = pictures.photos[0][0].file_id
 
-        res = await update.effective_message.reply_photo(
+        await update.effective_message.reply_photo(
             file_id, text + trail_text,
             reply_markup=InlineKeyboardMarkup([keyboard]) if keyboard else None
         )
-        logging.info(res)
 
         return
 

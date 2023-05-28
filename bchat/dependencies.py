@@ -30,12 +30,12 @@ def require_user_data(func):
                 age=20,
                 gender=0,
                 codename=codename,
+                new_user=True,
             )
 
         if not user_data.codename:
             res, cn = await update_user_code(user_data.user_id)
             user_data.codename = cn
-            print(res)
 
         return await func(update, ctx, user_data)
 
