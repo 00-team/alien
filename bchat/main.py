@@ -101,13 +101,13 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
                 '\n\nاین کاربر شما را بلاک کرده. ⛔'
             )
 
-        pictures = await ctx.bot.get_user_profile_photos(
-            code_user_data.user_id, limit=1
-        )
+        # pictures = await ctx.bot.get_user_profile_photos(
+        #     code_user_data.user_id, limit=1
+        # )
 
         file_id = DEF_PHOTO
-        if pictures.total_count > 0:
-            file_id = pictures.photos[0][0].file_id
+        # if pictures.total_count > 0:
+        #     file_id = pictures.photos[0][0].file_id
 
         await update.effective_message.reply_photo(
             file_id, text + trail_text,

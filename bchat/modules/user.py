@@ -109,13 +109,13 @@ async def user_link_extra(update: Update, ctx: Ctx, user_data: UserModel):
 
 @require_user_data
 async def user_profile(update: Update, ctx: Ctx, user_data: UserModel):
-    user = update.effective_user
-    pictures = await user.get_profile_photos(limit=1)
+    # user = update.effective_user
+    # pictures = await user.get_profile_photos(limit=1)
 
     file_id = config['default_profile_picture']
 
-    if pictures.total_count > 0:
-        file_id = pictures.photos[0][0].file_id
+    # if pictures.total_count > 0:
+    #     file_id = pictures.photos[0][0].file_id
 
     await update.message.reply_photo(
         file_id, get_profile_text(user_data, ctx.bot.username),
