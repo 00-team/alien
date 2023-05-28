@@ -18,7 +18,8 @@ class Users(BaseTable):
     direct_msg_id = Column(Integer)
     block_list = Column(JSON, server_default='{}')
     saved_list = Column(JSON, server_default='{}')
-    invite_score = Column(Integer, server_default=text('0'))
+    total_score = Column(Integer, server_default=text('0'))
+    used_score = Column(Integer, server_default=text('0'))
 
 
 class Genders(int, Enum):
@@ -36,7 +37,8 @@ class UserModel(BaseModel):
     direct_msg_id: int = None
     block_list: dict = {}
     saved_list: dict = {}
-    invite_score: int = 0
+    total_score: int = 0
+    used_score: int = 0
     new_user: bool = False
 
 

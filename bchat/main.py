@@ -12,7 +12,7 @@ from modules import show_saved_users, toggle_saved_user, toggle_user_block
 from modules import user_edit_age, user_edit_gender, user_edit_name, user_link
 from modules import user_link_extra, user_profile, user_set_age
 from modules import user_set_gender, user_set_name
-from modules.admin import cancel, get_user_score, stats
+from modules.admin import cancel, get_user_score, help_cmd, stats
 from modules.channels import channel_list, chat_member_update, my_chat_update
 from modules.channels import rq_channel_query, rq_channel_set_limit
 from settings import DEF_PHOTO, HOME_DIR, KW_DRTNSEN, KW_MY_LINK, KW_PROFILE
@@ -60,7 +60,7 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
         if user_data.new_user:
             await update_user(
                 code_user_data.user_id,
-                invite_score=code_user_data.invite_score + 1
+                total_score=code_user_data.total_score + 1
             )
 
         text = (
@@ -162,6 +162,7 @@ def main():
     application.add_handler(CommandHandler(['stats'], stats))
     application.add_handler(CommandHandler(['user_score'], get_user_score))
     application.add_handler(CommandHandler(['channels'], channel_list))
+    application.add_handler(CommandHandler(['help'], help_cmd))
 
     application.add_handler(MessageHandler(
         filters.Text([KW_PROFILE]),

@@ -49,22 +49,24 @@ async def get_user_score(update: Update, ctx: Ctx):
         'User: \n'
         f'    id: <code>{user_data.user_id}</code>\n'
         f'    name: {user_data.name}\n'
-        f'    invite score: {user_data.invite_score}\n🐧'
+        f'    total score: {user_data.total_score}\n🐧'
+        f'    used  score: {user_data.used_score}\n🐧'
     )
 
     if len(ctx.args) == 3 and ctx.args[1] == 'set':
         try:
-            new_score = int(ctx.args[2])
+            new_score = min(int(ctx.args[2]), user_data.total_score)
             await update_user(
                 user_data.user_id,
-                invite_score=new_score
+                used_score=new_score
             )
             await update.effective_message.reply_text(
-                f'Ok ✅\nuser invite score was set to: {new_score} 🤡'
+                'Ok ✅\nuser used score was set to: '
+                f'{new_score}/{user_data.total_score} 🤡'
             )
         except Exception:
             await update.effective_message.reply_text(
-                f'Error ❌\ninvalid invite score: {ctx.args[2]}'
+                f'Error ❌\ninvalid score: {ctx.args[2]}'
             )
 
 
@@ -73,6 +75,17 @@ async def stats(update: Update, ctx: Ctx):
     users = await get_user_count()
     await update.effective_message.reply_text(
         f'total users: {users}'
+    )
+
+
+@require_admin
+async def help_cmd(update: Update, ctx: Ctx):
+    await update.effective_message.reply_text(
+        '/help -> for this message\n'
+        '/stats -> user count\n'
+        '/user_score <code> -> get the user score\n'
+        '/user_score <code> set 12 -> set the user used score\n'
+        '/channels -> get list of channels'
     )
 
 
