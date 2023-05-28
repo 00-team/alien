@@ -43,8 +43,8 @@ def get_profile_text(user_data: UserModel, bot_username):
         f'نام: {user_data.name}\n'
         f'جنسیت: {GENDER_DISPLAY[user_data.gender]}\n'
         f'سن: {user_data.age}\n'
-        f'کد: `{user_data.codename}`\n'
-        f'کاربران دعوت شده: <pre>{user_data.invite_score}</pre>\n\n'
+        f'کد: <code>{user_data.codename}</code>\n'
+        f'کاربران دعوت شده: <code>{user_data.invite_score}</code>\n\n'
         f'لینک ناشناس: {get_link(user_data.codename, bot_username)}\n\n'
     )
 
