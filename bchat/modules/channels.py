@@ -110,6 +110,7 @@ async def rq_channel_query(update: Update, ctx: Ctx):
         return
 
     action, cid = data
+    logging.info(f'{cid=}\n{action=}')
 
     if cid not in rq_channels:
         return
