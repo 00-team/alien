@@ -360,11 +360,17 @@ async def user_edit_code(update: Update, ctx: Ctx, user_data: UserModel):
     ava_score = user_data.total_score - user_data.used_score
 
     if ava_score < CODE_CHANGE_COST:
-        await update.effective_message.reply_text(
+        await update.effective_message.reply_text((
             'حداقل امتیاز برای تغییر کد '
             f'{CODE_CHANGE_COST} امتیاز می باشد. ❌\n'
             'هر فردی که به شما پیام ناشناس ارسال کند 1 امتیاز محاسبه میشود.\n'
-            f'امتیاز قابل استفاده شما: {ava_score}'
+            f'امتیاز قابل استفاده شما: {ava_score}'),
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton(
+                    'جمع آوری امتیاز 🌟',
+                    callback_data='user_link'
+                )
+            ]])
         )
         return ConversationHandler.END
 
@@ -389,9 +395,17 @@ async def user_set_code(update: Update, ctx: Ctx, user_data: UserModel):
     ava_score = user_data.total_score - user_data.used_score
 
     if ava_score < CODE_CHANGE_COST:
-        await update.effective_message.reply_text(
-            f'حداقل امتیاز برای تغییر کد {CODE_CHANGE_COST} می باشد. ❌\n'
-            f'امتیاز قابل استفاده شما: {ava_score}'
+        await update.effective_message.reply_text((
+            'حداقل امتیاز برای تغییر کد '
+            f'{CODE_CHANGE_COST} امتیاز می باشد. ❌\n'
+            'هر فردی که به شما پیام ناشناس ارسال کند 1 امتیاز محاسبه میشود.\n'
+            f'امتیاز قابل استفاده شما: {ava_score}'),
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton(
+                    'جمع آوری امتیاز 🌟',
+                    callback_data='user_link'
+                )
+            ]])
         )
         return ConversationHandler.END
 
