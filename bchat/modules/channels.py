@@ -1,5 +1,7 @@
 
 
+import logging
+
 from database import get_user
 from dependencies import require_admin
 from settings import HOME_DIR
@@ -108,7 +110,7 @@ async def rq_channel_query(update: Update, ctx: Ctx):
         return
 
     action, cid = data
-    cid = int(cid)
+
     if cid not in rq_channels:
         return
 
@@ -117,7 +119,7 @@ async def rq_channel_query(update: Update, ctx: Ctx):
         rq_channels.save()
 
     elif action == 'leave_rq_channel':
-        if (await ctx.bot.leave_chat(cid)):
+        if (await ctx.bot.leave_chat(int(cid))):
             rq_channels.pop(cid, None)
 
     elif action == 'set_rq_channel_limit':
