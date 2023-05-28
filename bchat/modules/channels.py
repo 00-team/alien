@@ -101,6 +101,7 @@ async def rq_channel_query(update: Update, ctx: Ctx):
     query = update.callback_query
     await query.answer()
 
+    logging.info(f'{query.data=}\n{query.message=}')
     if not query.data or not query.message:
         return
 

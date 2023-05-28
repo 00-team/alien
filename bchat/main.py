@@ -185,7 +185,7 @@ def main():
 
     application.add_handler(CallbackQueryHandler(
         rq_channel_query,
-        pattern='^(toggle_rq_channel|leave_rq_channel)#[0-9]+$'
+        pattern='^(toggle_rq_channel|leave_rq_channel)#(-|)[0-9]+$'
     ))
 
     application.add_handler(CallbackQueryHandler(
@@ -224,7 +224,7 @@ def main():
         entry_points=[
             CallbackQueryHandler(
                 rq_channel_query,
-                pattern='^set_rq_channel_limit#[0-9]+$'
+                pattern='^set_rq_channel_limit#(-|)[0-9]+$'
             ),
         ],
         states={
