@@ -98,8 +98,11 @@ async def help_cmd(update: Update, ctx: Ctx):
         '/user_score <code> -> get the user score\n'
         '/user_score <code> set 12 -> set the user used score\n'
         '/user_score <code> set 12 total -> set the user total score\n'
-        '/channels -> get list of channels\n'
-        '/send_direct_to_all -> ...'
+        '/channels -> get list of channels\n---\n'
+        '/send_direct_to_all\n'
+        'limit=(69)\n\n'
+        'hi\n---\n'
+        '/cancel_send_direct_all -> ...'
     )
 
 
