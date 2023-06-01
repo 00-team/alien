@@ -111,6 +111,8 @@ async def cancel(update: Update, ctx: Ctx):
 
 
 async def send_direct_to_all_job(ctx: Ctx):
+    logging.info('sending a message to all users')
+
     all_users = await database.fetch_all(
         select(Users)
     )
@@ -125,7 +127,8 @@ async def send_direct_to_all_job(ctx: Ctx):
     limit = ctx.job.data['limit']
 
     if limit and limit < len(all_users):
-        all_users = random.shuffle(all_users)[:limit]
+        random.shuffle(all_users)
+        all_users = all_users[:limit]
 
     for U in all_users:
         time.sleep(0.1)
@@ -190,32 +193,34 @@ async def send_direct_to_all(update: Update, ctx: Ctx):
     limit_idx = text.find('limit=(')
 
     if limit_idx > -1:
-        limit = text[limit_idx + 6:]
+        limit = text[limit_idx + 7:]
         limit_end = limit.find(')')
         limit = limit[:limit_end]
-        text = text[limit_idx+6+limit_end:]
+        text = text[limit_idx+6+limit_end+1:]
 
-    logging.info(f'{limit=}')
-    logging.info(f'{text=}')
-
-    return
-
-    try:
-        limit = int(ctx.args[0])
-        text = text[len(ctx.args[0]):]
-    except Exception:
-        pass
+    if limit:
+        try:
+            limit = int(limit)
+        except Exception:
+            limit = None
 
     if not text:
         await update.effective_message.reply_text('Empty Message ❌')
 
-    return
-
     msg = await update.effective_message.reply_text(text)
     total_users = await get_user_count()
 
+    await update.effective_message.reply_text(
+        f'limit is: {limit}\n'
+        '/cancel_send_direct_all'
+    )
+
+    if ctx.job_queue.get_jobs_by_name('send_direct_to_all'):
+        await update.effective_message.reply_text('job already in queue. 🤡')
+        return
+
     ctx.job_queue.run_once(
-        send_direct_to_all_job, 1,
+        send_direct_to_all_job, 20,
         chat_id=msg.chat.id,
         user_id=update.effective_user.id,
         data={
@@ -230,4 +235,15 @@ async def send_direct_to_all(update: Update, ctx: Ctx):
     await msg.reply_text(
         '✅ پیام شما ذخیره شد ، پیام شما به '
         f'{limit}/{total_users} نفر ارسال خواهد شد .'
+    )
+
+
+@require_admin
+async def cancel_send_direct_all(update: Update, ctx: Ctx):
+    jbs = ctx.job_queue.get_jobs_by_name('send_direct_to_all')
+    for j in jbs:
+        j.schedule_removal()
+
+    await update.effective_message.reply_text(
+        'send direct to all was stoped.'
     )

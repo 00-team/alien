@@ -12,8 +12,8 @@ from modules import show_saved_users, toggle_saved_user, toggle_user_block
 from modules import user_edit_age, user_edit_gender, user_edit_name, user_link
 from modules import user_link_extra, user_profile, user_set_age
 from modules import user_set_gender, user_set_name
-from modules.admin import cancel, get_user_score, help_cmd, send_direct_to_all
-from modules.admin import stats
+from modules.admin import cancel, cancel_send_direct_all, get_user_score
+from modules.admin import help_cmd, send_direct_to_all, stats
 from modules.channels import channel_list, chat_member_update, my_chat_update
 from modules.channels import rq_channel_query, rq_channel_set_limit
 from modules.user import user_edit_code, user_set_code
@@ -167,6 +167,9 @@ def main():
     application.add_handler(CommandHandler(['help'], help_cmd))
     application.add_handler(CommandHandler(
         ['send_direct_to_all'], send_direct_to_all
+    ))
+    application.add_handler(CommandHandler(
+        ['cancel_send_direct_all'], cancel_send_direct_all
     ))
 
     application.add_handler(MessageHandler(
