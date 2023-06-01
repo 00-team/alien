@@ -174,10 +174,13 @@ async def send_show_direct(
                     'پاسخ ✍', callback_data=f'direct_reply#{direct.direct_id}'
                 ),
                 InlineKeyboardButton(
-                    'بلاک ⛔', callback_data=f'toggle_user_block#{direct.sender_id}'
+                    'بلاک ⛔',
+                    callback_data=f'toggle_user_block#{direct.sender_id}'
                 ),
             ]])
         )
+    except BadRequest:
+        pass
     except Exception as e:
         logging.exception(e)
 
