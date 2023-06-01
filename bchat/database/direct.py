@@ -50,6 +50,8 @@ async def get_direct_notseen(user_id: int) -> list[DirectModel]:
     for result in await database.fetch_all(query):
         directs.append(DirectModel(**result))
 
+    logging.info(f'not seen directs len: {len(directs)}/10')
+
     return directs
 
 
