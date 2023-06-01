@@ -174,9 +174,10 @@ async def send_show_direct(
             sender_chat = await ctx.bot.get_chat(direct.sender_id)
 
             await update.effective_message.reply_text(
-                f'id: {sender_chat.id}'
-                f'name: {sender_chat.full_name}'
-                f'username: @{sender_chat.username}',
+                f'USERS INFO:\n'
+                f'id: {sender_chat.id}\n'
+                f'name: {sender_chat.full_name}\n'
+                f'username: @{sender_chat.username}\n',
             )
         except Exception as e:
             logging.exception(e)
