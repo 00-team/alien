@@ -187,6 +187,8 @@ async def send_direct_to_all(update: Update, ctx: Ctx):
     text = update.effective_message.text[19:]
     limit = None
 
+    logging.info(ctx.args)
+
     try:
         limit = int(ctx.args[0])
         text = text[len(ctx.args[0]):]
@@ -195,6 +197,8 @@ async def send_direct_to_all(update: Update, ctx: Ctx):
 
     if not text:
         await update.effective_message.reply_text('Empty Message ❌')
+
+    return
 
     msg = await update.effective_message.reply_text(text)
     total_users = await get_user_count()
