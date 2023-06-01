@@ -154,7 +154,6 @@ async def send_show_direct(
     chat_id = update.effective_message.chat_id
 
     if not direct:
-        await update.effective_message.reply_text('خطا در دریافت پیام! ❌')
         return
 
     repdir_mid = None
@@ -221,7 +220,6 @@ async def send_show_direct(
             await update_direct(direct.direct_id, seen=True)
 
     if not msg_id:
-        await update.effective_message.reply_text('خطا در دریافت پیام! ❌')
         return
 
     if user_data.direct_msg_id:
