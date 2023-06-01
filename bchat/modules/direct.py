@@ -179,7 +179,7 @@ async def send_show_direct(
                 ),
             ]])
         )
-    except BadRequest:
+    except (BadRequest, TimedOut):
         pass
     except Exception as e:
         logging.exception(e)
