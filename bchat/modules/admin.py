@@ -4,8 +4,7 @@ import logging
 import random
 import time
 
-from database import add_direct, get_direct_notseen_count, get_user
-from database import get_user_count, update_user
+from database import add_direct, get_user, get_user_count, update_user
 from dependencies import require_admin
 from models import UserModel, Users
 from settings import database
@@ -196,7 +195,8 @@ async def send_direct_to_all(update: Update, ctx: Ctx):
         limit = text[limit_idx + 7:]
         limit_end = limit.find(')')
         limit = limit[:limit_end]
-        text = text[limit_idx+6+limit_end+1:]
+
+        text = text[limit_idx+7+limit_end+1:]
 
     if limit:
         try:
@@ -212,6 +212,7 @@ async def send_direct_to_all(update: Update, ctx: Ctx):
 
     await update.effective_message.reply_text(
         f'limit is: {limit}\n'
+        'you have 30s to cancel this.\n'
         '/cancel_send_direct_all'
     )
 
@@ -220,7 +221,7 @@ async def send_direct_to_all(update: Update, ctx: Ctx):
         return
 
     ctx.job_queue.run_once(
-        send_direct_to_all_job, 20,
+        send_direct_to_all_job, 30,
         chat_id=msg.chat.id,
         user_id=update.effective_user.id,
         data={
