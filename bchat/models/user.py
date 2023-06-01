@@ -9,7 +9,6 @@ from sqlalchemy import JSON, Column, Integer, String, text
 class Users(BaseTable):
     __tablename__ = 'users'
 
-    # row_id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     user_id = Column(Integer, primary_key=True, unique=True, index=True)
     codename = Column(String, nullable=False, index=True, unique=True)
     name = Column(String, nullable=False)

@@ -90,7 +90,8 @@ async def help_cmd(update: Update, ctx: Ctx):
         '/user_score <code> -> get the user score\n'
         '/user_score <code> set 12 -> set the user used score\n'
         '/user_score <code> set 12 total -> set the user total score\n'
-        '/channels -> get list of channels'
+        '/channels -> get list of channels\n'
+        '/send_direct_to_all -> ...'
     )
 
 
@@ -98,3 +99,8 @@ async def help_cmd(update: Update, ctx: Ctx):
 async def cancel(update: Update, ctx: Ctx):
     await update.effective_message.reply_text('canceled.')
     return ConversationHandler.END
+
+
+@require_admin
+async def send_direct_to_all(update: Update, ctx: Ctx):
+    print(update.effective_message.text)
