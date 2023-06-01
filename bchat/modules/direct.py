@@ -9,7 +9,7 @@ from database import update_user
 from dependencies import require_user_data
 from models import DirectModel, UserModel
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.error import BadRequest, Forbidden
+from telegram.error import BadRequest, Forbidden, TimedOut
 from telegram.ext import ContextTypes, ConversationHandler
 from utils import config
 
@@ -102,6 +102,8 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     if user_b and user_b.direct_msg_id:
         try:
             await ctx.bot.delete_message(receiver_id, user_b.direct_msg_id)
+        except TimedOut:
+            pass
         except Exception as e:
             logging.exception(e)
 
@@ -116,6 +118,8 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
         await update.effective_message.reply_text(
             'پیام شما به صورت ناشناس ارسال شد. ✅'
         )
+    except TimedOut:
+        pass
     except Exception as e:
         logging.exception(e)
 
@@ -126,6 +130,8 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     if send_msg_id:
         try:
             await ctx.bot.delete_message(chat_id, send_msg_id)
+        except TimedOut:
+            pass
         except Exception as e:
             logging.exception(e)
 
@@ -133,6 +139,8 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
         ctx.user_data.pop('handle_dirt_msg_err_msg_id', None)
         try:
             await ctx.bot.delete_message(chat_id, error_msg_id)
+        except TimedOut:
+            pass
         except Exception as e:
             logging.exception(e)
 
@@ -179,12 +187,16 @@ async def send_show_direct(
                 f'name: {sender_chat.full_name}\n'
                 f'username: @{sender_chat.username}\n',
             )
+        except TimedOut:
+            pass
         except Exception as e:
             logging.exception(e)
             try:
                 await update.effective_message.reply_text(
                     f'id: {direct.sender_id}'
                 )
+            except TimedOut:
+                pass
             except Exception as e:
                 logging.exception(e)
 
@@ -194,6 +206,8 @@ async def send_show_direct(
                 direct.sender_id, 'پیام شما مشاهده شد. 🧉',
                 reply_to_message_id=direct.message_id
             )
+        except TimedOut:
+            pass
         except Exception as e:
             logging.exception(e)
         finally:
@@ -208,6 +222,8 @@ async def send_show_direct(
             await ctx.bot.delete_message(chat_id, user_data.direct_msg_id)
         except (BadRequest, Forbidden) as e:
             logging.warn(e)
+        except TimedOut:
+            pass
         except Exception as e:
             logging.exception(e)
         finally:
@@ -256,12 +272,16 @@ async def cancel_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     if msg_id:
         try:
             await ctx.bot.delete_message(chat_id, msg_id)
+        except TimedOut:
+            pass
         except Exception as e:
             logging.exception(e)
 
     if error_msg_id:
         try:
             await ctx.bot.delete_message(chat_id, error_msg_id)
+        except TimedOut:
+            pass
         except Exception as e:
             logging.exception(e)
 
