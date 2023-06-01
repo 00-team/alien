@@ -187,7 +187,18 @@ async def send_direct_to_all(update: Update, ctx: Ctx):
     text = update.effective_message.text[19:]
     limit = None
 
-    logging.info(ctx.args)
+    limit_idx = text.find('limit=')
+
+    if limit_idx > -1:
+        limit = text[limit_idx + 6:]
+        limit_end = limit.find(' ')
+        limit = limit[:text.find(' ')]
+        text = text[limit_idx+6+limit_end:]
+
+    logging.info(f'{limit=}')
+    logging.info(f'{text=}')
+
+    return
 
     try:
         limit = int(ctx.args[0])
