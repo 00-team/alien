@@ -1,8 +1,16 @@
 
 
-from database import get_user, get_user_count, update_user
+import logging
+import time
+
+from database import add_direct, get_direct_notseen_count, get_user
+from database import get_user_count, update_user
 from dependencies import require_admin
-from telegram import Update
+from models import UserModel, Users
+from settings import database
+from sqlalchemy import select
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.error import Forbidden, NetworkError, RetryAfter, TelegramError
 from telegram.ext import ContextTypes, ConversationHandler
 
 Ctx = ContextTypes.DEFAULT_TYPE
@@ -101,7 +109,96 @@ async def cancel(update: Update, ctx: Ctx):
     return ConversationHandler.END
 
 
+async def send_direct_to_all_job(ctx: Ctx):
+    all_users = await database.fetch_all(
+        select(Users).where(Users.user_id == ctx.job.user_id)
+    )
+    data = {
+        'success': 0,
+        'blocked': 0,
+        'error': 0,
+        'timeout': 0,
+    }
+
+    for U in all_users:
+        time.sleep(0.1)
+        target = UserModel(**U)
+        direct_id = await add_direct(
+            target.user_id,
+            ctx.job.user_id,
+            ctx.job.data,
+        )
+
+        nseen_count = await get_direct_notseen_count(target.user_id)
+        keyboard = [InlineKeyboardButton(
+            'مشاهده 👀', callback_data=f'show_direct#{direct_id}'
+        )]
+
+        if nseen_count > 1:
+            keyboard.append(InlineKeyboardButton(
+                'مشاهده همه 📭',
+                callback_data='show_direct#all'
+            ))
+
+        if target.direct_msg_id:
+            try:
+                await ctx.bot.delete_message(
+                    target.user_id, target.direct_msg_id
+                )
+            except Exception as e:
+                logging.exception(e)
+
+        try:
+            msg = await ctx.bot.send_message(
+                target.user_id,
+                'شما یک پیام جدید دارید!\n\n'
+                f' {nseen_count} پیام خوانده نشده.\n.',
+                reply_markup=InlineKeyboardMarkup([keyboard])
+            )
+            await update_user(target.user_id, direct_msg_id=msg.id)
+
+        except RetryAfter as e:
+            time.sleep(e.retry_after + 10)
+            logging.info(f'[send_all]: retry_after {e.retry_after}')
+            data['timeout'] += 1
+        except Forbidden:
+            logging.info(
+                f'[send_all]: forbidden {target.user_id} - {target.name}'
+            )
+            data['blocked'] += 1
+        except NetworkError:
+            data['error'] += 1
+        except TelegramError as e:
+            logging.exception(e)
+            data['error'] += 1
+
+    time.sleep(2)
+    await ctx.bot.send_message(ctx.job.user_id, (
+        'send to all done.\n'
+        f'success: {data["success"]}\n'
+        f'blocked: {data["blocked"]}\n'
+        f'error: {data["error"]}\n'
+        f'timeout: {data["timeout"]}\n'
+    ))
+
+
 @require_admin
 async def send_direct_to_all(update: Update, ctx: Ctx):
+
     text = update.effective_message.text[19:]
-    await update.effective_message.reply_text(text)
+    if not text:
+        await update.effective_message.reply_text('Empty Message ❌')
+
+    msg = await update.effective_message.reply_text(text)
+    total_users = await get_user_count()
+
+    ctx.job_queue.run_once(
+        send_direct_to_all, 1,
+        chat_id=msg.chat.id,
+        user_id=update.effective_user.id,
+        data=msg.message_id,
+        name='send_direct_to_all'
+    )
+    await msg.reply_text(
+        f'✅ پیام شما ذخیره شد ، پیام شما به {total_users} نفر ارسال خواهد شد .'
+    )
