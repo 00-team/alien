@@ -1,6 +1,7 @@
 
 
 import logging
+import random
 import time
 
 from database import add_direct, get_direct_notseen_count, get_user
@@ -185,10 +186,14 @@ async def send_direct_to_all_job(ctx: Ctx):
 
 @require_admin
 async def send_direct_to_all(update: Update, ctx: Ctx):
-
     text = update.effective_message.text[19:]
+
+    logging.info(ctx.args)
+
     if not text:
         await update.effective_message.reply_text('Empty Message ❌')
+
+    return
 
     msg = await update.effective_message.reply_text(text)
     total_users = await get_user_count()
