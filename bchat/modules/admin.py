@@ -103,4 +103,5 @@ async def cancel(update: Update, ctx: Ctx):
 
 @require_admin
 async def send_direct_to_all(update: Update, ctx: Ctx):
-    print(update.effective_message.text)
+    text = update.effective_message.text[19:]
+    await update.effective_message.reply_text(text)
