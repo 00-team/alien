@@ -157,6 +157,7 @@ async def send_direct_to_all_job(ctx: Ctx):
             )
             await update_user(target.user_id, direct_msg_id=msg.id)
 
+            data['success'] += 1
         except RetryAfter as e:
             time.sleep(e.retry_after + 10)
             logging.info(f'[send_all]: retry_after {e.retry_after}')
