@@ -174,61 +174,70 @@ def main():
 
     application.add_handler(MessageHandler(
         filters.Text([KW_PROFILE]),
-        user_profile
+        user_profile, block=False
     ))
 
     application.add_handler(MessageHandler(
         filters.Text([KW_MY_LINK]),
-        user_link
+        user_link, block=False,
     ))
     application.add_handler(CallbackQueryHandler(
         user_link,
-        pattern='^user_link$'
+        pattern='^user_link$',
+        block=False
     ))
 
     application.add_handler(MessageHandler(
         filters.Text([KW_DRTNSEN]),
-        send_not_seen_messages
+        send_not_seen_messages,
+        block=False,
     ))
 
     application.add_handler(CallbackQueryHandler(
         show_direct_message,
-        pattern='^show_direct#[0-9]+$'
+        pattern='^show_direct#[0-9]+$',
+        block=False
     ))
 
     application.add_handler(CallbackQueryHandler(
         rq_channel_query,
-        pattern='^(toggle_rq_channel|leave_rq_channel)#(-|)[0-9]+$'
+        pattern='^(toggle_rq_channel|leave_rq_channel)#(-|)[0-9]+$',
+        block=False
     ))
 
     application.add_handler(CallbackQueryHandler(
         toggle_saved_user,
-        pattern='^(remove_saved_user|save_user)#[0-9]+$'
+        pattern='^(remove_saved_user|save_user)#[0-9]+$',
+        block=False
     ))
 
     application.add_handler(MessageHandler(
         filters.Text([KW_SAVELST]),
-        show_saved_users,
+        show_saved_users, block=False,
     ))
 
     application.add_handler(CallbackQueryHandler(
         send_not_seen_messages,
-        pattern='^show_direct#all$'
+        pattern='^show_direct#all$',
+        block=False
     ))
 
     application.add_handler(CallbackQueryHandler(
         toggle_user_block,
-        pattern='^toggle_user_block#[0-9]+$'
+        pattern='^toggle_user_block#[0-9]+$',
+        block=False
     ))
 
     application.add_handler(CallbackQueryHandler(
         user_link_extra,
-        pattern='^user_link_(.*)$'
+        pattern='^user_link_(.*)$',
+        block=False
     ))
 
     application.add_handler(CallbackQueryHandler(
         coming_soon,
-        pattern='^coming_soon$'
+        pattern='^coming_soon$',
+        block=False
     ))
 
     # set rq channel limit
