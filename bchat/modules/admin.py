@@ -111,7 +111,7 @@ async def cancel(update: Update, ctx: Ctx):
 
 async def send_direct_to_all_job(ctx: Ctx):
     all_users = await database.fetch_all(
-        select(Users).where(Users.user_id == ctx.job.user_id)
+        select(Users)
     )
     data = {
         'success': 0,
