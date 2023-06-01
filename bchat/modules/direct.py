@@ -158,24 +158,28 @@ async def send_show_direct(
         return
 
     repdir_mid = None
+    msg_id = None
 
     if direct.reply_to:
         repdir = await get_direct(direct.reply_to)
         if repdir:
             repdir_mid = repdir.message_id
 
-    msg_id = await ctx.bot.copy_message(
-        chat_id, direct.sender_id, direct.message_id,
-        reply_to_message_id=repdir_mid,
-        reply_markup=InlineKeyboardMarkup([[
-            InlineKeyboardButton(
-                'پاسخ ✍', callback_data=f'direct_reply#{direct.direct_id}'
-            ),
-            InlineKeyboardButton(
-                'بلاک ⛔', callback_data=f'toggle_user_block#{direct.sender_id}'
-            ),
-        ]])
-    )
+    try:
+        msg_id = await ctx.bot.copy_message(
+            chat_id, direct.sender_id, direct.message_id,
+            reply_to_message_id=repdir_mid,
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton(
+                    'پاسخ ✍', callback_data=f'direct_reply#{direct.direct_id}'
+                ),
+                InlineKeyboardButton(
+                    'بلاک ⛔', callback_data=f'toggle_user_block#{direct.sender_id}'
+                ),
+            ]])
+        )
+    except Exception as e:
+        logging.exception(e)
 
     if chat_id in config['ADMINS']:
         try:
