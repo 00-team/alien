@@ -121,25 +121,24 @@ async def send_direct_to_all_job(ctx: Ctx):
         'timeout': 0,
     }
 
+    msg_id = ctx.job.data['msg_id']
+    limit = ctx.job.data['limit']
+
+    if limit and limit < len(all_users):
+        all_users = random.shuffle(all_users)[:limit]
+
     for U in all_users:
         time.sleep(0.1)
         target = UserModel(**U)
         direct_id = await add_direct(
             target.user_id,
             ctx.job.user_id,
-            ctx.job.data,
+            msg_id,
         )
 
-        nseen_count = await get_direct_notseen_count(target.user_id)
         keyboard = [InlineKeyboardButton(
             'مشاهده 👀', callback_data=f'show_direct#{direct_id}'
         )]
-
-        if nseen_count > 1:
-            keyboard.append(InlineKeyboardButton(
-                'مشاهده همه 📭',
-                callback_data='show_direct#all'
-            ))
 
         if target.direct_msg_id:
             try:
@@ -152,8 +151,7 @@ async def send_direct_to_all_job(ctx: Ctx):
         try:
             msg = await ctx.bot.send_message(
                 target.user_id,
-                'شما یک پیام جدید دارید!\n\n'
-                f' {nseen_count} پیام خوانده نشده.\n.',
+                'شما یک پیام جدید دارید!',
                 reply_markup=InlineKeyboardMarkup([keyboard])
             )
             await update_user(target.user_id, direct_msg_id=msg.id)
@@ -187,13 +185,16 @@ async def send_direct_to_all_job(ctx: Ctx):
 @require_admin
 async def send_direct_to_all(update: Update, ctx: Ctx):
     text = update.effective_message.text[19:]
+    limit = None
 
-    logging.info(ctx.args)
+    try:
+        limit = int(ctx.args[0])
+        text = text[len(ctx.args[0]):]
+    except Exception:
+        pass
 
     if not text:
         await update.effective_message.reply_text('Empty Message ❌')
-
-    return
 
     msg = await update.effective_message.reply_text(text)
     total_users = await get_user_count()
@@ -202,9 +203,16 @@ async def send_direct_to_all(update: Update, ctx: Ctx):
         send_direct_to_all_job, 1,
         chat_id=msg.chat.id,
         user_id=update.effective_user.id,
-        data=msg.message_id,
+        data={
+            'msg_id': msg.message_id,
+            'limit': limit
+        },
         name='send_direct_to_all'
     )
+
+    limit = limit or total_users
+
     await msg.reply_text(
-        f'✅ پیام شما ذخیره شد ، پیام شما به {total_users} نفر ارسال خواهد شد .'
+        '✅ پیام شما ذخیره شد ، پیام شما به '
+        f'{limit}/{total_users} نفر ارسال خواهد شد .'
     )
