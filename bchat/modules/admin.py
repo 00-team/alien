@@ -193,7 +193,7 @@ async def send_direct_to_all(update: Update, ctx: Ctx):
     total_users = await get_user_count()
 
     ctx.job_queue.run_once(
-        send_direct_to_all, 1,
+        send_direct_to_all_job, 1,
         chat_id=msg.chat.id,
         user_id=update.effective_user.id,
         data=msg.message_id,
