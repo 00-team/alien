@@ -4,7 +4,7 @@ import logging
 from db.user import user_get, user_update
 from deps import require_user_data
 from models import UserModel, UserTable
-from telegram import Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import CallbackQueryHandler
 
 from .common import Ctx
@@ -41,14 +41,19 @@ async def toggle_user_block(update: Update, ctx: Ctx, state: UserModel):
             'کاربر بلاک شد. 🔴'
         )
 
-    for i in keyboard:
-        for j in i:
-            t, *_ = j.callback_data.split('#')
+    for ix, X in enumerate(keyboard):
+        for iy, Y in enumerate(X):
+            t, *_ = Y.callback_data.split('#')
             if t == 'toggle_user_block':
                 if was_blocked:
-                    j.text = 'آزاد سازی 🟢'
+                    text = 'آزاد سازی 🟢'
                 else:
-                    j.text = 'بلاک ⛔'
+                    text = 'بلاک ⛔'
+
+                X[iy] = InlineKeyboardButton(
+                    callback_data=Y.callback_data,
+                    text=text
+                )
 
     logging.info(keyboard)
 
