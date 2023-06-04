@@ -8,6 +8,7 @@ from database import get_user, get_user_count, update_user
 from db.direct import direct_add
 from deps import require_admin
 from models import UserModel, UserTable
+from modules.common import delete_message
 from settings import database
 from sqlalchemy import select
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
@@ -142,13 +143,8 @@ async def send_direct_to_all_job(ctx: Ctx):
             'مشاهده 👀', callback_data=f'show_direct#{direct_id}'
         )]
 
-        if target.direct_msg_id:
-            try:
-                await ctx.bot.delete_message(
-                    target.user_id, target.direct_msg_id
-                )
-            except Exception as e:
-                logging.exception(e)
+        # if target.direct_msg_id:
+        #     await delete_message(ctx, target.user_id, target.direct_msg_id)
 
         try:
             msg = await ctx.bot.send_message(
