@@ -233,7 +233,7 @@ def get_top_raw(from_date: int) -> list[dict]:
             )
             logging.info(f'date: {str(datetime.fromtimestamp(date))}')
 
-            date = int(events[-1]['date'])
+            date = int(events[-1]['date']) + 1
 
             time.sleep(0.5)
 
