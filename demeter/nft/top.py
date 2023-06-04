@@ -14,14 +14,15 @@ def get_top(from_date: int) -> dict:
 
     events = get_top_raw(from_date)
     for idx, e in enumerate(events):
-        logging.info(f'[{idx}/{len(events)}]e is None: {e is None}')
-        if e is None:
-            continue
-
         price = float(e.get('amountInETH', 0))
-        CID = e.get('nft', {}).get('creator', {}).get('id')
-        BID = None
+        creator = e['nft']['creator']
         event_type = e['event']
+
+        CID = None
+        BID = None
+
+        if creator:
+            CID = creator.get('id')
 
         if event_type == 'Sold':
             BID = (e.get('auction', {}) .get('highestBid', {})
