@@ -79,3 +79,19 @@ def get_top(from_date: int) -> dict:
             'price': sorted(buyers, reverse=True, key=price_sort)[:5]
         }
     }
+
+
+INDEX_EMOJI = {
+    0: '🥇',
+    1: '🥈',
+    2: '🥉',
+    3: '🎗',
+    4: '🎗',
+}
+
+
+def get_top_tweet(data: dict):
+    text = ''
+
+    for idx, acc in enumerate([]):
+        text += INDEX_EMOJI.get(idx, '-') + ' '
