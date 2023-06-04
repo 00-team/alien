@@ -148,3 +148,4 @@ price.db.json
 *.db
 
 bchat/migrations/versions/
+bchat/channels.json
