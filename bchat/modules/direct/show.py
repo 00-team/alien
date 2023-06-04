@@ -63,6 +63,13 @@ async def send_show_direct(
     except Exception:
         pass
 
+    if msg_id and user_data.direct_msg_id:
+        await user_update(
+            UserTable.user_id == user_data.user_id,
+            direct_msg_id=None
+        )
+        await delete_message(ctx, chat_id, user_data.direct_msg_id)
+
     if direct.from_admin:
         return
 
@@ -77,16 +84,6 @@ async def send_show_direct(
             )
         except Exception:
             pass
-
-    if not msg_id:
-        return
-
-    if user_data.direct_msg_id:
-        await delete_message(ctx, chat_id, user_data.direct_msg_id)
-        await user_update(
-            UserTable.user_id == user_data.user_id,
-            direct_msg_id=None
-        )
 
 
 @require_joined
