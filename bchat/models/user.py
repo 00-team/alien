@@ -21,6 +21,9 @@ class Users(BaseTable):
     used_score = Column(Integer, server_default=text('0'))
 
 
+UserTable = Users
+
+
 class Genders(int, Enum):
     unknown = 0
     boy = auto()
