@@ -8,6 +8,7 @@ from deps import require_user_data
 from models import DirectTable, UserModel, UserTable
 from modules.common import delete_message
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.error import Forbidden
 from telegram.ext import CallbackQueryHandler, ContextTypes
 from telegram.ext import ConversationHandler, MessageHandler, filters
 
@@ -116,8 +117,12 @@ async def handle_direct_message(update: Update, ctx: Ctx, state: UserModel):
         await update.effective_message.reply_text(
             'پیام شما به صورت ناشناس ارسال شد. ✅'
         )
-    except Exception:
-        pass
+    except Forbidden:
+        await update.effective_message.reply_text(
+            'این کاربر ربات را ترک کرده. ❌'
+        )
+    except Exception as e:
+        logging.exception(e)
 
     send_msg_id = ctx.user_data.pop('send_direct_msg_id', None)
 
