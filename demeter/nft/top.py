@@ -37,6 +37,8 @@ def get_top(from_date: int) -> dict:
         elif event_type == 'BuyPriceAccepted':
             BID = e.get('buyNow', {}).get('buyer', {}).get('id')
 
+        logging.info(f'[{idx}]: {bool(BID)=} - {bool(CID)=}')
+
         if BID:
             if BID in data['B']:
                 data['B'][BID]['price'] += price
