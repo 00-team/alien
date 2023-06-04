@@ -65,7 +65,7 @@ async def toggle_user_block(update: Update, ctx: Ctx, state: UserModel):
 
         new_keyboard.append(row)
 
-    logging.info(new_msg.id, update.effective_message.id)
+    logging.info(f'{new_msg.id} - {update.effective_message.id}')
 
     await update.effective_message.edit_reply_markup(
         InlineKeyboardMarkup(new_keyboard)
