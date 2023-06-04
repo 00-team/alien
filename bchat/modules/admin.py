@@ -4,15 +4,16 @@ import logging
 import random
 import time
 
-from database import add_direct, get_user, get_user_count, update_user
-from dependencies import require_admin
-from models import UserModel, Users
+from database import get_user, get_user_count, update_user
+from db.direct import direct_add
+from deps import require_admin
+from models import UserModel, UserTable
 from settings import database
 from sqlalchemy import select
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.error import Forbidden, NetworkError, RetryAfter, TelegramError
 from telegram.error import TimedOut
-from telegram.ext import ContextTypes, ConversationHandler
+from telegram.ext import CommandHandler, ContextTypes
 
 Ctx = ContextTypes.DEFAULT_TYPE
 
@@ -107,17 +108,11 @@ async def help_cmd(update: Update, ctx: Ctx):
     )
 
 
-@require_admin
-async def cancel(update: Update, ctx: Ctx):
-    await update.effective_message.reply_text('canceled.')
-    return ConversationHandler.END
-
-
 async def send_direct_to_all_job(ctx: Ctx):
     logging.info('sending a message to all users')
 
     all_users = await database.fetch_all(
-        select(Users)
+        select(UserTable)
     )
     data = {
         'success': 0,
@@ -136,10 +131,11 @@ async def send_direct_to_all_job(ctx: Ctx):
     for U in all_users:
         time.sleep(0.1)
         target = UserModel(**U)
-        direct_id = await add_direct(
-            target.user_id,
-            ctx.job.user_id,
-            msg_id,
+        direct_id = await direct_add(
+            user_id=target.user_id,
+            sender_id=ctx.job.user_id,
+            message_id=msg_id,
+            from_admin=True
         )
 
         keyboard = [InlineKeyboardButton(
@@ -268,3 +264,16 @@ async def send_user_info(update: Update, ctx: Ctx, user_id: int):
         pass
     except Exception as e:
         logging.exception(e)
+
+
+HANDLERS_ADMIN = [
+    CommandHandler(['stats'], stats),
+    CommandHandler(['user_score'], get_user_score),
+    CommandHandler(['help'], help_cmd),
+    CommandHandler(
+        ['send_direct_to_all'], send_direct_to_all
+    ),
+    CommandHandler(
+        ['cancel_send_direct_all'], cancel_send_direct_all
+    ),
+]

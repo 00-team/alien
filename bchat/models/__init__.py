@@ -1,9 +1,10 @@
-
-from .direct import Direct, DirectModel
-from .user import GENDER_DISPLAY, Genders, UserModel, Users
+from .direct import DirectModel, DirectTable
+from .user import GENDER_DISPLAY, Genders, UserModel, UserTable, gender_keys
+from .user import gender_pattern
 
 __all__ = [
-    'UserModel', 'Users',
-    'Genders', 'GENDER_DISPLAY',
-    'Direct', 'DirectModel',
+    'DirectTable', 'DirectModel',
+
+    'GENDER_DISPLAY', 'Genders', 'gender_keys', 'gender_pattern',
+    'UserTable', 'UserModel'
 ]

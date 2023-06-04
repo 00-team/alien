@@ -3,11 +3,13 @@
 import logging
 
 from database import get_user
-from dependencies import require_admin
+from deps import require_admin
 from settings import HOME_DIR
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.error import NetworkError, TelegramError
-from telegram.ext import ContextTypes, ConversationHandler
+from telegram.ext import CallbackQueryHandler, ChatMemberHandler
+from telegram.ext import CommandHandler, ContextTypes, ConversationHandler
+from telegram.ext import MessageHandler, filters
 from utils import config
 
 from gshare import DbDict
@@ -214,3 +216,48 @@ def require_joined(func):
             await func(update, ctx)
 
     return decorator
+
+
+@require_admin
+async def cancel(update: Update, ctx: Ctx):
+    await update.effective_message.reply_text('canceled.')
+    return ConversationHandler.END
+
+
+HANDLERS_CHANNELS = [
+    CommandHandler(['channels'], channel_list),
+    CallbackQueryHandler(
+        rq_channel_query,
+        pattern='^(toggle_rq_channel|leave_rq_channel)#(-|)[0-9]+$',
+        block=False
+    ),
+    ConversationHandler(
+        per_message=False,
+        entry_points=[
+            CallbackQueryHandler(
+                rq_channel_query,
+                pattern='^set_rq_channel_limit#(-|)[0-9]+$'
+            ),
+        ],
+        states={
+            'EDIT_RQ_CH_LIMIT': [
+                MessageHandler(
+                    filters.ChatType.PRIVATE,
+                    rq_channel_set_limit,
+                )
+            ],
+        },
+        fallbacks=[
+            CommandHandler(
+                'cancel', cancel,
+            ),
+        ],
+    ),
+    ChatMemberHandler(
+        chat_member_update, ChatMemberHandler.CHAT_MEMBER
+    ),
+    ChatMemberHandler(
+        my_chat_update, ChatMemberHandler.MY_CHAT_MEMBER
+    ),
+
+]

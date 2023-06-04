@@ -4,7 +4,7 @@ from settings import BaseTable
 from sqlalchemy import Boolean, Column, Integer, text
 
 
-class Direct(BaseTable):
+class DirectTable(BaseTable):
     __tablename__ = 'direct'
 
     direct_id = Column(
@@ -17,9 +17,6 @@ class Direct(BaseTable):
     reply_to = Column(Integer)
     seen = Column(Boolean, server_default=text('0'))
     from_admin = Column(Boolean, server_default=text('0'))
-
-
-DirectTable = Direct
 
 
 class DirectModel(BaseModel):

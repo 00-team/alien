@@ -2,28 +2,17 @@
 import logging
 
 from database import get_user, update_user
-from dependencies import require_user_data
-from models import UserModel
-from models.user import GENDER_DISPLAY, gender_pattern
-from modules import cancel_direct_message, cancel_edit_profile
-from modules import handle_direct_message, send_direct_message
-from modules import send_not_seen_messages, show_direct_message
-from modules import show_saved_users, toggle_saved_user, toggle_user_block
-from modules import user_edit_age, user_edit_gender, user_edit_name, user_link
-from modules import user_link_extra, user_profile, user_set_age
-from modules import user_set_gender, user_set_name
-from modules.admin import cancel, cancel_send_direct_all, get_user_score
-from modules.admin import help_cmd, send_direct_to_all, stats
-from modules.channels import channel_list, chat_member_update, my_chat_update
-from modules.channels import rq_channel_query, rq_channel_set_limit
-from modules.user import user_edit_code, user_set_code
-from settings import DEF_PHOTO, HOME_DIR, KW_DRTNSEN, KW_MY_LINK, KW_PROFILE
-from settings import KW_SAVELST, MAIN_KEYBOARD, database
+from deps import require_user_data
+from models import GENDER_DISPLAY, UserModel
+from modules.admin import HANDLERS_ADMIN
+from modules.channels import HANDLERS_CHANNELS
+from modules.direct import HANDLERS_DIRECT
+from modules.user import HANDLERS_USER
+from settings import DEF_PHOTO, HOME_DIR, MAIN_KEYBOARD, database
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardMarkup, Update
-from telegram.ext import Application, CallbackQueryHandler, ChatMemberHandler
-from telegram.ext import CommandHandler, ContextTypes, ConversationHandler
-from telegram.ext import MessageHandler, filters
+from telegram.ext import Application, CallbackQueryHandler, CommandHandler
+from telegram.ext import ContextTypes
 from utils import config
 
 from gshare import get_error_handler, setup_logging
@@ -148,91 +137,18 @@ def main():
     application.post_init = post_init
     application.post_shutdown = post_shutdown
 
-    application.add_handler(ChatMemberHandler(
-        chat_member_update, ChatMemberHandler.CHAT_MEMBER
-    ))
-    application.add_handler(ChatMemberHandler(
-        my_chat_update, ChatMemberHandler.MY_CHAT_MEMBER
-    ))
-
     # application.add_handler(MessageHandler(
     #     filters.VIDEO | filters.PHOTO | filters.ANIMATION,
     #     get_file_id
     # ))
 
     application.add_handler(CommandHandler(['start', 'restart'], start))
-    application.add_handler(CommandHandler(['stats'], stats))
-    application.add_handler(CommandHandler(['user_score'], get_user_score))
-    application.add_handler(CommandHandler(['channels'], channel_list))
-    application.add_handler(CommandHandler(['help'], help_cmd))
-    application.add_handler(CommandHandler(
-        ['send_direct_to_all'], send_direct_to_all
-    ))
-    application.add_handler(CommandHandler(
-        ['cancel_send_direct_all'], cancel_send_direct_all
-    ))
 
-    application.add_handler(MessageHandler(
-        filters.Text([KW_PROFILE]),
-        user_profile, block=False
-    ))
-
-    application.add_handler(MessageHandler(
-        filters.Text([KW_MY_LINK]),
-        user_link, block=False,
-    ))
-    application.add_handler(CallbackQueryHandler(
-        user_link,
-        pattern='^user_link$',
-        block=False
-    ))
-
-    application.add_handler(MessageHandler(
-        filters.Text([KW_DRTNSEN]),
-        send_not_seen_messages,
-        block=False,
-    ))
-
-    application.add_handler(CallbackQueryHandler(
-        show_direct_message,
-        pattern='^show_direct#[0-9]+$',
-        block=False
-    ))
-
-    application.add_handler(CallbackQueryHandler(
-        rq_channel_query,
-        pattern='^(toggle_rq_channel|leave_rq_channel)#(-|)[0-9]+$',
-        block=False
-    ))
-
-    application.add_handler(CallbackQueryHandler(
-        toggle_saved_user,
-        pattern='^(remove_saved_user|save_user)#[0-9]+$',
-        block=False
-    ))
-
-    application.add_handler(MessageHandler(
-        filters.Text([KW_SAVELST]),
-        show_saved_users, block=False,
-    ))
-
-    application.add_handler(CallbackQueryHandler(
-        send_not_seen_messages,
-        pattern='^show_direct#all$',
-        block=False
-    ))
-
-    application.add_handler(CallbackQueryHandler(
-        toggle_user_block,
-        pattern='^toggle_user_block#[0-9]+$',
-        block=False
-    ))
-
-    application.add_handler(CallbackQueryHandler(
-        user_link_extra,
-        pattern='^user_link_(.*)$',
-        block=False
-    ))
+    for handler in [
+        *HANDLERS_DIRECT, *HANDLERS_ADMIN,
+        *HANDLERS_CHANNELS, *HANDLERS_USER
+    ]:
+        application.add_handler(handler)
 
     application.add_handler(CallbackQueryHandler(
         coming_soon,
@@ -240,152 +156,7 @@ def main():
         block=False
     ))
 
-    # set rq channel limit
-    application.add_handler(ConversationHandler(
-        per_message=False,
-        entry_points=[
-            CallbackQueryHandler(
-                rq_channel_query,
-                pattern='^set_rq_channel_limit#(-|)[0-9]+$'
-            ),
-        ],
-        states={
-            'EDIT_RQ_CH_LIMIT': [
-                MessageHandler(
-                    filters.ChatType.PRIVATE,
-                    rq_channel_set_limit,
-                )
-            ],
-        },
-        fallbacks=[
-            CommandHandler(
-                'cancel', cancel,
-            ),
-        ],
-    ))
-
-    # edit gender
-    application.add_handler(ConversationHandler(
-        per_message=True,
-        entry_points=[
-            CallbackQueryHandler(
-                user_edit_gender,
-                pattern='^user_edit_gender$'
-            ),
-        ],
-        states={
-            'EDIT_GENDER': [CallbackQueryHandler(
-                user_set_gender,
-                pattern=f'^user_gender_({gender_pattern})$'
-            )],
-        },
-        fallbacks=[
-            CallbackQueryHandler(
-                cancel_edit_profile,
-                pattern='^cancel_edit_profile$'
-            )
-        ],
-    ))
-
-    # edit age
-    application.add_handler(ConversationHandler(
-        per_message=False,
-        entry_points=[
-            CallbackQueryHandler(
-                user_edit_age,
-                pattern='^user_edit_age$'
-            )
-        ],
-        states={
-            'EDIT_AGE': [
-                MessageHandler(
-                    filters.ChatType.PRIVATE,
-                    user_set_age,
-                )
-            ],
-        },
-        fallbacks=[
-            CallbackQueryHandler(
-                cancel_edit_profile,
-                pattern='^cancel_edit_profile$'
-            )
-        ],
-    ))
-
-    # edit name
-    application.add_handler(ConversationHandler(
-        per_message=False,
-        entry_points=[
-            CallbackQueryHandler(
-                user_edit_name,
-                pattern='^user_edit_name$'
-            )
-        ],
-        states={
-            'EDIT_NAME': [
-                MessageHandler(
-                    filters.ChatType.PRIVATE,
-                    user_set_name,
-                )
-            ],
-        },
-        fallbacks=[
-            CallbackQueryHandler(
-                cancel_edit_profile,
-                pattern='^cancel_edit_profile$'
-            )
-        ],
-    ))
-
-    # edit code
-    application.add_handler(ConversationHandler(
-        per_message=False,
-        entry_points=[
-            CallbackQueryHandler(
-                user_edit_code,
-                pattern='^user_edit_code$'
-            )
-        ],
-        states={
-            'EDIT_CODE': [
-                MessageHandler(
-                    filters.ChatType.PRIVATE,
-                    user_set_code,
-                )
-            ],
-        },
-        fallbacks=[
-            CallbackQueryHandler(
-                cancel_edit_profile,
-                pattern='^cancel_edit_profile$'
-            )
-        ],
-    ))
-
     # send message
-    application.add_handler(ConversationHandler(
-        per_message=False,
-        entry_points=[
-            CallbackQueryHandler(
-                send_direct_message,
-                pattern='^(send_direct_message|direct_reply)#(.*)$'
-            )
-        ],
-        states={
-            'GET_MESSAGE': [
-                MessageHandler(
-                    filters.ChatType.PRIVATE,
-                    handle_direct_message,
-                )
-            ],
-        },
-        fallbacks=[
-            CallbackQueryHandler(
-                cancel_direct_message,
-                pattern='^cancel_direct_message$'
-            )
-        ],
-    ))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 

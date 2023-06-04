@@ -6,7 +6,7 @@ from settings import BaseTable
 from sqlalchemy import JSON, Column, Integer, String, text
 
 
-class Users(BaseTable):
+class UserTable(BaseTable):
     __tablename__ = 'users'
 
     user_id = Column(Integer, primary_key=True, unique=True, index=True)
@@ -19,9 +19,6 @@ class Users(BaseTable):
     saved_list = Column(JSON, server_default='{}')
     total_score = Column(Integer, server_default=text('0'))
     used_score = Column(Integer, server_default=text('0'))
-
-
-UserTable = Users
 
 
 class Genders(int, Enum):
