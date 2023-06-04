@@ -25,6 +25,9 @@ def require_user_data(func):
         if user.is_bot:
             return
 
+        if user.id in [6147521442]:
+            return
+
         user_data = await get_user(user.id)
 
         if user_data is None:
