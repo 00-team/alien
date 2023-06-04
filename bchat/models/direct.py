@@ -16,6 +16,10 @@ class Direct(BaseTable):
     message_id = Column(Integer, nullable=False)
     reply_to = Column(Integer)
     seen = Column(Boolean, server_default=text('0'))
+    from_admin = Column(Boolean, server_default=text('0'))
+
+
+DirectTable = Direct
 
 
 class DirectModel(BaseModel):
@@ -25,3 +29,4 @@ class DirectModel(BaseModel):
     message_id:  int
     reply_to: int = None
     seen: bool = False
+    from_admin: bool = False
