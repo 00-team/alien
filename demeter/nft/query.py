@@ -129,11 +129,10 @@ query Events($min_price: String!, $date: Int!){
 
 
 _top_query = '''
-query TopEvents($date: Int!, $skip: Int!){
+query TopEvents($date: Int!){
   events: nftHistories(
     orderBy: date
     orderDirection: asc
-    skip: skip
     where: {
         event_in: [
             Sold, OfferAccepted
@@ -218,14 +217,9 @@ def get_top_raw(from_date: int) -> list[dict]:
         date = from_date
         n = 0
         while n < 100:
-            res = _graghql(_event_url, _top_query, {
+            events = _graghql(_event_url, _top_query, {
                 'date': int(date),
-            }).json()
-            logging.info(res)
-            logging.info(res['data'])
-            exit()
-
-            res['data']['events']
+            }).json()['data']['events']
 
             if not events:
                 break
