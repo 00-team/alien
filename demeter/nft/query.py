@@ -1,4 +1,5 @@
 import logging
+import time
 
 from httpx import Response as _R
 from httpx import post as _POST
@@ -127,6 +128,60 @@ query Events($min_price: String!, $date: Int!){
 '''
 
 
+_top_query = '''
+query TopEvents($date: Int!, $skip: Int!){
+  events: nftHistories(
+    orderBy: date
+    orderDirection: asc
+    skip: skip
+    where: {
+        event_in: [
+            Sold, OfferAccepted
+            PrivateSale, BuyPriceAccepted
+        ],
+        date_gte: $date,
+    }
+  ) {
+    amountInETH
+    date
+    event
+
+    offer {
+      buyer {
+        id
+      }
+    }
+
+    privateSale {
+      buyer {
+        id
+      }
+    }
+
+    nft {
+      creator {
+        id
+      }
+    }
+
+    auction {
+      highestBid {
+        bidder {
+          id
+        }
+      }
+    }
+
+    buyNow {
+      buyer {
+        id
+      }
+    }
+  }
+}
+'''
+
+
 def _graghql(url: str, query: str, variables: dict = {}) -> _R:
     result = _POST(url, json={
         'query': query,
@@ -154,6 +209,34 @@ def get_events_raw(date, min_price) -> None | list[dict]:
     except Exception as e:
         logging.error('error getting events.')
         logging.exception(e)
+
+
+def get_top_raw(from_date: int) -> list[dict]:
+    batchs = []
+
+    try:
+        date = from_date
+        n = 0
+        while n < 100:
+            events = _graghql(_event_url, _top_query, {
+                'date': int(date),
+            }).json()['data']['events']
+
+            if not events:
+                break
+
+            date = events[-1]['date']
+
+            batchs += events
+            logging.info(f'iter: {n}')
+            time.sleep(0.5)
+
+        return batchs
+    except Exception as e:
+        logging.error('error getting events.')
+        logging.exception(e)
+
+    return batchs
 
 
 def get_display_raw(addr=None, tid=None, actor_pk=None) -> None | dict:
