@@ -28,14 +28,14 @@ db = DbDict(
 
 
 def main():
-    logging.info(json.dumps(get_top(now() - WEEK_TIME), indent=2))
-    exit()
+    # logging.info(json.dumps(get_top(now() - WEEK_TIME), indent=2))
+    # exit()
     while True:
 
-        if db['last_month'] + MONTH_TIME < now():
-            pass
-        elif db['last_week'] + WEEK_TIME < now():
-            pass
+        # if db['last_month'] + MONTH_TIME < now():
+        #     pass
+        # elif db['last_week'] + WEEK_TIME < now():
+        #     pass
 
         last_date = db['last_date']
         before_tweets = now()
