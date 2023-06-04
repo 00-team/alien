@@ -61,11 +61,13 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     receiver_id = None
 
     if send_type is None or send_id is None:
+        logging.info(f'{send_type=} - {send_id=}')
         return
 
     if send_type == 'direct_reply':
         direct = await get_direct(send_id)
         if not direct:
+            logging.info(f'direct to reply not found: {send_id=}')
             return
 
         direct_id = await add_direct(
@@ -85,6 +87,7 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
         receiver_id = send_id
 
     if not direct_id or not receiver_id:
+        logging.info(f'no {direct_id=} or {receiver_id=}')
         return
 
     nseen_count = await get_direct_notseen_count(receiver_id)
@@ -102,10 +105,8 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
     if user_b and user_b.direct_msg_id:
         try:
             await ctx.bot.delete_message(receiver_id, user_b.direct_msg_id)
-        except TimedOut:
+        except Exception:
             pass
-        except Exception as e:
-            logging.exception(e)
 
     try:
         msg = await ctx.bot.send_message(
@@ -145,125 +146,6 @@ async def handle_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
             logging.exception(e)
 
     return ConversationHandler.END
-
-
-async def send_show_direct(
-    update: Update, ctx: Ctx,
-    direct: DirectModel, user_data: UserModel
-):
-    chat_id = update.effective_message.chat_id
-
-    if not direct:
-        return
-
-    repdir_mid = None
-    msg_id = None
-
-    if direct.reply_to:
-        repdir = await get_direct(direct.reply_to)
-        if repdir:
-            repdir_mid = repdir.message_id
-
-    try:
-        msg_id = await ctx.bot.copy_message(
-            chat_id, direct.sender_id, direct.message_id,
-            reply_to_message_id=repdir_mid,
-            reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton(
-                    'پاسخ ✍', callback_data=f'direct_reply#{direct.direct_id}'
-                ),
-                InlineKeyboardButton(
-                    'بلاک ⛔',
-                    callback_data=f'toggle_user_block#{direct.sender_id}'
-                ),
-            ]])
-        )
-    except (BadRequest, TimedOut):
-        pass
-    except Exception as e:
-        logging.exception(e)
-
-    if chat_id in config['ADMINS']:
-        try:
-            sender_chat = await ctx.bot.get_chat(direct.sender_id)
-
-            await update.effective_message.reply_text(
-                f'USERS INFO:\n'
-                f'id: {sender_chat.id}\n'
-                f'name: {sender_chat.full_name}\n'
-                f'username: @{sender_chat.username}\n',
-            )
-        except TimedOut:
-            pass
-        except Exception as e:
-            logging.exception(e)
-            try:
-                await update.effective_message.reply_text(
-                    f'id: {direct.sender_id}'
-                )
-            except TimedOut:
-                pass
-            except Exception as e:
-                logging.exception(e)
-
-    if msg_id and not direct.seen:
-        try:
-            await ctx.bot.send_message(
-                direct.sender_id, 'پیام شما مشاهده شد. 🧉',
-                reply_to_message_id=direct.message_id
-            )
-        except TimedOut:
-            pass
-        except Exception as e:
-            logging.exception(e)
-        finally:
-            await update_direct(direct.direct_id, seen=True)
-
-    if not msg_id:
-        return
-
-    if user_data.direct_msg_id:
-        try:
-            await ctx.bot.delete_message(chat_id, user_data.direct_msg_id)
-        except (BadRequest, Forbidden) as e:
-            logging.warn(e)
-        except TimedOut:
-            pass
-        except Exception as e:
-            logging.exception(e)
-        finally:
-            await update_user(user_data.user_id, direct_msg_id=None)
-
-
-@require_joined
-@require_user_data
-async def show_direct_message(update: Update, ctx: Ctx, usr_data: UserModel):
-    await update.callback_query.answer()
-
-    direct_id = update.callback_query.data.split('#')[-1]
-
-    direct = await get_direct(int(direct_id))
-    await send_show_direct(update, ctx, direct, usr_data)
-
-
-@require_joined
-@require_user_data
-async def send_not_seen_messages(update: Update, ctx: Ctx, user_data: UserModel):
-    if update.callback_query:
-        await update.callback_query.answer()
-
-    user_id = update.effective_user.id
-    directs = await get_direct_notseen(user_id)
-
-    if not directs:
-        await update.effective_message.reply_text(
-            'پیامی یافت نشد! 🧊'
-        )
-        return
-
-    for direct in directs[:10]:
-        await send_show_direct(update, ctx, direct, user_data)
-        time.sleep(1)
 
 
 @require_user_data
