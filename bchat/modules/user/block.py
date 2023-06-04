@@ -1,5 +1,7 @@
 
 
+import logging
+
 from db.user import user_get, user_update
 from deps import require_user_data
 from models import UserModel, UserTable
@@ -25,7 +27,7 @@ async def toggle_user_block(update: Update, ctx: Ctx, state: UserModel):
         return
 
     if state.block_list.pop(uid, False):
-        await update.effective_message.reply_text(
+        new_msg = await update.effective_message.reply_text(
             'کاربر آزادسازی گردید. 🟢'
         )
         was_blocked = True
@@ -35,7 +37,7 @@ async def toggle_user_block(update: Update, ctx: Ctx, state: UserModel):
             'codename': target_user.codename,
             'name': target_user.name,
         }
-        await update.effective_message.reply_text(
+        new_msg = await update.effective_message.reply_text(
             'کاربر بلاک شد. 🔴'
         )
 
@@ -62,6 +64,8 @@ async def toggle_user_block(update: Update, ctx: Ctx, state: UserModel):
                 row.append(Y)
 
         new_keyboard.append(row)
+
+    logging.info(new_msg.id, update.effective_message.id)
 
     await update.effective_message.edit_reply_markup(
         InlineKeyboardMarkup(new_keyboard)
