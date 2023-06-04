@@ -171,13 +171,15 @@ async def send_direct_to_all_job(ctx: Ctx):
             data['error'] += 1
 
     time.sleep(2)
-    await ctx.bot.send_message(ctx.job.user_id, (
+    stats = (
         'send to all done.\n'
         f'success: {data["success"]}\n'
         f'blocked: {data["blocked"]}\n'
         f'error: {data["error"]}\n'
         f'timeout: {data["timeout"]}\n'
-    ))
+    )
+    logging.info(stats)
+    await ctx.bot.send_message(ctx.job.user_id, stats)
 
 
 @require_admin
