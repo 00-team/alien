@@ -13,14 +13,11 @@ from .common import Ctx
 @require_user_data
 async def toggle_user_block(update: Update, ctx: Ctx, state: UserModel):
     await update.callback_query.answer()
-
-    if update.effective_message:
-        logging.info(update.effective_message.reply_markup)
-    else:
-        logging.info('no message')
+    keyboard = update.effective_message.reply_markup.inline_keyboard
 
     uid = update.callback_query.data.split('#')[-1]
     target_user = await user_get(UserTable.user_id == int(uid))
+    was_blocked = False
 
     if not target_user:
         await update.effective_message.reply_text('کاربر پیدا نشد. ❌')
@@ -31,6 +28,10 @@ async def toggle_user_block(update: Update, ctx: Ctx, state: UserModel):
         await update.effective_message.reply_text(
             'کاربر آزادسازی گردید. 🟢'
         )
+        was_blocked = True
+        # await update.effective_message.edit_reply_markup(
+        #     update.effective_message.reply_markup.inline_keyboard
+        # )
     else:
         state.block_list[uid] = {
             'codename': target_user.codename,
@@ -39,6 +40,17 @@ async def toggle_user_block(update: Update, ctx: Ctx, state: UserModel):
         await update.effective_message.reply_text(
             'کاربر بلاک شد. 🔴'
         )
+
+    for i in keyboard:
+        for j in i:
+            t, *_ = j.callback_data.split('#')
+            if t == 'toggle_user_block':
+                if was_blocked:
+                    j.text = 'آزاد سازی 🟢'
+                else:
+                    j.text = 'بلاک ⛔'
+
+    logging.info(keyboard)
 
     await user_update(
         UserTable.user_id == state.user_id,
