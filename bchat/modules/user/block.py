@@ -14,7 +14,10 @@ from .common import Ctx
 async def toggle_user_block(update: Update, ctx: Ctx, state: UserModel):
     await update.callback_query.answer()
 
-    logging.info(update.message.reply_markup)
+    if update.effective_message:
+        logging.info(update.message.reply_markup)
+    else:
+        logging.info('no message')
 
     uid = update.callback_query.data.split('#')[-1]
     target_user = await user_get(UserTable.user_id == int(uid))
