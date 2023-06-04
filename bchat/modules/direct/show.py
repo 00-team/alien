@@ -1,4 +1,5 @@
 
+import logging
 import time
 
 from db.direct import direct_get, direct_update
@@ -26,6 +27,7 @@ async def send_show_direct(
     chat_id = update.effective_message.chat_id
 
     if not direct:
+        logging.info('direct was none')
         return
 
     repdir_mid = None
