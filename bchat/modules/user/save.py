@@ -42,9 +42,12 @@ async def show_saved_users(update: Update, ctx: Ctx, state: UserModel):
 @require_user_data
 async def toggle_saved_user(update: Update, ctx: Ctx, state: UserModel):
     await update.callback_query.answer()
+    keyboard = update.effective_message.reply_markup.inline_keyboard
+    new_keyboard = []
 
     uid = update.callback_query.data.split('#')[-1]
     target_user = await user_get(UserTable.user_id == int(uid))
+    text = 'حذف کاربر ❌'
 
     if not target_user:
         await update.effective_message.reply_text('کاربر پیدا نشد. ❌')
@@ -55,6 +58,7 @@ async def toggle_saved_user(update: Update, ctx: Ctx, state: UserModel):
         await update.effective_message.reply_text(
             'کاربر از لیست حذف شد. 🔴'
         )
+        text = 'ذخیر کاربر ⭐'
     else:
         if len(state.saved_list.keys()) >= 10:
             await update.effective_message.reply_text(
@@ -73,6 +77,24 @@ async def toggle_saved_user(update: Update, ctx: Ctx, state: UserModel):
     await user_update(
         UserTable.user_id == state.user_id,
         saved_list=state.saved_list
+    )
+
+    for X in keyboard:
+        row = []
+        for Y in X:
+            t, *_ = Y.callback_data.split('#')
+            if t == 'remove_saved_user' or t == 'save_user':
+                row.append(InlineKeyboardButton(
+                    callback_data=Y.callback_data,
+                    text=text
+                ))
+            else:
+                row.append(Y)
+
+        new_keyboard.append(row)
+
+    await update.effective_message.edit_reply_markup(
+        InlineKeyboardMarkup(new_keyboard)
     )
 
 
