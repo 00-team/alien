@@ -15,7 +15,7 @@ async def toggle_user_block(update: Update, ctx: Ctx, state: UserModel):
     await update.callback_query.answer()
 
     if update.effective_message:
-        logging.info(update.message.reply_markup)
+        logging.info(update.effective_message.reply_markup)
     else:
         logging.info('no message')
 
