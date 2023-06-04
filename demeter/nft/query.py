@@ -218,9 +218,14 @@ def get_top_raw(from_date: int) -> list[dict]:
         date = from_date
         n = 0
         while n < 100:
-            events = _graghql(_event_url, _top_query, {
+            res = _graghql(_event_url, _top_query, {
                 'date': int(date),
-            }).json()['data']['events']
+            }).json()
+            logging.info(res)
+            logging.info(res['data'])
+            exit()
+
+            res['data']['events']
 
             if not events:
                 break
