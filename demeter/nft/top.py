@@ -29,7 +29,7 @@ def get_top(from_date: int) -> dict:
                    .get('bidder', {}).get('id'))
 
         elif event_type == 'OfferAccepted':
-            BID = e.get('offer', {}).buyer('buyer', {}).get('id')
+            BID = e.get('offer', {}).get('buyer', {}).get('id')
 
         elif event_type == 'PrivateSale':
             BID = e.get('privateSale', {}).get('buyer', {}).get('id')
