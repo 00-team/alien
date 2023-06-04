@@ -28,7 +28,7 @@ db = DbDict(
 
 
 def main():
-    logging.info(json.dumps(get_top(now() - DAY_TIME), indent=2))
+    logging.info(json.dumps(get_top(now() - WEEK_TIME), indent=2))
     exit()
     while True:
 
