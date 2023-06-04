@@ -37,8 +37,6 @@ def get_top(from_date: int) -> dict:
         elif event_type == 'BuyPriceAccepted':
             BID = e.get('buyNow', {}).get('buyer', {}).get('id')
 
-        logging.info(f'[{idx}]: {bool(BID)=} - {bool(CID)=}')
-
         if BID:
             if BID in data['B']:
                 data['B'][BID]['price'] += price
@@ -59,25 +57,25 @@ def get_top(from_date: int) -> dict:
                     'total': 1
                 }
 
-        def price_sort(item: dict):
-            return item[1]['price']
+    def price_sort(item: dict):
+        return item[1]['price']
 
-        def total_sort(item: dict):
-            return item[1]['total']
+    def total_sort(item: dict):
+        return item[1]['total']
 
-        creators = data['C'].items()
-        buyers = data['B'].items()
+    creators = data['C'].items()
+    buyers = data['B'].items()
 
-        logging.info(f'{len(creators)=}')
-        logging.info(f'{len(buyers)=}')
+    logging.info(f'{len(creators)=}')
+    logging.info(f'{len(buyers)=}')
 
-        return {
-            'creators': {
-                'total': sorted(creators, key=total_sort)[:5],
-                'price': sorted(creators, key=price_sort)[:5]
-            },
-            'buyers': {
-                'total': sorted(buyers, key=total_sort)[:5],
-                'price': sorted(buyers, key=price_sort)[:5]
-            }
+    return {
+        'creators': {
+            'total': sorted(creators, key=total_sort)[:5],
+            'price': sorted(creators, key=price_sort)[:5]
+        },
+        'buyers': {
+            'total': sorted(buyers, key=total_sort)[:5],
+            'price': sorted(buyers, key=price_sort)[:5]
         }
+    }
