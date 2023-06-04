@@ -14,6 +14,7 @@ from .common import Ctx
 async def toggle_user_block(update: Update, ctx: Ctx, state: UserModel):
     await update.callback_query.answer()
     keyboard = update.effective_message.reply_markup.inline_keyboard
+    new_keyboard = []
 
     uid = update.callback_query.data.split('#')[-1]
     target_user = await user_get(UserTable.user_id == int(uid))
@@ -42,6 +43,7 @@ async def toggle_user_block(update: Update, ctx: Ctx, state: UserModel):
         )
 
     for ix, X in enumerate(keyboard):
+        row = []
         for iy, Y in enumerate(X):
             t, *_ = Y.callback_data.split('#')
             if t == 'toggle_user_block':
@@ -50,12 +52,17 @@ async def toggle_user_block(update: Update, ctx: Ctx, state: UserModel):
                 else:
                     text = 'بلاک ⛔'
 
-                X[iy] = InlineKeyboardButton(
+                row.append(InlineKeyboardButton(
                     callback_data=Y.callback_data,
                     text=text
-                )
+                ))
+            else:
+                row.append(Y)
+
+        new_keyboard.append(row)
 
     logging.info(keyboard)
+    logging.info(new_keyboard)
 
     await user_update(
         UserTable.user_id == state.user_id,
