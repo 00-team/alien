@@ -71,11 +71,11 @@ def get_top(from_date: int) -> dict:
 
     return {
         'creators': {
-            'total': sorted(creators, key=total_sort)[:5],
-            'price': sorted(creators, key=price_sort)[:5]
+            'total': sorted(creators, reverse=True, key=total_sort)[:5],
+            'price': sorted(creators, reverse=True, key=price_sort)[:5]
         },
         'buyers': {
-            'total': sorted(buyers, key=total_sort)[:5],
-            'price': sorted(buyers, key=price_sort)[:5]
+            'total': sorted(buyers, reverse=True, key=total_sort)[:5],
+            'price': sorted(buyers, reverse=True, key=price_sort)[:5]
         }
     }
