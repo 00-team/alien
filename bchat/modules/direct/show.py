@@ -39,6 +39,11 @@ async def send_show_direct(
         if repdir:
             repdir_mid = repdir.message_id
 
+    await direct_update(
+        DirectTable.direct_id == direct.direct_id,
+        seen=True
+    )
+
     try:
         msg_id = await ctx.bot.copy_message(
             chat_id, direct.sender_id, direct.message_id,
@@ -70,11 +75,6 @@ async def send_show_direct(
             )
         except Exception:
             pass
-
-        await direct_update(
-            DirectTable.direct_id == direct.direct_id,
-            seen=True
-        )
 
     if not msg_id:
         return
