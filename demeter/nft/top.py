@@ -66,6 +66,9 @@ def get_top(from_date: int) -> dict:
         creators = data['C'].items()
         buyers = data['B'].items()
 
+        logging.info(f'{len(creators)=}')
+        logging.info(f'{len(buyers)=}')
+
         return {
             'creators': {
                 'total': sorted(creators, key=total_sort)[:5],
