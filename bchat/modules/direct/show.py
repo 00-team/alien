@@ -1,19 +1,17 @@
 
-import logging
 import time
 
 from db.direct import direct_get, direct_update
 from db.user import user_update
-from dependencies import require_user_data
+from deps import require_user_data
 from models import DirectModel, UserModel
-from models.direct import DirectModel, DirectTable
+from models.direct import DirectTable
 from models.user import UserTable
 from modules.admin import send_user_info
 from modules.channels import require_joined
 from modules.common import delete_message
 from settings import KW_DRTNSEN
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.error import BadRequest, Forbidden, TelegramError, TimedOut
 from telegram.ext import CallbackQueryHandler, ContextTypes, MessageHandler
 from telegram.ext import filters
 from utils import config
@@ -34,9 +32,12 @@ async def send_show_direct(
     msg_id = None
 
     if direct.reply_to:
-        repdir = await direct_get(DirectTable.direct_id == direct.reply_to)
+        repdir = await direct_get(
+            DirectTable.direct_id == direct.reply_to,
+            limit=1
+        )
         if repdir:
-            repdir_mid = repdir[0].message_id
+            repdir_mid = repdir.message_id
 
     try:
         msg_id = await ctx.bot.copy_message(
