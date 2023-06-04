@@ -1,5 +1,6 @@
 import logging
 import time
+from datetime import datetime
 
 from httpx import Response as _R
 from httpx import post as _POST
@@ -214,20 +215,26 @@ def get_top_raw(from_date: int) -> list[dict]:
     batchs = []
 
     try:
-        date = from_date
+        date = int(from_date)
         n = 0
         while n < 100:
             events = _graghql(_event_url, _top_query, {
-                'date': int(date),
+                'date': date,
             }).json()['data']['events']
 
             if not events:
                 break
 
-            date = events[-1]['date']
-
             batchs += events
-            logging.info(f'iter: {n}')
+            n += 1
+
+            logging.info(
+                f'iter: {n} - events: {len(events)} - batchs: {len(batchs)}'
+            )
+            logging.info(f'date: {str(datetime.fromtimestamp(date))}')
+
+            date = int(events[-1]['date'])
+
             time.sleep(0.5)
 
         return batchs
