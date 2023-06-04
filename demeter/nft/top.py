@@ -2,7 +2,7 @@
 from .query import get_top_raw
 
 
-def get_top(from_date: int):
+def get_top(from_date: int) -> dict:
     data = {
         # byters
         'B': {},
@@ -21,9 +21,51 @@ def get_top(from_date: int):
             BID = (e.get('auction', {}) .get('highestBid', {})
                    .get('bidder', {}).get('id'))
 
-    'Sold': Auction,
-    'Bid': Auction,
-    'OfferAccepted': Offer,
-    'OfferMade': Offer,
-    'PrivateSale': PrivateSale,
-    'BuyPriceAccepted': BuyNow,
+        elif event_type == 'OfferAccepted':
+            BID = e.get('offer', {}).buyer('buyer', {}).get('id')
+
+        elif event_type == 'PrivateSale':
+            BID = e.get('privateSale', {}).get('buyer', {}).get('id')
+
+        elif event_type == 'BuyPriceAccepted':
+            BID = e.get('buyNow', {}).get('buyer', {}).get('id')
+
+        if BID:
+            if BID in data['B']:
+                data['B'][BID]['price'] += price
+                data['B'][BID]['total'] += 1
+            else:
+                data['B'][BID] = {
+                    'price': price,
+                    'total': 1
+                }
+
+        if CID:
+            if CID in data['C']:
+                data['C'][CID]['price'] += price
+                data['C'][CID]['total'] += 1
+            else:
+                data['C'][CID] = {
+                    'price': price,
+                    'total': 1
+                }
+
+        def price_sort(item: dict):
+            return item[1]['price']
+
+        def total_sort(item: dict):
+            return item[1]['total']
+
+        creators = data['C'].items()
+        buyers = data['B'].items()
+
+        return {
+            'creators': {
+                'total': sorted(creators, key=total_sort)[:5],
+                'price': sorted(creators, key=price_sort)[:5]
+            },
+            'buyers': {
+                'total': sorted(buyers, key=total_sort)[:5],
+                'price': sorted(buyers, key=price_sort)[:5]
+            }
+        }
