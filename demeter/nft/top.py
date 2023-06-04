@@ -1,4 +1,6 @@
 
+import logging
+
 from .query import get_top_raw
 
 
@@ -11,7 +13,11 @@ def get_top(from_date: int) -> dict:
     }
 
     events = get_top_raw(from_date)
-    for e in events:
+    for idx, e in enumerate(events):
+        logging.info(f'[{idx}/{len(events)}]e is None: {e is None}')
+        if e is None:
+            continue
+
         price = float(e.get('amountInETH', 0))
         CID = e.get('nft', {}).get('creator', {}).get('id')
         BID = None
