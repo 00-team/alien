@@ -16,6 +16,8 @@ async def user_profile(update: Update, ctx: Ctx, state: UserModel):
     # pictures = await user.get_profile_photos(limit=1)
 
     file_id = config['default_profile_picture']
+    if state.picture:
+        file_id = state.picture
 
     # if pictures.total_count > 0:
     #     file_id = pictures.photos[0][0].file_id
