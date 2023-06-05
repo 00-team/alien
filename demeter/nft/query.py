@@ -159,6 +159,7 @@ query TopEvents($date: Int!){
     }
 
     nft {
+      id
       creator {
         id
       }

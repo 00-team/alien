@@ -1,7 +1,7 @@
 
 import logging
 
-from .query import get_top_raw
+from .query import get_display_raw, get_top_raw
 
 
 def get_top(from_date: int) -> dict:
@@ -15,6 +15,7 @@ def get_top(from_date: int) -> dict:
     events = get_top_raw(from_date)
     for idx, e in enumerate(events):
         price = float(e.get('amountInETH', 0))
+        nft_id = e['nft']['id'] + ':' + e.get('amountInETH')
         creator = e['nft']['creator']
         event_type = e['event']
 
@@ -41,20 +42,24 @@ def get_top(from_date: int) -> dict:
             if BID in data['B']:
                 data['B'][BID]['price'] += price
                 data['B'][BID]['total'] += 1
+                data['B'][BID]['nfts'].add(nft_id)
             else:
                 data['B'][BID] = {
                     'price': price,
-                    'total': 1
+                    'total': 1,
+                    'nfts': {nft_id}
                 }
 
         if CID:
             if CID in data['C']:
                 data['C'][CID]['price'] += price
                 data['C'][CID]['total'] += 1
+                data['C'][CID]['nfts'].add(nft_id)
             else:
                 data['C'][CID] = {
                     'price': price,
-                    'total': 1
+                    'total': 1,
+                    'nfts': {nft_id}
                 }
 
     def price_sort(item: dict):
@@ -69,7 +74,7 @@ def get_top(from_date: int) -> dict:
     logging.info(f'{len(creators)=}')
     logging.info(f'{len(buyers)=}')
 
-    return {
+    top = {
         'creators': {
             'total': sorted(creators, reverse=True, key=total_sort)[:5],
             'price': sorted(creators, reverse=True, key=price_sort)[:5]
@@ -79,6 +84,19 @@ def get_top(from_date: int) -> dict:
             'price': sorted(buyers, reverse=True, key=price_sort)[:5]
         }
     }
+
+    all_users = set()
+    for user in (
+        top['creators']['total'] +
+        top['creators']['price'] +
+        top['buyers']['total'] +
+        top['buyers']['price']
+    ):
+        all_users.add(user[0])
+
+    top['users'] = list(all_users)
+    logging.info(f'all users: {len(all_users)}')
+    return top
 
 
 INDEX_EMOJI = {
