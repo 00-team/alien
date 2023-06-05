@@ -5,7 +5,8 @@ import random
 import time
 
 from database import get_user, get_user_count, update_user
-from db.direct import direct_add, direct_get, direct_update
+from db.direct import direct_add, direct_get, direct_unseen_count
+from db.direct import direct_update
 from deps import require_admin, require_user_data
 from models import DirectTable, UserModel, UserTable
 from settings import database
@@ -269,6 +270,8 @@ async def send_user_info(update: Update, ctx: Ctx, user_id: int):
 async def seen_all(update: Update, ctx: Ctx, state: UserModel):
     user = update.effective_user
     limit = 500
+    total = await direct_unseen_count(user.id)
+
     try:
         limit = max(int(ctx.args[0]), 2)
     except Exception:
@@ -281,7 +284,7 @@ async def seen_all(update: Update, ctx: Ctx, state: UserModel):
     )
 
     await update.effective_message.reply_text(
-        f'loaded {len(directs)} directs.'
+        f'loaded {len(directs)}/{total} directs.'
     )
     success = 0
     errors = 0
