@@ -15,6 +15,8 @@ from .common import Ctx
 async def toggle_user_block(update: Update, ctx: Ctx, state: UserModel):
     await update.callback_query.answer()
     msg = update.effective_message
+    if not msg.reply_markup:
+        return
     keyboard = msg.reply_markup.inline_keyboard
     new_keyboard = []
 
