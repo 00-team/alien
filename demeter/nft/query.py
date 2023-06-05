@@ -184,7 +184,6 @@ query TopEvents($date: Int!){
 
 
 def _graghql(url: str, query: str, variables: dict = {}) -> _R:
-    logging.info(variables)
     result = _POST(url, json={
         'query': query,
         'variables': variables
@@ -198,8 +197,6 @@ def _graghql(url: str, query: str, variables: dict = {}) -> _R:
             f'error getting events {result.status_code}'
             f'\n\n{result.text}'
         ))
-
-    logging.info(result.json())
 
     return result
 
@@ -250,12 +247,12 @@ def get_top_raw(from_date: int) -> list[dict]:
 
 
 def get_display_raw(addr=None, tid=None, actor_pk=None) -> None | dict:
-    if not ((addr and tid) or actor_pk):
+    if not ((addr and tid is not None) or actor_pk):
         return None
 
     try:
         return _graghql(_display_url, _display_query, {
-            'get_art': addr and (tid is not None),
+            'get_art': bool(addr and (tid is not None)),
             'get_actor': bool(actor_pk),
             'addr': str(addr),
             'token_id': int(tid or 0),
