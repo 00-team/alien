@@ -7,7 +7,7 @@ from deps import require_admin, require_score, require_user_data
 from models.user import UserModel, UserTable
 from modules.common import delete_message
 from settings import PICTURE_CHANGE_COST
-from telegram import Update
+from telegram import InputMediaPhoto, Update
 from telegram.constants import ParseMode
 from telegram.ext import CallbackQueryHandler, ConversationHandler
 from telegram.ext import MessageHandler, filters
@@ -24,7 +24,7 @@ async def user_edit_picture(update: Update, ctx: Ctx, user_data: UserModel):
     await update.effective_message.edit_caption(
         f'برای تغییر عکس پروفایل {PICTURE_CHANGE_COST}'
         ' امتیاز از حساب شما کسر می شود.\n\n'
-        'نام خود را ارسال کنید.',
+        'عکس پروفایل خود را ارسال کنید.',
         reply_markup=IKB_EDIT_CANCEL
     )
 
@@ -38,8 +38,7 @@ async def user_edit_picture(update: Update, ctx: Ctx, user_data: UserModel):
 async def user_set_picture(update: Update, ctx: Ctx, state: UserModel):
     # error_msg_id = ctx.user_data.get(NAME_ERROR_MSG_KEY)
     msg = update.effective_message
-
-    logging.info(msg.photo)
+    photo_id = msg.photo[0].file_id
 
     # try:
     #     name = msg.text
@@ -59,21 +58,24 @@ async def user_set_picture(update: Update, ctx: Ctx, state: UserModel):
     #
     #     return
 
-    # await user_update(
-    #     UserTable.user_id == state.user_id,
-    #     name=name,
-    #     used_score=state.used_score + NAME_CHANGE_COST
-    # )
-    # state.name = name
-    # state.used_score += NAME_CHANGE_COST
+    await user_update(
+        UserTable.user_id == state.user_id,
+        picture=photo_id,
+        used_score=state.used_score + PICTURE_CHANGE_COST
+    )
+    state.picture = photo_id
+    state.used_score += PICTURE_CHANGE_COST
 
     profile_msg_id = ctx.user_data.pop(PROFILE_MSG_KEY, None)
     if profile_msg_id:
-        await ctx.bot.edit_message_caption(
-            msg.chat_id,
+        await ctx.bot.edit_message_media(
+            InputMediaPhoto(
+                media=photo_id,
+                caption=get_profile_text(state, ctx.bot.username),
+                parse_mode=ParseMode.HTML
+            ),
+            chat_id=msg.chat_id,
             message_id=profile_msg_id,
-            caption=get_profile_text(state, ctx.bot.username),
-            parse_mode=ParseMode.HTML,
             reply_markup=IKB_PROFILE
         )
         await delete_message(ctx, msg.chat_id, msg.id)
