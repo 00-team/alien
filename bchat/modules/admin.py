@@ -279,7 +279,7 @@ async def seen_all(update: Update, ctx: Ctx, state: UserModel):
 
     directs = await direct_get(
         DirectTable.user_id == user.id,
-        DirectTable.seen is False,
+        DirectTable.seen == False,
         limit=limit
     )
 
