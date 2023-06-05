@@ -55,6 +55,7 @@ async def user_set_name(update: Update, ctx: Ctx, state: UserModel):
 
     await user_update(
         UserTable.user_id == state.user_id,
+        name=name,
         used_score=state.used_score + NAME_CHANGE_COST
     )
     state.name = name
