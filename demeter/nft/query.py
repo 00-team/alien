@@ -184,6 +184,7 @@ query TopEvents($date: Int!){
 
 
 def _graghql(url: str, query: str, variables: dict = {}) -> _R:
+    logging.info(variables)
     result = _POST(url, json={
         'query': query,
         'variables': variables
@@ -197,6 +198,8 @@ def _graghql(url: str, query: str, variables: dict = {}) -> _R:
             f'error getting events {result.status_code}'
             f'\n\n{result.text}'
         ))
+
+    logging.info(result.json())
 
     return result
 
