@@ -16,7 +16,6 @@ from .common import EDIT_PICTURE_TRG, H_CANCEL_EDIT_PROFILE, IKB_EDIT_CANCEL
 from .common import IKB_PROFILE, PROFILE_MSG_KEY, Ctx, get_profile_text
 
 
-@require_admin
 @require_user_data
 @require_score(PICTURE_CHANGE_COST, 'عکس پروفایل')
 async def user_edit_picture(update: Update, ctx: Ctx, user_data: UserModel):
@@ -32,7 +31,6 @@ async def user_edit_picture(update: Update, ctx: Ctx, user_data: UserModel):
     return 'EDIT_PICTURE'
 
 
-@require_admin
 @require_user_data
 @require_score(PICTURE_CHANGE_COST, 'عکس پروفایل')
 async def user_set_picture(update: Update, ctx: Ctx, state: UserModel):
