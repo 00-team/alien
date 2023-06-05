@@ -3,7 +3,7 @@
 import logging
 
 from db.user import user_update
-from deps import require_admin, require_score, require_user_data
+from deps import require_score, require_user_data
 from models.user import UserModel, UserTable
 from modules.common import delete_message
 from settings import PICTURE_CHANGE_COST
