@@ -255,7 +255,7 @@ def get_display_raw(addr=None, tid=None, actor_pk=None) -> None | dict:
             'get_art': addr and (tid is not None),
             'get_actor': bool(actor_pk),
             'addr': str(addr),
-            'token_id': int(tid),
+            'token_id': int(tid or 0),
             'actor_pk': str(actor_pk)
         }).json()['data']
     except Exception as e:
