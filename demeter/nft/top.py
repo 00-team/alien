@@ -124,7 +124,7 @@ def get_top_data(from_date: int) -> dict:
 
     for idx, pk in enumerate(all_users):
         logging.info(f'getting user info: {idx}')
-        time.sleep(0.3)
+        time.sleep(0.1)
         user = get_display_raw(actor_pk=pk)
         top['users'][pk] = pk[:10] + '...'
 
