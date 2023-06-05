@@ -131,12 +131,12 @@ def get_top_data(from_date: int) -> dict:
             'pk': pk
         }
 
-        if user is None:
+        if not user or not user['actor']:
             continue
 
-        top['users'][pk]['name'] = user['actor']['name']
-        top['users'][pk]['username'] = user['actor']['username']
-        top['users'][pk]['twitter'] = user['actor']['twitter']
+        top['users'][pk]['name'] = user['actor'][0]['name']
+        top['users'][pk]['username'] = user['actor'][0]['username']
+        top['users'][pk]['twitter'] = user['actor'][0]['twitter']
 
     return top
 
