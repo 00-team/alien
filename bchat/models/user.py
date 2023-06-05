@@ -19,6 +19,7 @@ class UserTable(BaseTable):
     saved_list = Column(JSON, server_default='{}')
     total_score = Column(Integer, server_default=text('0'))
     used_score = Column(Integer, server_default=text('0'))
+    picture = Column(String)
 
 
 class Genders(int, Enum):
@@ -33,6 +34,7 @@ class UserModel(BaseModel):
     gender: Genders
     name: str
     age: int
+    picture: str = None
     direct_msg_id: int = None
     block_list: dict = {}
     saved_list: dict = {}
