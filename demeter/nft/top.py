@@ -151,7 +151,7 @@ INDEX_EMOJI = {
 
 
 def get_top(from_date: int):
-    data = get_top(from_date)
+    data = get_top_data(from_date)
     logging.info(json.dumps(data, indent=2))
     text = ''
 
