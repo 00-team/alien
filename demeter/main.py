@@ -28,8 +28,12 @@ db = DbDict(
 
 
 def main():
-    logging.info(json.dumps(get_top(now() - DAY_TIME), indent=2))
+
+    logging.info(
+        get_top(now() - DAY_TIME, 'Week')
+    )
     exit()
+
     while True:
 
         # if db['last_month'] + MONTH_TIME < now():

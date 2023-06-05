@@ -126,34 +126,73 @@ def get_top_data(from_date: int) -> dict:
         logging.info(f'getting user info: {idx}')
         time.sleep(0.3)
         user = get_display_raw(actor_pk=pk)
-
-        top['users'][pk] = {
-            'pk': pk
-        }
+        top['users'][pk] = pk[:10] + '...'
 
         if not user or not user['actor']:
             continue
 
-        top['users'][pk]['name'] = user['actor'][0]['name']
-        top['users'][pk]['username'] = user['actor'][0]['username']
-        top['users'][pk]['twitter'] = user['actor'][0]['twitter']
+        name = user['actor'][0]['name']
+        username = user['actor'][0]['username']
+        twitter = user['actor'][0]['twitter']
+
+        display_name = pk[:10] + '...'
+
+        if twitter:
+            display_name = '@' + twitter[0]['username']
+        elif username:
+            display_name = username
+        elif name:
+            display_name = name
+
+        top['users'][pk] = display_name
 
     return top
 
 
 INDEX_EMOJI = {
-    0: '🥇',
-    1: '🥈',
-    2: '🥉',
-    3: '🎗',
-    4: '🎗',
+    0: '🥇 ',
+    1: '🥈 ',
+    2: '🥉 ',
+    3: '🎗 ',
+    4: '🎗 ',
 }
 
 
-def get_top(from_date: int):
+def get_top(from_date: int, date_name: str) -> tuple[str, dict]:
     data = get_top_data(from_date)
     logging.info(json.dumps(data, indent=2))
-    text = ''
 
-    for idx, acc in enumerate([]):
-        text += INDEX_EMOJI.get(idx, '-') + ' '
+    G = data['creators']['total']
+    nft = G[0][1]['top_nft']
+    text = f'🏆 Top Creators of The {date_name}\n\n'
+
+    for idx, user in enumerate(G):
+        text += INDEX_EMOJI.get(idx, '- ')
+        text += data['users'][user[0]]
+        text += ' Sold ' + user[1]['total'] + ' Nfts.\n'
+
+    art = {}
+    art_data = get_display_raw(nft['pk'], nft['id'])
+    if not art_data:
+        art = None
+    else:
+        art = art_data['art'][0]
+        host = art['assetHost'].strip('/')
+        path = art['assetPath'].strip('/')
+
+        asset = f'{art["assetScheme"]}{host}/{path}'
+        mime_type = art['mimeType']
+
+        if not asset.endswith('.mp4') and mime_type in ['video/mp4']:
+            asset += '/nft.mp4'
+
+        art = {
+            'asset': asset,
+            'id': nft['pk'] + '-' + nft['id']
+        }
+
+    return text, art
+
+    #     top['creators']['price'],
+    #     top['buyers']['total'],
+    #     top['buyers']['price']
