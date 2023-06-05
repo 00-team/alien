@@ -5,10 +5,9 @@ import random
 import time
 
 from database import get_user, get_user_count, update_user
-from db.direct import direct_add
-from deps import require_admin
-from models import UserModel, UserTable
-from modules.common import delete_message
+from db.direct import direct_add, direct_get, direct_update
+from deps import require_admin, require_user_data
+from models import DirectTable, UserModel, UserTable
 from settings import database
 from sqlalchemy import select
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
@@ -264,8 +263,52 @@ async def send_user_info(update: Update, ctx: Ctx, user_id: int):
         logging.exception(e)
 
 
+@require_admin
+@require_user_data
+async def seen_all(update: Update, ctx: Ctx, state: UserModel):
+    user = update.effective_user
+    limit = 500
+    try:
+        limit = max(int(ctx.args[0]), 2)
+    except Exception:
+        pass
+
+    directs = await direct_get(
+        DirectTable.user_id == user.id,
+        DirectTable.seen is False,
+        limit=limit
+    )
+
+    await update.effective_message.reply_text(
+        f'loaded {len(directs)} directs.'
+    )
+    success = 0
+    errors = 0
+
+    for direct in directs:
+        try:
+            await direct_update(
+                DirectTable.direct_id == direct.direct_id,
+                seen=True
+            )
+            await ctx.bot.send_message(
+                direct.sender_id, 'پیام شما مشاهده شد. 🧉',
+                reply_to_message_id=direct.message_id
+            )
+            success += 1
+        except Exception:
+            errors += 1
+
+        time.sleep(0.1)
+
+    await update.effective_message.reply_text(
+        f'success: {success}\nerrors: {errors}'
+    )
+
+
 HANDLERS_ADMIN = [
     CommandHandler(['stats'], stats),
+    CommandHandler(['seen_all'], seen_all),
     CommandHandler(['user_score'], get_user_score),
     CommandHandler(['help'], help_cmd),
     CommandHandler(
