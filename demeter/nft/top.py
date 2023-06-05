@@ -187,7 +187,11 @@ def get_top(from_date: int, date_name: str) -> tuple[str, dict]:
 
         art = {
             'asset': asset,
-            'id': nft['pk'] + '-' + nft['id']
+            'id': nft['pk'] + '-' + str(nft['id']),
+            'url': (
+                'https://foundation.app/collection/'
+                f'{art["collection"]["slug"]}/{nft["id"]}'
+            )
         }
 
     return text, art

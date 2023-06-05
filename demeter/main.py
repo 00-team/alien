@@ -29,9 +29,21 @@ db = DbDict(
 
 def main():
 
-    logging.info(
-        get_top(now() - DAY_TIME, 'Week')
-    )
+    text, art = get_top(now() - DAY_TIME, 'Week')
+    media = None
+
+    if art:
+        media = upload_media(art['asset'], art['id'])
+
+    twt_id = tweet(text, media=media)
+
+    if twt_id and art:
+        time.sleep(2)
+        tweet(
+            art['url'],
+            reply=twt_id
+        )
+
     exit()
 
     while True:
@@ -59,6 +71,7 @@ def main():
                 twt_id = tweet(tweet_text, media=media)
 
                 if twt_id:
+                    time.sleep(2)
                     tweet(
                         event.url,
                         reply=twt_id
