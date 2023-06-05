@@ -97,6 +97,7 @@ async def help_cmd(update: Update, ctx: Ctx):
     await update.effective_message.reply_text(
         '/help -> for this message\n'
         '/stats -> user count\n'
+        '/seen_all -> seen all of your directs\n'
         '/user_score <code> -> get the user score\n'
         '/user_score <code> set 12 -> set the user used score\n'
         '/user_score <code> set 12 total -> set the user total score\n'
