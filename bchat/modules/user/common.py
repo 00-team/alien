@@ -17,6 +17,7 @@ EDIT_AGE_TRG = 'user:edit:age'
 EDIT_NAME_TRG = 'user:edit:name'
 EDIT_GENDER_TRG = 'user:edit:gender'
 EDIT_CODE_TRG = 'user:edit:code'
+EDIT_PICTURE_TRG = 'user:edit:picture'
 
 IKB_PROFILE = InlineKeyboardMarkup([
     [
@@ -32,7 +33,7 @@ IKB_PROFILE = InlineKeyboardMarkup([
     ],
     [
         InlineKeyboardButton(
-            'تغییر عکس پروفایل 🖼', callback_data='coming_soon'
+            'تغییر عکس پروفایل 🖼', callback_data=EDIT_PICTURE_TRG
         ),
         InlineKeyboardButton(
             'تغییر کد 🔥', callback_data=EDIT_CODE_TRG
