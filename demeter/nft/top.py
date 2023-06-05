@@ -1,10 +1,12 @@
 
+import json
 import logging
+import time
 
 from .query import get_display_raw, get_top_raw
 
 
-def get_top(from_date: int) -> dict:
+def get_top_data(from_date: int) -> dict:
     data = {
         # byters
         'B': {},
@@ -68,6 +70,9 @@ def get_top(from_date: int) -> dict:
     def total_sort(item: dict):
         return item[1]['total']
 
+    def nft_sort(item: str):
+        return float(item.split(':')[-1])
+
     creators = data['C'].items()
     buyers = data['B'].items()
 
@@ -85,6 +90,27 @@ def get_top(from_date: int) -> dict:
         }
     }
 
+    for G in (
+        top['creators']['total'],
+        top['creators']['price'],
+        top['buyers']['total'],
+        top['buyers']['price']
+    ):
+        top_nft = max(list(G[0][1].pop('nfts')), key=nft_sort)
+        logging.info(f'top nft: {top_nft}')
+
+        nft_id, nft_price = top_nft.split(':')
+        nft_pk, token_id = nft_id.split('-')
+
+        G[0][1]['top_nft'] = {
+            'pk': nft_pk,
+            'id': int(token_id),
+            'price': float(nft_price)
+        }
+
+        for u in G[1:]:
+            u[1].pop('nfts', None)
+
     all_users = set()
     for user in (
         top['creators']['total'] +
@@ -94,8 +120,23 @@ def get_top(from_date: int) -> dict:
     ):
         all_users.add(user[0])
 
-    top['users'] = list(all_users)
-    logging.info(f'all users: {len(all_users)}')
+    top['users'] = {}
+
+    for pk in all_users:
+        time.sleep(0.3)
+        user = get_display_raw(actor_pk=pk)
+
+        top['users'][pk] = {
+            'pk': pk
+        }
+
+        if user is None:
+            continue
+
+        top['users'][pk]['name'] = user['actor']['name']
+        top['users'][pk]['username'] = user['actor']['username']
+        top['users'][pk]['twitter'] = user['actor']['twitter']
+
     return top
 
 
@@ -108,7 +149,9 @@ INDEX_EMOJI = {
 }
 
 
-def get_top_tweet(data: dict):
+def get_top(from_date: int):
+    data = get_top(from_date)
+    logging.info(json.dumps(data, indent=2))
     text = ''
 
     for idx, acc in enumerate([]):
