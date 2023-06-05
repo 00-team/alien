@@ -124,7 +124,6 @@ def get_top_data(from_date: int) -> dict:
 
     for idx, pk in enumerate(all_users):
         logging.info(f'getting user info: {idx}')
-        time.sleep(0.1)
         user = get_display_raw(actor_pk=pk)
         top['users'][pk] = pk[:10] + '...'
 
@@ -169,7 +168,7 @@ def get_top(from_date: int, date_name: str) -> tuple[str, dict]:
     for idx, user in enumerate(G):
         text += INDEX_EMOJI.get(idx, '- ')
         text += data['users'][user[0]]
-        text += ' Sold ' + user[1]['total'] + ' Nfts.\n'
+        text += ' Sold ' + str(user[1]['total']) + ' Nfts.\n'
 
     art = {}
     art_data = get_display_raw(nft['pk'], nft['id'])
