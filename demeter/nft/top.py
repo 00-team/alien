@@ -157,6 +157,31 @@ INDEX_EMOJI = {
 }
 
 
+def get_art(nft):
+    art_data = get_display_raw(nft['pk'], nft['id'])
+    if not art_data:
+        return None
+
+    art = art_data['art'][0]
+    host = art['assetHost'].strip('/')
+    path = art['assetPath'].strip('/')
+
+    asset = f'{art["assetScheme"]}{host}/{path}'
+    mime_type = art['mimeType']
+
+    if not asset.endswith('.mp4') and mime_type in ['video/mp4']:
+        asset += '/nft.mp4'
+
+    return {
+        'asset': asset,
+        'id': nft['pk'] + '-' + str(nft['id']),
+        'url': (
+            'https://foundation.app/collection/'
+            f'{art["collection"]["slug"]}/{nft["id"]}'
+        )
+    }
+
+
 def get_top(from_date: int, date_name: str) -> tuple[str, dict]:
     data = get_top_data(from_date)
     logging.info(json.dumps(data, indent=2))
@@ -170,32 +195,45 @@ def get_top(from_date: int, date_name: str) -> tuple[str, dict]:
         text += data['users'][user[0]]
         text += ' Sold ' + str(user[1]['total']) + ' Nfts.\n'
 
-    art = {}
-    art_data = get_display_raw(nft['pk'], nft['id'])
-    if not art_data:
-        art = None
-    else:
-        art = art_data['art'][0]
-        host = art['assetHost'].strip('/')
-        path = art['assetPath'].strip('/')
+    text += '\n#FoundationSold'
+    art = get_art(nft)
+    yield text, art
 
-        asset = f'{art["assetScheme"]}{host}/{path}'
-        mime_type = art['mimeType']
+    G = data['buyers']['total']
+    nft = G[0][1]['top_nft']
+    text = f'🏆 Top Collectors of The {date_name}\n\n'
 
-        if not asset.endswith('.mp4') and mime_type in ['video/mp4']:
-            asset += '/nft.mp4'
+    for idx, user in enumerate(G):
+        text += INDEX_EMOJI.get(idx, '- ')
+        text += data['users'][user[0]]
+        text += ' Bought ' + str(user[1]['total']) + ' Nfts.\n'
 
-        art = {
-            'asset': asset,
-            'id': nft['pk'] + '-' + str(nft['id']),
-            'url': (
-                'https://foundation.app/collection/'
-                f'{art["collection"]["slug"]}/{nft["id"]}'
-            )
-        }
+    text += '\n#FoundationSold'
+    art = get_art(nft)
+    yield text, art
 
-    return text, art
+    G = data['creators']['price']
+    nft = G[0][1]['top_nft']
+    text = f'🏆 Top Creators of The {date_name}\n\n'
 
-    #     top['creators']['price'],
-    #     top['buyers']['total'],
-    #     top['buyers']['price']
+    for idx, user in enumerate(G):
+        text += INDEX_EMOJI.get(idx, '- ')
+        text += data['users'][user[0]]
+        text += ' Sold ' + str(user[1]['price']) + ' Eth worth of Nfts.\n'
+
+    text += '\n#FoundationSold'
+    art = get_art(nft)
+    yield text, art
+
+    G = data['buyers']['price']
+    nft = G[0][1]['top_nft']
+    text = f'🏆 Top Collectors of The {date_name}\n\n'
+
+    for idx, user in enumerate(G):
+        text += INDEX_EMOJI.get(idx, '- ')
+        text += data['users'][user[0]]
+        text += ' Bought ' + str(user[1]['price']) + ' Eth worth of Nfts.\n'
+
+    text += '\n#FoundationSold'
+    art = get_art(nft)
+    yield text, art

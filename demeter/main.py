@@ -29,29 +29,43 @@ db = DbDict(
 
 def main():
 
-    text, art = get_top(now() - DAY_TIME, 'Week')
-    media = None
-
-    if art:
-        media = upload_media(art['asset'], art['id'])
-
-    twt_id = tweet(text, media=media)
-
-    if twt_id and art:
-        time.sleep(2)
-        tweet(
-            art['url'],
-            reply=twt_id
-        )
-
-    exit()
-
     while True:
 
-        # if db['last_month'] + MONTH_TIME < now():
-        #     pass
-        # elif db['last_week'] + WEEK_TIME < now():
-        #     pass
+        if db['last_month'] + MONTH_TIME < now():
+            for text, art in get_top(now() - MONTH_TIME, 'Month'):
+                media = None
+                if art:
+                    media = upload_media(art['asset'], art['id'])
+
+                twt_id = tweet(text, media=media)
+                if twt_id and art:
+                    time.sleep(2)
+                    tweet(
+                        art['url'],
+                        reply=twt_id
+                    )
+
+                time.sleep(TWT_DELAY)
+
+            db['last_week'] = now()
+            db['last_month'] = now()
+        elif db['last_week'] + WEEK_TIME < now():
+            for text, art in get_top(now() - WEEK_TIME, 'Week'):
+                media = None
+                if art:
+                    media = upload_media(art['asset'], art['id'])
+
+                twt_id = tweet(text, media=media)
+                if twt_id and art:
+                    time.sleep(2)
+                    tweet(
+                        art['url'],
+                        reply=twt_id
+                    )
+
+                time.sleep(TWT_DELAY)
+
+            db['last_week'] = now()
 
         last_date = db['last_date']
         before_tweets = now()
