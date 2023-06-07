@@ -3,7 +3,7 @@ from enum import Enum, auto
 
 from pydantic import BaseModel
 from settings import BaseTable
-from sqlalchemy import JSON, Column, Integer, String, text
+from sqlalchemy import JSON, Boolean, Column, Integer, String, text
 
 
 class UserTable(BaseTable):
@@ -20,6 +20,7 @@ class UserTable(BaseTable):
     total_score = Column(Integer, server_default=text('0'))
     used_score = Column(Integer, server_default=text('0'))
     picture = Column(String)
+    blocked_bot = Column(Boolean, server_default=text('0'))
 
 
 class Genders(int, Enum):
@@ -40,6 +41,7 @@ class UserModel(BaseModel):
     saved_list: dict = {}
     total_score: int = 0
     used_score: int = 0
+    blocked_bot: bool = False
     new_user: bool = False
 
 
