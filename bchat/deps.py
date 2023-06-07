@@ -1,7 +1,8 @@
 
 
-from database import add_user, get_user, update_user_code
-from models import UserModel
+from database import add_user, update_user_code
+from db.user import user_get, user_update
+from models import UserModel, UserTable
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes, ConversationHandler
 from utils import config
@@ -28,7 +29,7 @@ def require_user_data(func):
         if user.id in [6147521442]:
             return
 
-        user_data = await get_user(user.id)
+        user_data = await user_get(UserTable.user_id == user.id)
 
         if user_data is None:
             codename = await add_user(user.id, user.full_name)
@@ -44,6 +45,16 @@ def require_user_data(func):
         if not user_data.codename:
             res, cn = await update_user_code(user_data.user_id)
             user_data.codename = cn
+
+        if user_data.admin_blocked:
+            return
+
+        if user_data.blocked_bot:
+            await user_update(
+                UserTable.user_id == user_data.user_id,
+                blocked_bot=False
+            )
+            user_data.blocked_bot = False
 
         return await func(update, ctx, user_data)
 
