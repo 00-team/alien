@@ -2,9 +2,9 @@
 
 import logging
 
-from database import get_user, update_user
+from db.user import user_get, user_update
 from deps import require_user_data
-from models import GENDER_DISPLAY, UserModel
+from models import GENDER_DISPLAY, UserModel, UserTable
 from settings import MAIN_KEYBOARD
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardMarkup, Update
@@ -28,33 +28,35 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
             )
             return
 
-        code_user_data = await get_user(codename=codename)
-        if code_user_data is None:
+        target = await user_get(
+            UserTable.codename == codename
+        )
+        if target is None:
             await update.effective_message.reply_text(
                 f'کاربری با کد {codename} پیدا نشد. ❌'
             )
             return
 
         if user_data.new_user:
-            await update_user(
-                code_user_data.user_id,
-                total_score=code_user_data.total_score + 1
+            await user_update(
+                UserTable.user_id == target.user_id,
+                total_score=target.total_score + 1
             )
 
         text = (
-            f'نام: {code_user_data.name}\n'
-            f'جنسیت: {GENDER_DISPLAY[code_user_data.gender]}\n'
+            f'نام: {target.name}\n'
+            f'جنسیت: {GENDER_DISPLAY[target.gender]}\n'
             f'سن: {user_data.age}\n'
         )
 
         trail_text = '\n\n👇 دکمه ارسال پیام رو بزن و بعدش پیامت رو ارسال کن.'
 
         keyboard = []
-        if str(code_user_data.user_id) in user_data.saved_list:
+        if str(target.user_id) in user_data.saved_list:
             keyboard.append(InlineKeyboardButton(
                 'حذف کاربر ❌',
                 callback_data=(
-                    f'remove_saved_user#{code_user_data.user_id}'
+                    f'remove_saved_user#{target.user_id}'
                 )
             ))
         else:
@@ -62,15 +64,15 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
                 keyboard.append(InlineKeyboardButton(
                     'ذخیر کاربر ⭐',
                     callback_data=(
-                        f'save_user#{code_user_data.user_id}'
+                        f'save_user#{target.user_id}'
                     )
                 ))
 
-        if str(user_data.user_id) not in code_user_data.block_list:
+        if str(user_data.user_id) not in target.block_list:
             keyboard.append(InlineKeyboardButton(
                 'ارسال پیام ✉',
                 callback_data=(
-                    f'send_direct_message#{code_user_data.user_id}'
+                    f'send_direct_message#{target.user_id}'
                 )
             ))
         else:
@@ -83,8 +85,8 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
         # )
 
         file_id = config['default_profile_picture']
-        if code_user_data.picture:
-            file_id = code_user_data.picture
+        if target.picture:
+            file_id = target.picture
 
         # if pictures.total_count > 0:
         #     file_id = pictures.photos[0][0].file_id

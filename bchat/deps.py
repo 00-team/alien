@@ -43,8 +43,7 @@ def require_user_data(func):
             )
 
         if not user_data.codename:
-            res, cn = await update_user_code(user_data.user_id)
-            user_data.codename = cn
+            user_data.codename = await update_user_code(user_data.user_id)
 
         if user_data.admin_blocked:
             return

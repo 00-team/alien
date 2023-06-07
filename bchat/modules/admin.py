@@ -9,7 +9,7 @@ from db.direct import direct_update
 from db.user import user_count, user_get, user_update
 from deps import require_admin, require_user_data
 from models import DirectTable, UserModel, UserTable
-from settings import database, sqlx
+from settings import sqlx
 from sqlalchemy import select
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.error import Forbidden, NetworkError, RetryAfter, TelegramError

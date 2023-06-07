@@ -2,8 +2,9 @@
 
 import logging
 
-from database import get_user
+from db.user import user_get
 from deps import require_admin
+from models import UserTable
 from settings import HOME_DIR
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.error import NetworkError, TelegramError
@@ -26,7 +27,7 @@ async def chat_member_update(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         return
 
     chat_member = update.chat_member.new_chat_member
-    user_data = await get_user(chat_member.user.id)
+    user_data = await user_get(UserTable.user_id == chat_member.user.id)
 
     if chat_member.status == 'member' and user_data:
         rq_channels[cid]['amount'] += 1

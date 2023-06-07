@@ -36,5 +36,5 @@ metadata = MetaData()
 
 BaseTable = declarative_base(metadata=metadata)
 
-database = Database(DATABASE_URL)
-sqlx = database
+sqlx = Database(DATABASE_URL)
+database = sqlx
