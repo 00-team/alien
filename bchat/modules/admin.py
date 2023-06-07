@@ -4,12 +4,12 @@ import logging
 import random
 import time
 
-from database import get_user, get_user_count, update_user
 from db.direct import direct_add, direct_get, direct_unseen_count
 from db.direct import direct_update
+from db.user import user_count, user_get, user_update
 from deps import require_admin, require_user_data
 from models import DirectTable, UserModel, UserTable
-from settings import database
+from settings import database, sqlx
 from sqlalchemy import select
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.error import Forbidden, NetworkError, RetryAfter, TelegramError
@@ -49,7 +49,8 @@ async def get_user_score(update: Update, ctx: Ctx):
         )
         return
 
-    user_data = await get_user(None, ctx.args[0])
+    user_data = await user_get(UserTable.codename == ctx.args[0])
+
     if user_data is None:
         await update.effective_message.reply_text(
             f'Error ❌\nuser with code {ctx.args[0]} was not found'
@@ -67,15 +68,17 @@ async def get_user_score(update: Update, ctx: Ctx):
     if len(ctx.args) >= 3 and ctx.args[1] == 'set':
         try:
             if len(ctx.args) > 3 and ctx.args[3] == 'total':
-                await update_user(
-                    user_data.user_id, total_score=int(ctx.args[2])
+                await user_update(
+                    UserTable.user_id == user_data.user_id,
+                    total_score=int(ctx.args[2])
                 )
             else:
                 new_score = min(int(ctx.args[2]), user_data.total_score)
-                await update_user(
-                    user_data.user_id,
-                    used_score=new_score
+                await user_update(
+                    UserTable.user_id == user_data.user_id,
+                    used_score=new_score,
                 )
+
             await update.effective_message.reply_text(
                 'Ok ✅\nuser score was updated'
             )
@@ -87,9 +90,11 @@ async def get_user_score(update: Update, ctx: Ctx):
 
 @require_admin
 async def stats(update: Update, ctx: Ctx):
-    users = await get_user_count()
+    total = await user_count(False)
+    active = await user_count(True)
+
     await update.effective_message.reply_text(
-        f'total users: {users}'
+        f'total users: {active}/{total}'
     )
 
 
@@ -113,8 +118,9 @@ async def help_cmd(update: Update, ctx: Ctx):
 async def send_direct_to_all_job(ctx: Ctx):
     logging.info('sending a message to all users')
 
-    all_users = await database.fetch_all(
+    all_users = await sqlx.fetch_all(
         select(UserTable)
+        .where(UserTable.blocked_bot is False)
     )
     data = {
         'success': 0,
@@ -153,8 +159,10 @@ async def send_direct_to_all_job(ctx: Ctx):
                 'شما یک پیام جدید دارید!',
                 reply_markup=InlineKeyboardMarkup([keyboard])
             )
-            await update_user(target.user_id, direct_msg_id=msg.id)
-
+            await user_update(
+                UserTable.user_id == target.user_id,
+                direct_msg_id=msg.id
+            )
             data['success'] += 1
         except RetryAfter as e:
             time.sleep(e.retry_after + 10)
@@ -165,6 +173,10 @@ async def send_direct_to_all_job(ctx: Ctx):
                 f'[send_all]: forbidden {target.user_id} - {target.name}'
             )
             data['blocked'] += 1
+            await user_update(
+                UserTable.user_id == target.user_id,
+                blocked_bot=True
+            )
         except NetworkError:
             data['error'] += 1
         except TelegramError as e:
@@ -185,6 +197,11 @@ async def send_direct_to_all_job(ctx: Ctx):
 
 @require_admin
 async def send_direct_to_all(update: Update, ctx: Ctx):
+
+    if ctx.job_queue.get_jobs_by_name('send_direct_to_all'):
+        await update.effective_message.reply_text('job already in queue. 🤡')
+        return
+
     text = update.effective_message.text[19:]
     limit = None
 
@@ -207,17 +224,13 @@ async def send_direct_to_all(update: Update, ctx: Ctx):
         await update.effective_message.reply_text('Empty Message ❌')
 
     msg = await update.effective_message.reply_text(text)
-    total_users = await get_user_count()
+    total_users = await user_count(True)
 
     await update.effective_message.reply_text(
         f'limit is: {limit}\n'
         'you have 30s to cancel this.\n'
         '/cancel_send_direct_all'
     )
-
-    if ctx.job_queue.get_jobs_by_name('send_direct_to_all'):
-        await update.effective_message.reply_text('job already in queue. 🤡')
-        return
 
     ctx.job_queue.run_once(
         send_direct_to_all_job, 30,
