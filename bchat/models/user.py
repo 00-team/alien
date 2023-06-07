@@ -21,6 +21,7 @@ class UserTable(BaseTable):
     used_score = Column(Integer, server_default=text('0'))
     picture = Column(String)
     blocked_bot = Column(Boolean, server_default=text('0'))
+    admin_blocked = Column(Boolean, server_default=text('0'))
 
 
 class Genders(int, Enum):
@@ -43,6 +44,7 @@ class UserModel(BaseModel):
     used_score: int = 0
     blocked_bot: bool = False
     new_user: bool = False
+    admin_blocked: bool = False
 
 
 GENDER_DISPLAY = {
