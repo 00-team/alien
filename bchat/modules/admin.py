@@ -120,7 +120,7 @@ async def send_direct_to_all_job(ctx: Ctx):
 
     all_users = await sqlx.fetch_all(
         select(UserTable)
-        .where(UserTable.blocked_bot is False)
+        .where(UserTable.blocked_bot == False)
     )
     data = {
         'success': 0,
