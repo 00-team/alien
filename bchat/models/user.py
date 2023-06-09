@@ -20,6 +20,7 @@ class UserTable(BaseTable):
     total_score = Column(Integer, server_default=text('0'))
     used_score = Column(Integer, server_default=text('0'))
     picture = Column(String)
+    username = Column(String)
     blocked_bot = Column(Boolean, server_default=text('0'))
     admin_blocked = Column(Boolean, server_default=text('0'))
 
@@ -37,6 +38,7 @@ class UserModel(BaseModel):
     name: str
     age: int
     picture: str = None
+    username: str = None
     direct_msg_id: int = None
     block_list: dict = {}
     saved_list: dict = {}
