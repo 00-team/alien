@@ -29,6 +29,8 @@ async def find_user_start(update: Update, ctx: Ctx, state: UserModel):
         ]])
     )
 
+    return 'FIND_USER'
+
 
 @require_user_data
 async def find_user(update: Update, ctx: Ctx, state: UserModel):
