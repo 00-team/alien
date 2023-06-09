@@ -15,6 +15,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.error import Forbidden, NetworkError, RetryAfter, TelegramError
 from telegram.error import TimedOut
 from telegram.ext import CommandHandler, ContextTypes
+from utils import config
 
 Ctx = ContextTypes.DEFAULT_TYPE
 
@@ -103,6 +104,7 @@ async def help_cmd(update: Update, ctx: Ctx):
     await update.effective_message.reply_text(
         '/help -> for this message\n'
         '/stats -> user count\n'
+        '/update_db -> only for developer\n'
         '/seen_all -> seen all of your directs\n'
         '/user_score <code> -> get the user score\n'
         '/user_score <code> set 12 -> set the user used score\n'
@@ -323,8 +325,69 @@ async def seen_all(update: Update, ctx: Ctx, state: UserModel):
     )
 
 
+@require_admin
+async def update_db(update: Update, ctx: Ctx):
+    admin = update.effective_user
+    if admin.id != config['ADMINS'][0]:
+        return
+
+    users = await sqlx.fetch_all(select(UserTable))
+    data = {
+        'success': 0,
+        'username': 0,
+        'blocked': 0,
+        'error': 0,
+        'timeout': 0,
+    }
+
+    for U in users:
+        time.sleep(0.1)
+        target = UserModel(**U)
+
+        try:
+            user = await ctx.bot.get_chat(target.user_id)
+            await user_update(
+                UserTable.user_id == target.user_id,
+                username=user.username
+            )
+            data['success'] += 1
+            if user.username:
+                data['username'] += 1
+        except RetryAfter as e:
+            time.sleep(e.retry_after + 10)
+            logging.info(f'[send_all]: retry_after {e.retry_after}')
+            data['timeout'] += 1
+        except Forbidden:
+            logging.info(
+                f'[send_all]: forbidden {target.user_id} - {target.name}'
+            )
+            data['blocked'] += 1
+            await user_update(
+                UserTable.user_id == target.user_id,
+                blocked_bot=True
+            )
+        except NetworkError:
+            data['error'] += 1
+        except TelegramError as e:
+            logging.exception(e)
+            data['error'] += 1
+
+    time.sleep(2)
+    stats = (
+        'send to all done.\n'
+        f'success: {data["success"]}\n'
+        f'blocked: {data["blocked"]}\n'
+        f'username: {data["username"]}\n'
+        f'error: {data["error"]}\n'
+        f'timeout: {data["timeout"]}\n'
+    )
+    logging.info(stats)
+    await ctx.bot.send_message(admin.id, stats)
+
+
 HANDLERS_ADMIN = [
     CommandHandler(['stats'], stats),
+    CommandHandler(['update_db'], update_db),
     CommandHandler(['seen_all'], seen_all),
     CommandHandler(['user_score'], get_user_score),
     CommandHandler(['help'], help_cmd),
