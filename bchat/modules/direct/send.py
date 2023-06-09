@@ -18,18 +18,37 @@ Ctx = ContextTypes.DEFAULT_TYPE
 @require_user_data
 async def send_direct_message(update: Update, ctx: Ctx, _):
     await update.callback_query.answer()
+    user_id = update.effective_user.id
 
     send_type, send_id = update.callback_query.data.split('#')
     send_id = int(send_id)
     reply_to_msg_id = None
     text = 'پیام خود را ارسال کنید:'
+    target = None
 
     if send_type == 'direct_reply':
+        direct = await direct_get(DirectTable.direct_id == send_id, limit=1)
+        if not direct:
+            return
+
+        target = await user_get(UserTable.user_id == direct.user_id)
+
         reply_to_msg_id = update.effective_message.id
         text = (
             '☝️ در حال پاسخ دادن به فرستنده این '
             'پیام هستی ... ؛ منتظریم بفرستی :)'
         )
+    else:
+        target = await user_get(UserTable.user_id == send_id)
+
+    if not target:
+        return
+
+    if str(user_id) in target.block_list:
+        await update.effective_message.reply_text(
+            'این کاربر شما را بلاک کرده. ⛔'
+        )
+        ConversationHandler.END
 
     msg = await update.effective_message.reply_text(
         text,
