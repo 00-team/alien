@@ -46,7 +46,7 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
         text = (
             f'نام: {target.name}\n'
             f'جنسیت: {GENDER_DISPLAY[target.gender]}\n'
-            f'سن: {user_data.age}\n'
+            f'سن: {target.age}\n'
         )
 
         trail_text = '\n\n👇 دکمه ارسال پیام رو بزن و بعدش پیامت رو ارسال کن.'
