@@ -51,6 +51,8 @@ async def find_user(update: Update, ctx: Ctx, state: UserModel):
     if msg.forward_from and not msg.forward_from.is_bot:
         target_user_id = msg.forward_from.id
 
+    logging.info(f'\n{target_user_id=}\n{target_username=}\n')
+
     if target_username:
         target = await user_get(UserTable.username == target_username)
     elif target_user_id:

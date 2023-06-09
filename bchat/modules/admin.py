@@ -327,63 +327,7 @@ async def seen_all(update: Update, ctx: Ctx, state: UserModel):
 
 @require_admin
 async def update_db(update: Update, ctx: Ctx):
-    admin = update.effective_user
-    users = await sqlx.fetch_all(select(UserTable))
-
-    data = {
-        'success': 0,
-        'username': 0,
-        'blocked': 0,
-        'error': 0,
-        'timeout': 0,
-    }
-
-    logging.info(f'total users: {len(users)}')
-
-    for idx, U in enumerate(users):
-        time.sleep(0.1)
-        target = UserModel(**U)
-        logging.info(f'[{idx}] {target.name}')
-
-        try:
-            user = await ctx.bot.get_chat(target.user_id)
-            await user_update(
-                UserTable.user_id == target.user_id,
-                username=user.username
-            )
-            data['success'] += 1
-            if user.username:
-                data['username'] += 1
-        except RetryAfter as e:
-            time.sleep(e.retry_after + 10)
-            logging.info(f'[send_all]: retry_after {e.retry_after}')
-            data['timeout'] += 1
-        except Forbidden:
-            logging.info(
-                f'[send_all]: forbidden {target.user_id} - {target.name}'
-            )
-            data['blocked'] += 1
-            await user_update(
-                UserTable.user_id == target.user_id,
-                blocked_bot=True
-            )
-        except NetworkError:
-            data['error'] += 1
-        except TelegramError as e:
-            logging.exception(e)
-            data['error'] += 1
-
-    time.sleep(2)
-    stats = (
-        'send to all done.\n'
-        f'success: {data["success"]}\n'
-        f'blocked: {data["blocked"]}\n'
-        f'username: {data["username"]}\n'
-        f'error: {data["error"]}\n'
-        f'timeout: {data["timeout"]}\n'
-    )
-    logging.info(stats)
-    await ctx.bot.send_message(admin.id, stats)
+    await update.effective_message.reply_text('nothing to do.')
 
 
 HANDLERS_ADMIN = [
