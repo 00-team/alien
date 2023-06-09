@@ -45,7 +45,7 @@ async def find_user(update: Update, ctx: Ctx, state: UserModel):
 
     for e in msg.entities:
         if e.type == MessageEntity.MENTION:
-            target_username = msg.text[e.offset:e.offset+e.length]
+            target_username = msg.text[e.offset+1:e.offset+e.length]
             break
 
     if msg.forward_from and not msg.forward_from.is_bot:
