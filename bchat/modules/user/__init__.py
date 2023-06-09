@@ -1,6 +1,7 @@
 from .age import H_AGE_CONV
 from .block import H_BLOCK
 from .code import H_CODE_CONV
+from .find import H_FIND_CONV
 from .gender import H_GENDER_CONV
 from .link import H_LINK
 from .name import H_NAME_CONV
@@ -14,6 +15,7 @@ HANDLERS_USER = [
     H_CODE_CONV,
     H_GENDER_CONV,
     H_PICTURE_CONV,
+    H_FIND_CONV,
     *H_LINK,
     *H_PROFILE,
     *H_SAVE,

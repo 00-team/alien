@@ -24,12 +24,13 @@ KW_PROFILE = 'پروفایل من 👤'
 KW_MY_LINK = 'لینک ناشناس من 🔗'
 KW_DRTNSEN = 'پیام های خوانده نشده 📬'
 KW_SAVELST = 'کاربران ذخیره شده 📋'
+KW_CTSPLCN = '💖 به مخاطب خاص وصلم کن'
 
 
 MAIN_KEYBOARD = [
     [KW_PROFILE],
     [KW_MY_LINK, KW_SAVELST],
-    [KW_DRTNSEN],
+    [KW_DRTNSEN, KW_CTSPLCN],
 ]
 
 metadata = MetaData()
