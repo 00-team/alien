@@ -70,6 +70,17 @@ async def find_user(update: Update, ctx: Ctx, state: UserModel):
         )
         return
 
+    if state.user_id in config['ADMINS']:
+        await msg.reply_text(
+            'admin inspect 🐧\n'
+            f'user_id: {target.user_id}\n'
+            f'codename: {target.codename}\n'
+            f'username: {target.username}\n'
+            f'blocked bot: {target.blocked_bot}\n'
+            f'baned: {target.admin_blocked}\n'
+            f'score: {target.used_score}/{target.total_score}\n'
+        )
+
     if target.user_id == state.user_id:
         await update.effective_message.reply_text(
             'اینکه آدم گاهی با خودش حرف بزنه خوبه ، '
