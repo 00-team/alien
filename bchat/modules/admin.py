@@ -328,8 +328,8 @@ async def seen_all(update: Update, ctx: Ctx, state: UserModel):
 @require_admin
 async def update_db(update: Update, ctx: Ctx):
     admin = update.effective_user
-
     users = await sqlx.fetch_all(select(UserTable))
+
     data = {
         'success': 0,
         'username': 0,
@@ -340,9 +340,10 @@ async def update_db(update: Update, ctx: Ctx):
 
     logging.info(f'total users: {len(users)}')
 
-    for U in users:
+    for idx, U in enumerate(users):
         time.sleep(0.1)
         target = UserModel(**U)
+        logging.info(f'[{idx}] {target.name}')
 
         try:
             user = await ctx.bot.get_chat(target.user_id)
@@ -387,7 +388,7 @@ async def update_db(update: Update, ctx: Ctx):
 
 HANDLERS_ADMIN = [
     CommandHandler(['stats'], stats),
-    CommandHandler(['update_db'], update_db),
+    CommandHandler(['update_db'], update_db, block=False),
     CommandHandler(['seen_all'], seen_all),
     CommandHandler(['user_score'], get_user_score),
     CommandHandler(['help'], help_cmd),
