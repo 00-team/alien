@@ -328,8 +328,6 @@ async def seen_all(update: Update, ctx: Ctx, state: UserModel):
 @require_admin
 async def update_db(update: Update, ctx: Ctx):
     admin = update.effective_user
-    if admin.id != config['ADMINS'][0]:
-        return
 
     users = await sqlx.fetch_all(select(UserTable))
     data = {
@@ -339,6 +337,8 @@ async def update_db(update: Update, ctx: Ctx):
         'error': 0,
         'timeout': 0,
     }
+
+    logging.info(f'total users: {len(users)}')
 
     for U in users:
         time.sleep(0.1)
