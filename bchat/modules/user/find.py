@@ -50,6 +50,11 @@ async def find_user(update: Update, ctx: Ctx, state: UserModel):
 
     if msg.forward_from and not msg.forward_from.is_bot:
         target_user_id = msg.forward_from.id
+    else:
+        try:
+            target_user_id = int(msg.text)
+        except Exception:
+            pass
 
     logging.info(f'\n{target_user_id=}\n{target_username=}\n')
 
@@ -68,6 +73,14 @@ async def find_user(update: Update, ctx: Ctx, state: UserModel):
             ]])
         )
         return
+
+    if target.user_id == state.user_id:
+        await update.effective_message.reply_text(
+            'اینکه آدم گاهی با خودش حرف بزنه خوبه ، '
+            'ولی اینجا نمیتونی به خودت پیام ناشناس بفرستی ! :)\n\n'
+            'چه کاری برات انجام بدم؟'
+        )
+        return ConversationHandler.END
 
     await msg.reply_text(f'{target_username=}\n{target_user_id=}')
     text = (
