@@ -17,13 +17,10 @@ from .common import Ctx
 
 @require_user_data
 async def find_user_start(update: Update, ctx: Ctx, state: UserModel):
-    user = update.effective_user
 
-    if user.id != config['ADMINS'][0]:
-        return ConversationHandler.END
-
-    await update.effective_message.reply_text(
-        'send a username or forward a message from the user',
+    await update.effective_message.reply_text((
+        'برای پیدا کردن مخاطب خاصت ایدشو '
+        'برام بفرست یا یه پیام ازش برام فورارد کن. 🥰'),
         reply_markup=InlineKeyboardMarkup([[
             InlineKeyboardButton(
                 'لغو ❌', callback_data='cancel_find_user'
@@ -36,7 +33,6 @@ async def find_user_start(update: Update, ctx: Ctx, state: UserModel):
 
 @require_user_data
 async def find_user(update: Update, ctx: Ctx, state: UserModel):
-    logging.info(update.to_dict())
     msg = update.effective_message
 
     target_username = None
@@ -56,7 +52,7 @@ async def find_user(update: Update, ctx: Ctx, state: UserModel):
         except Exception:
             pass
 
-    logging.info(f'\n{target_user_id=}\n{target_username=}\n')
+    logging.info(f'{target_user_id=} - {target_username=}')
 
     if target_username:
         target = await user_get(UserTable.username == target_username)
@@ -82,7 +78,6 @@ async def find_user(update: Update, ctx: Ctx, state: UserModel):
         )
         return ConversationHandler.END
 
-    await msg.reply_text(f'{target_username=}\n{target_user_id=}')
     text = (
         f'نام: {target.name}\n'
         f'جنسیت: {GENDER_DISPLAY[target.gender]}\n'
