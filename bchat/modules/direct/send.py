@@ -134,7 +134,8 @@ async def handle_direct_message(update: Update, ctx: Ctx, state: UserModel):
             direct_msg_id=new_msg.id
         )
         await update.effective_message.reply_text(
-            'پیام شما به صورت ناشناس ارسال شد. ✅'
+            'پیام شما به صورت ناشناس ارسال شد. ✅',
+            reply_to_message_id=msg.id
         )
     except Forbidden:
         await update.effective_message.reply_text(
