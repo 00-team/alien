@@ -19,7 +19,7 @@ from .common import Ctx
 async def find_user_start(update: Update, ctx: Ctx, state: UserModel):
 
     await update.effective_message.reply_text((
-        'برای پیدا کردن مخاطب خاصت ایدشو '
+        'برای پیدا کردن مخاطب خاصت ایدی شو '
         'برام بفرست یا یه پیام ازش برام فورارد کن. 🥰'),
         reply_markup=InlineKeyboardMarkup([[
             InlineKeyboardButton(
