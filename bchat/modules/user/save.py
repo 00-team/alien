@@ -42,10 +42,13 @@ async def show_saved_users(update: Update, ctx: Ctx, state: UserModel):
 @require_user_data
 async def toggle_saved_user(update: Update, ctx: Ctx, state: UserModel):
     await update.callback_query.answer()
+    data = update.callback_query.data
+    if not data:
+        return
     keyboard = update.effective_message.reply_markup.inline_keyboard
     new_keyboard = []
 
-    uid = update.callback_query.data.split('#')[-1]
+    uid = data.split('#')[-1]
     target_user = await user_get(UserTable.user_id == int(uid))
     text = 'حذف کاربر ❌'
 

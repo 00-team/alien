@@ -95,6 +95,8 @@ async def show_directs(update: Update, ctx: Ctx, user_data: UserModel):
 
     if update.callback_query:
         await update.callback_query.answer()
+        if not update.callback_query.data:
+            return
         direct_id = update.callback_query.data.split('#')[-1]
 
     if direct_id == 'all':
