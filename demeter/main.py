@@ -8,8 +8,8 @@ from shared import HOME_DIR, DbDict, now
 
 from twitter import tweet, upload_media
 
-ART_DELAY = 10 * 60  # 10m
-TWT_DELAY = 40 * 60  # 5m
+ART_DELAY = 10 * 60
+TWT_DELAY = 40 * 60
 
 DAY_TIME = 60 * 60 * 24
 WEEK_TIME = DAY_TIME * 7
