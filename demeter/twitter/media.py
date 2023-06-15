@@ -13,6 +13,7 @@ from .utils import MediaError
 
 def download_media(url: str) -> tuple[NamedTemporaryFile, str]:
     try:
+        logging.info(f'download: {url}')
         media = NamedTemporaryFile()
         with stream('GET', url) as response:
             total = int(response.headers.get('Content-Length', 0))
