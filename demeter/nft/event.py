@@ -103,13 +103,14 @@ class Event(ABC):
     @property
     def asset_info(self) -> str:
         mime_type = self.art.mime_type
+        end = '#FoundationSold'
 
         if mime_type == 'video/mp4':
-            return f'🎥 video {format_duration(self.art.duration)}'
+            return f'🎥 video {format_duration(self.art.duration)} {end}'
         elif mime_type == 'image/gif':
-            return '🎞 gif'
+            return f'🎞 gif {end}'
         else:
-            return '📷 image'
+            return f'📷 image {end}'
 
     @property
     def url(self):
