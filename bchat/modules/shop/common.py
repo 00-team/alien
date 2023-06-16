@@ -26,30 +26,53 @@ CHARGE_TEXT = (
         f'{r[0]} امتیاز - کد شارژ {r[1]} هزار تومانی' for r in CHARGE_RANGE
     ])
 )
-
-
 MEMBER_TEXT = (
     '\n\nتعرفه ممبر 😺\n\n' + '\n'.join([
-        f'{r[0]} امتیاز - {r[1]} ممبر' for r in CHARGE_RANGE
+        f'{r[0]} امتیاز - {r[1]} ممبر' for r in MEMBER_RANGE
     ])
 )
-
 SHOP_TEXT = CHARGE_TEXT + MEMBER_TEXT
-SHOP_IKB = InlineKeyboardMarkup([[
+
+
+CART_BTN = InlineKeyboardButton(
+    'سبد خرید 📦',
+    callable_data='shop_cart'
+)
+SHOP_BTN = InlineKeyboardButton(
+    'فروشگاه 🏪',
+    callback_data='show_shop'
+)
+
+CS_COM_BTNS = [
     InlineKeyboardButton(
-        'charge',
+        'شارژ 🔋',
         callback_data='shop_phone_charge'
     ),
     InlineKeyboardButton(
-        'member',
+        'ممبر 😺',
         callback_data='shop_channel_member'
-    )
-]])
+    ),
 
-SHOP_BTN = InlineKeyboardButton(
-    'show shop 🏪',
-    callback_data='show_shop'
-)
+]
+
+SHOP_IKB = InlineKeyboardMarkup([
+    CS_COM_BTNS,
+    [CART_BTN],
+])
+CART_IKB = InlineKeyboardMarkup([
+    CS_COM_BTNS,
+    [SHOP_BTN],
+])
+SHOP_CART_IKB = InlineKeyboardMarkup([[SHOP_BTN, CART_BTN]])
+
+
+GET_SCORE_IKB = InlineKeyboardMarkup([
+    [InlineKeyboardButton(
+        'جمع آوری امتیاز 🌟',
+        callback_data='user_link'
+    )],
+    [SHOP_BTN],
+])
 
 keyboard = [[]]
 
