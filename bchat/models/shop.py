@@ -17,6 +17,24 @@ class ShopTable(BaseTable):
     done = Column(Boolean, server_default=text('0'))
 
 
+class ChargeCodeTable(BaseTable):
+    __tablename__ = 'charge_code'
+
+    cc_id = Column(Integer, primary_key=True, autoincrement=True)
+    amount = Column(Integer, nullable=False)
+    user_id = Column(Integer)
+    code = Column(String, nullable=False)
+    used = Column(Boolean, server_default=text('0'))
+
+
+class ChargeCodeModel(BaseModel):
+    cc_id: int
+    amount: int
+    user_id: int = None
+    code: str
+    used: bool = False
+
+
 class ItemType(int, Enum):
     phone_charge = 0
     channel_member = 1

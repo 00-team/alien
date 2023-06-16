@@ -1,5 +1,4 @@
 
-
 import logging
 import random
 import time
@@ -15,7 +14,6 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.error import Forbidden, NetworkError, RetryAfter, TelegramError
 from telegram.error import TimedOut
 from telegram.ext import CommandHandler, ContextTypes
-from utils import config
 
 Ctx = ContextTypes.DEFAULT_TYPE
 
@@ -106,6 +104,7 @@ async def help_cmd(update: Update, ctx: Ctx):
         '/stats -> user count\n'
         '/update_db -> only for developer\n'
         '/seen_all -> seen all of your directs\n'
+        '/charge <Toman> <code> <code> ...\n'
         '/user_score <code> -> get the user score\n'
         '/user_score <code> set 12 -> set the user used score\n'
         '/user_score <code> set 12 total -> set the user total score\n'
@@ -330,7 +329,7 @@ async def update_db(update: Update, ctx: Ctx):
     await update.effective_message.reply_text('nothing to do.')
 
 
-HANDLERS_ADMIN = [
+H_MISC = [
     CommandHandler(['stats'], stats),
     CommandHandler(['update_db'], update_db, block=False),
     CommandHandler(['seen_all'], seen_all),
