@@ -8,7 +8,7 @@ from deps import require_user_data
 from models import DirectModel, UserModel
 from models.direct import DirectTable
 from models.user import UserTable
-from modules.admin import send_user_info
+from modules.admin.tools import send_user_info
 from modules.channels import require_joined
 from modules.common import delete_message
 from settings import KW_DRTNSEN
