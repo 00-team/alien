@@ -54,6 +54,7 @@ async def cart(update: Update, ctx: Ctx, state: UserModel):
             charge_text = (
                 f'🔋 کد شارژ {c} هزار تومانی - {i.score} امتیاز'
             )
+            charge_text = i.reason
 
         elif i.item == ItemType.channel_member:
             member_text = f'member - {i.score}'

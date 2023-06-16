@@ -12,6 +12,11 @@ CHARGE_RANGE = (
     (800, 810),
     (1200, 250),
 )
+CHARGE_PTC = {
+    'irancell': 'ایرانسل 🟡',
+    'irmci': 'همراه اول 🔵',
+    'rightel': 'رایتل 🟣',
+}
 
 MEMBER_RANGE = (
     # score - member
@@ -74,21 +79,31 @@ GET_SCORE_IKB = InlineKeyboardMarkup([
     [SHOP_BTN, CART_BTN],
 ])
 
-keyboard = [[]]
 
-for i, r in enumerate(CHARGE_RANGE):
-    if i % 2:
-        keyboard.append([])
-
-    keyboard[-1].append(InlineKeyboardButton(
-        f'{r[0]} ⚡',
-        callback_data=f'shop_buy_charge#{i}'
-    ))
-
-CHARGE_IKB = InlineKeyboardMarkup([
-    *keyboard,
-    [SHOP_BTN]
+CHARGE_PTC_IKB = InlineKeyboardMarkup([
+    [InlineKeyboardButton(
+        p[1], callback_data=f'shop_charge_ptc#{p[0]}'
+    ) for p in CHARGE_PTC.items()],
+    [SHOP_BTN, CART_BTN]
 ])
+
+
+def get_charge_ikb(ptc: str):
+    keyboard = [[]]
+
+    for i, r in enumerate(CHARGE_RANGE):
+        if i % 2:
+            keyboard.append([])
+
+        keyboard[-1].append(InlineKeyboardButton(
+            f'{r[0]} ⚡',
+            callback_data=f'shop_buy_charge#{ptc}#{i}'
+        ))
+
+    return InlineKeyboardMarkup([
+        *keyboard,
+        [SHOP_BTN]
+    ])
 
 
 keyboard = [[]]

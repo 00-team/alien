@@ -7,16 +7,37 @@ from models import ItemType, ShopTable, UserModel, UserTable
 from telegram import Update
 from telegram.ext import CallbackQueryHandler
 
-from .common import CHARGE_IKB, CHARGE_RANGE, CHARGE_TEXT, GET_SCORE_IKB
-from .common import SHOP_CART_IKB, Ctx
+from .common import CHARGE_PTC, CHARGE_PTC_IKB, CHARGE_RANGE, CHARGE_TEXT
+from .common import GET_SCORE_IKB, SHOP_CART_IKB, Ctx, get_charge_ikb
 
 
 @require_user_data
 async def phone_charge(update: Update, ctx: Ctx, state: UserModel):
     await update.callback_query.answer()
     await update.effective_message.edit_text(
-        CHARGE_TEXT,
-        reply_markup=CHARGE_IKB
+        'اپراتور خود را انتخاب کنید 🌊',
+        reply_markup=CHARGE_PTC_IKB
+    )
+
+
+@require_user_data
+async def charge_amount(update: Update, ctx: Ctx, state: UserModel):
+    await update.callback_query.answer()
+    data = update.callback_query.data
+    if not data:
+        return
+
+    _, ptc = data.split('#')
+
+    ptc_display = CHARGE_PTC[ptc]
+
+    text = (
+        f'اپراتور انتخابی شما: {ptc_display}\n\n{CHARGE_TEXT}\n.'
+    )
+
+    await update.effective_message.edit_text(
+        text,
+        reply_markup=get_charge_ikb(ptc)
     )
 
 
@@ -29,7 +50,7 @@ async def buy_phone_charge(update: Update, ctx: Ctx, state: UserModel):
     if not data:
         return
 
-    a, idx = data.split('#')
+    a, ptc, idx = data.split('#')
     if a != 'shop_buy_charge':
         return
 
@@ -62,9 +83,9 @@ async def buy_phone_charge(update: Update, ctx: Ctx, state: UserModel):
     await shop_add(
         user_id=user.id,
         score=price,
-        reason=f'شارژ {charge} هزار تومانی',
+        reason=f'شارژ {charge} هزار تومانی ' + CHARGE_PTC[ptc],
         item=ItemType.phone_charge,
-        data={'charge': charge}
+        data={'charge': charge, 'ptc': ptc}
     )
     await user_update(
         UserTable.user_id == user.id,
@@ -84,8 +105,13 @@ H_CHARGE = [
         block=False
     ),
     CallbackQueryHandler(
+        charge_amount,
+        pattern='^shop_charge_ptc#(irmci|irancell|rightel)$',
+        block=False
+    ),
+    CallbackQueryHandler(
         buy_phone_charge,
-        pattern='^shop_buy_charge#[0-9]+$',
+        pattern='^shop_buy_charge#(irmci|irancell|rightel)#[0-9]+$',
         block=False
     )
 ]
