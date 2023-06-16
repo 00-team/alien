@@ -56,7 +56,7 @@ async def cart(update: Update, ctx: Ctx, state: UserModel):
     if not (charge_text or member_text):
         text = 'چیزی برای نمایش یافت نشد 😕'
     else:
-        text += (
+        text = (
             'سبد خرید شما:\n\n' + charge_text + '\n\n' + member_text
         )
 

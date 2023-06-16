@@ -78,7 +78,7 @@ async def buy_phone_charge(update: Update, ctx: Ctx, state: UserModel):
         used_score=state.used_score + price
     )
 
-    await update.effective_message.reply_text(
+    await update.effective_message.edit_text(
         'شارژ برای شما ارسال خواهد شد. ✅',
         reply_markup=SHOP_CART_IKB
     )
