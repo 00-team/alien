@@ -1,15 +1,13 @@
 
-from db.shop import shop_add, shop_get
-from db.user import user_update
+from db.shop import shop_get
 from deps import require_user_data
-from models import ItemType, ShopModel, ShopTable, UserModel, UserTable
+from models import ItemType, ShopTable, UserModel
 from settings import KW_USESCOR
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import CallbackQueryHandler, ContextTypes, MessageHandler
-from telegram.ext import filters
+from telegram import Update
+from telegram.ext import CallbackQueryHandler, MessageHandler, filters
 from utils import config
 
-from .common import CART_IKB, SHOP_IKB, SHOP_TEXT, Ctx
+from .common import CART_IKB, CHARGE_TEXT, MEMBER_TEXT, SHOP_IKB, Ctx
 
 
 @require_user_data
@@ -20,7 +18,10 @@ async def shop(update: Update, ctx: Ctx, state: UserModel):
 
     ava_score = state.total_score - state.used_score
 
-    text = f'امتیاز شما: {ava_score} 🛍\n\n' + SHOP_TEXT
+    text = (
+        f'امتیاز شما: {ava_score} 🛍\n\n'
+        f'{CHARGE_TEXT}\n\n{MEMBER_TEXT}\n.'
+    )
 
     if update.callback_query:
         await update.callback_query.answer()

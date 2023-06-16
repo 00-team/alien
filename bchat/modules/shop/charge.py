@@ -3,15 +3,13 @@
 from db.shop import shop_add, shop_get
 from db.user import user_update
 from deps import require_user_data
-from models import ItemType, ShopModel, ShopTable, UserModel, UserTable
-from settings import KW_USESCOR
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import CallbackQueryHandler, ContextTypes, MessageHandler
-from telegram.ext import filters
+from models import ItemType, ShopTable, UserModel, UserTable
+from telegram import Update
+from telegram.ext import CallbackQueryHandler
 from utils import config
 
 from .common import CHARGE_IKB, CHARGE_RANGE, CHARGE_TEXT, GET_SCORE_IKB
-from .common import SHOP_BTN, SHOP_CART_IKB, SHOP_IKB, SHOP_TEXT, Ctx
+from .common import SHOP_CART_IKB, Ctx
 
 
 @require_user_data
