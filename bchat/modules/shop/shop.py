@@ -18,16 +18,20 @@ async def shop(update: Update, ctx: Ctx, state: UserModel):
     if user.id != config['ADMINS'][0]:
         return
 
+    ava_score = state.total_score - state.used_score
+
+    text = f'امتیاز شما: {ava_score} 🛍\n\n' + SHOP_TEXT
+
     if update.callback_query:
         await update.callback_query.answer()
         await update.effective_message.edit_text(
-            SHOP_TEXT,
+            text,
             reply_markup=SHOP_IKB
         )
         return
 
     await update.message.reply_text(
-        SHOP_TEXT,
+        text,
         reply_markup=SHOP_IKB
     )
 
