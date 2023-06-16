@@ -6,7 +6,6 @@ from deps import require_user_data
 from models import ItemType, ShopTable, UserModel, UserTable
 from telegram import Update
 from telegram.ext import CallbackQueryHandler
-from utils import config
 
 from .common import CHARGE_IKB, CHARGE_RANGE, CHARGE_TEXT, GET_SCORE_IKB
 from .common import SHOP_CART_IKB, Ctx
@@ -14,10 +13,6 @@ from .common import SHOP_CART_IKB, Ctx
 
 @require_user_data
 async def phone_charge(update: Update, ctx: Ctx, state: UserModel):
-    user = update.effective_user
-    if user.id != config['ADMINS'][0]:
-        return
-
     await update.callback_query.answer()
     await update.effective_message.edit_text(
         CHARGE_TEXT,

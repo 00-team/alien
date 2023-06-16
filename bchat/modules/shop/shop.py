@@ -13,7 +13,7 @@ from .common import CART_IKB, CHARGE_TEXT, MEMBER_TEXT, SHOP_IKB, Ctx
 @require_user_data
 async def shop(update: Update, ctx: Ctx, state: UserModel):
     user = update.effective_user
-    if user.id != config['ADMINS'][0]:
+    if user.id not in config['ADMINS']:
         return
 
     ava_score = state.total_score - state.used_score
