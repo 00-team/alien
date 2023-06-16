@@ -36,7 +36,7 @@ SHOP_TEXT = CHARGE_TEXT + MEMBER_TEXT
 
 CART_BTN = InlineKeyboardButton(
     'سبد خرید 📦',
-    callable_data='shop_cart'
+    callback_data='shop_cart'
 )
 SHOP_BTN = InlineKeyboardButton(
     'فروشگاه 🏪',
