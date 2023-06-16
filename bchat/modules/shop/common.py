@@ -1,5 +1,8 @@
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ContextTypes
+
+Ctx = ContextTypes.DEFAULT_TYPE
 
 CHARGE_RANGE = (
     # score - charge in toman
@@ -30,3 +33,53 @@ MEMBER_TEXT = (
         f'{r[0]} امتیاز - {r[1]} ممبر' for r in CHARGE_RANGE
     ])
 )
+
+SHOP_TEXT = CHARGE_TEXT + MEMBER_TEXT
+SHOP_IKB = InlineKeyboardMarkup([[
+    InlineKeyboardButton(
+        'charge',
+        callback_data='shop_phone_charge'
+    ),
+    InlineKeyboardButton(
+        'member',
+        callback_data='shop_channel_member'
+    )
+]])
+
+SHOP_BTN = InlineKeyboardButton(
+    'show shop 🏪',
+    callback_data='show_shop'
+)
+
+keyboard = [[]]
+
+for i, r in enumerate(CHARGE_RANGE):
+    if i % 2:
+        keyboard.append([])
+
+    keyboard[-1].append(InlineKeyboardButton(
+        f'{r[0]} ⚡',
+        callback_data=f'shop_buy_charge#{i}'
+    ))
+
+CHARGE_IKB = InlineKeyboardMarkup([
+    *keyboard,
+    [SHOP_BTN]
+])
+
+
+keyboard = [[]]
+
+for i, r in enumerate(MEMBER_RANGE):
+    if i % 2:
+        keyboard.append([])
+
+    keyboard[-1].append(InlineKeyboardButton(
+        f'{r[0]} 🤡',
+        callback_data=f'shop_buy_member#{i}'
+    ))
+
+MEMBER_IKB = InlineKeyboardMarkup([
+    *keyboard,
+    [SHOP_BTN]
+])

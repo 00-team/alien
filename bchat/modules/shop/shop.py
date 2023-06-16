@@ -3,10 +3,11 @@ from deps import require_user_data
 from models import UserModel
 from settings import KW_USESCOR
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import ContextTypes, MessageHandler, filters
+from telegram.ext import CallbackQueryHandler, ContextTypes, MessageHandler
+from telegram.ext import filters
 from utils import config
 
-Ctx = ContextTypes.DEFAULT_TYPE
+from .common import SHOP_IKB, SHOP_TEXT, Ctx
 
 
 @require_user_data
@@ -15,18 +16,17 @@ async def shop(update: Update, ctx: Ctx, state: UserModel):
     if user.id != config['ADMINS'][0]:
         return
 
+    if update.callback_query:
+        await update.callback_query.answer()
+        await update.effective_message.edit_text(
+            SHOP_TEXT,
+            reply_markup=SHOP_IKB
+        )
+        return
+
     await update.message.reply_text(
-        'shop',
-        reply_markup=InlineKeyboardMarkup([[
-            InlineKeyboardButton(
-                'charge',
-                callback_data='shop_phone_charge'
-            ),
-            InlineKeyboardButton(
-                'member',
-                callback_data='shop_channel_member'
-            )
-        ]])
+        SHOP_TEXT,
+        reply_markup=SHOP_IKB
     )
 
 
@@ -34,5 +34,6 @@ H_SHOP = [
     MessageHandler(
         filters.Text([KW_USESCOR]),
         shop, block=False
-    )
+    ),
+    CallbackQueryHandler(shop, pattern='show_shop')
 ]
