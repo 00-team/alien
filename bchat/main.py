@@ -6,6 +6,7 @@ from models import UserModel
 from modules.admin import HANDLERS_ADMIN
 from modules.channels import HANDLERS_CHANNELS
 from modules.direct import HANDLERS_DIRECT
+from modules.shop import HANDLERS_SHOP
 from modules.start import start
 from modules.user import HANDLERS_USER
 from settings import HOME_DIR, sqlx
@@ -58,7 +59,8 @@ def main():
 
     for handler in [
         *HANDLERS_DIRECT, *HANDLERS_ADMIN,
-        *HANDLERS_CHANNELS, *HANDLERS_USER
+        *HANDLERS_CHANNELS, *HANDLERS_USER,
+        *HANDLERS_SHOP
     ]:
         application.add_handler(handler)
 
