@@ -71,7 +71,7 @@ GET_SCORE_IKB = InlineKeyboardMarkup([
         'جمع آوری امتیاز 🌟',
         callback_data='user_link'
     )],
-    [SHOP_BTN],
+    [SHOP_BTN, CART_BTN],
 ])
 
 keyboard = [[]]
