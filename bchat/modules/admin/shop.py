@@ -58,7 +58,7 @@ async def show_shop(update: Update, ctx: Ctx):
         pass
 
     items = await shop_get(ShopTable.done == False, offset=offset)
-    text = ''
+    text = 'shop items:\n'
 
     for i in items:
         text += f'[{i.item_id}] {i.reason}\n'
