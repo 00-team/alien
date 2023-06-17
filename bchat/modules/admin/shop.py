@@ -54,7 +54,7 @@ async def show_shop(update: Update, ctx: Ctx):
     offset = 0
     try:
         offset = int(ctx.args[0]) * 10
-    except ValueError:
+    except Exception:
         pass
 
     items = await shop_get(ShopTable.done == False, offset=offset)
