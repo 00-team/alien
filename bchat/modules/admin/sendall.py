@@ -134,18 +134,21 @@ async def sendall_message(update: Update, ctx: Ctx):
         ]])
     )
 
-    return ConversationHandler.END
-
 
 @require_admin
 async def cancel(update: Update, ctx: Ctx):
     jbs = ctx.job_queue.get_jobs_by_name(JOB_ID)
+    stoped = False
     for j in jbs:
         j.schedule_removal()
+        stoped = True
 
-    await update.effective_message.reply_text(
-        'send all was stoped.'
-    )
+    if stoped:
+        text = 'send all was stoped ✅'
+    else:
+        text = 'send all job was not found ❌'
+
+    await update.effective_message.reply_text(text)
     return ConversationHandler.END
 
 
