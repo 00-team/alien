@@ -118,7 +118,7 @@ async def help_cmd(update: Update, ctx: Ctx):
 
 
 async def send_direct_to_all_job(ctx: Ctx):
-    logging.info('sending a message to all users')
+    logging.info('sending a direct message to all users')
 
     all_users = await sqlx.fetch_all(
         select(UserTable)

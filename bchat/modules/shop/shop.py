@@ -11,6 +11,10 @@ from .common import CART_IKB, CHARGE_TEXT, MEMBER_TEXT, SHOP_IKB, Ctx
 
 @require_user_data
 async def shop(update: Update, ctx: Ctx, state: UserModel):
+    await update.effective_message.reply_text(
+        'به زودی ... 🏞'
+    )
+    return
     ava_score = state.total_score - state.used_score
 
     text = (

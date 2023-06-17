@@ -109,7 +109,7 @@ async def buy_phone_charge(update: Update, ctx: Ctx, state: UserModel):
             data={'charge': charge, 'ptc': ptc}
         )
         await msg.edit_text(
-            'شارژ برای شما ارسال خواهد شد. ✅',
+            'تا 24 ساعت آیدنده شارژ برای شما ارسال خواهد شد. ✅',
             reply_markup=SHOP_CART_IKB
         )
 
