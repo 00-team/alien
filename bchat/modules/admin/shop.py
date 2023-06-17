@@ -1,11 +1,13 @@
 
 
 import logging
+import time
 
 from db.chargc import chargc_add
 from db.shop import shop_get, shop_update
 from deps import require_admin
 from models import ItemType, ShopTable
+from modules.shop.common import CHARGE_PTC, CHARGE_RANGE
 from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes
 
@@ -14,14 +16,31 @@ Ctx = ContextTypes.DEFAULT_TYPE
 
 @require_admin
 async def add_charge_codes(update: Update, ctx: Ctx):
-    if len(ctx.args) < 2:
-        await update.effective_message.reply_text('/charge 20\ncode1\ncode2')
+    msg = update.effective_message
+    usage = (
+        f'/charge <{"|".join(CHARGE_PTC.keys())}> 20\n'
+        'code1\ncode2\n...'
+    )
+    if len(ctx.args) < 3:
+        await msg.reply_text(usage)
         return
 
     try:
-        amount = int(ctx.args[0])
+        amount = int(ctx.args[1])
+        ptc = ctx.args[0]
+        if ptc not in CHARGE_PTC.keys():
+            raise ValueError
+
+        for _, a in CHARGE_RANGE:
+            if amount == a:
+                break
+        else:
+            await msg.reply_text(
+                f'invalid amount {amount}'
+            )
+            raise ValueError
     except Exception:
-        await update.effective_message.reply_text('/charge 20\ncode1\ncode2')
+        await msg.reply_text(usage)
         return
 
     items = await shop_get(
@@ -32,21 +51,29 @@ async def add_charge_codes(update: Update, ctx: Ctx):
     codes = ctx.args[1:]
 
     for i in items:
-        if amount == i.data['charge']:
+        if amount == i.data['charge'] and ptc == i.data['ptc']:
             try:
                 await ctx.bot.send_message(
                     i.user_id,
-                    f'شارژ شما: {codes.pop()}'
+                    f'کد شارژ {CHARGE_PTC[ptc]} شما:\n{codes.pop()}'
                 )
                 await shop_update(
                     ShopTable.item_id == i.item_id,
                     done=True
                 )
+                await msg.reply_text('sent a code to a user ✅')
+                time.sleep(1)
             except Exception as e:
                 logging.exception(e)
 
+    added = 0
     for code in ctx.args[1:]:
-        await chargc_add(amount=amount, code=code)
+        if await chargc_add(amount=amount, code=code):
+            added += 1
+
+    await msg.reply_text(
+        f'added {added} codes'
+    )
 
 
 @require_admin
