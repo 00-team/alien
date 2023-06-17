@@ -48,7 +48,7 @@ async def add_charge_codes(update: Update, ctx: Ctx):
         ShopTable.done == False,
     )
 
-    codes = ctx.args[1:]
+    codes = ctx.args[2:]
 
     for i in items:
         if amount == i.data['charge'] and ptc == i.data['ptc']:
@@ -67,7 +67,7 @@ async def add_charge_codes(update: Update, ctx: Ctx):
                 logging.exception(e)
 
     added = 0
-    for code in ctx.args[2:]:
+    for code in codes:
         if await chargc_add(amount=amount, code=code, op=ptc):
             added += 1
 
