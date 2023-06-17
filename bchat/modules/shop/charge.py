@@ -1,9 +1,12 @@
 
 
+import logging
+
+from db.chargc import chargc_get, chargc_update
 from db.shop import shop_add, shop_get
 from db.user import user_update
 from deps import require_user_data
-from models import ItemType, ShopTable, UserModel, UserTable
+from models import ChargcTable, ItemType, ShopTable, UserModel, UserTable
 from telegram import Update
 from telegram.ext import CallbackQueryHandler
 
@@ -46,6 +49,7 @@ async def buy_phone_charge(update: Update, ctx: Ctx, state: UserModel):
     await update.callback_query.answer()
     data = update.callback_query.data
     user = update.effective_user
+    msg = update.effective_message
 
     if not data:
         return
@@ -61,7 +65,7 @@ async def buy_phone_charge(update: Update, ctx: Ctx, state: UserModel):
     ava_score = state.total_score - state.used_score
 
     if ava_score < price:
-        await update.effective_message.edit_text(
+        await msg.edit_text(
             'امتیاز شما برای این خرید کافی نیست ❌',
             reply_markup=GET_SCORE_IKB
         )
@@ -80,21 +84,38 @@ async def buy_phone_charge(update: Update, ctx: Ctx, state: UserModel):
         )
         return
 
-    await shop_add(
-        user_id=user.id,
-        score=price,
-        reason=f'شارژ {charge} هزار تومانی ' + CHARGE_PTC[ptc],
-        item_type=ItemType.charge,
-        data={'charge': charge, 'ptc': ptc}
+    charge_code = await chargc_get(
+        ChargcTable.op == ptc,
+        ChargcTable.amount == charge,
+        ChargcTable.used == False,
     )
+    if charge_code:
+        await msg.edit_text(
+            f'کد شارژ {CHARGE_PTC[ptc]} شما:\n{charge_code.code}',
+            reply_markup=SHOP_CART_IKB
+        )
+        await chargc_update(
+            ChargcTable.cc_id == charge_code.cc_id,
+            used=True,
+            user_id=user.id
+        )
+    else:
+        await shop_add(
+            user_id=user.id,
+            score=price,
+            reason=f'شارژ {charge} هزار تومانی ' + CHARGE_PTC[ptc],
+            item_type=ItemType.charge,
+            data={'charge': charge, 'ptc': ptc}
+        )
+        await msg.edit_text(
+            'شارژ برای شما ارسال خواهد شد. ✅',
+            reply_markup=SHOP_CART_IKB
+        )
+
+    logging.info(f'{user.full_name} bougth charge {charge} {ptc}')
     await user_update(
         UserTable.user_id == user.id,
         used_score=state.used_score + price
-    )
-
-    await update.effective_message.edit_text(
-        'شارژ برای شما ارسال خواهد شد. ✅',
-        reply_markup=SHOP_CART_IKB
     )
 
 
