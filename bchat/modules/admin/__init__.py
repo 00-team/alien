@@ -1,8 +1,8 @@
 
-from .charge import H_CHARGE
 from .misc import H_MISC
+from .shop import H_SHOP
 
 HANDLERS_ADMIN = [
     *H_MISC,
-    *H_CHARGE,
+    *H_SHOP,
 ]

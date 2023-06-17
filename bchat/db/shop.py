@@ -5,8 +5,8 @@ from settings import sqlx
 from sqlalchemy import insert, select, update
 
 
-async def shop_get(*where, limit=10) -> list[ShopModel] | ShopModel:
-    query = select(ShopTable).where(*where)
+async def shop_get(*where, limit=10, offset=0) -> list[ShopModel] | ShopModel:
+    query = select(ShopTable).where(*where).offset(offset)
 
     if limit == 1:
         row = await sqlx.fetch_one(query)

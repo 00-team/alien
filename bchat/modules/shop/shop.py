@@ -49,14 +49,14 @@ async def cart(update: Update, ctx: Ctx, state: UserModel):
     member_text = ''
 
     for i in items:
-        if i.item == ItemType.phone_charge:
+        if i.item_type == ItemType.charge:
             c = i.data['charge']
             charge_text = (
                 f'🔋 کد شارژ {c} هزار تومانی - {i.score} امتیاز'
             )
             charge_text = i.reason
 
-        elif i.item == ItemType.channel_member:
+        elif i.item_type == ItemType.member:
             member_text = f'member - {i.score}'
 
     if not (charge_text or member_text):

@@ -1,6 +1,5 @@
 from .direct import DirectModel, DirectTable
-from .shop import ChargeCodeModel, ChargeCodeTable, ItemType, ShopModel
-from .shop import ShopTable
+from .shop import ChargcModel, ChargcTable, ItemType, ShopModel, ShopTable
 from .user import GENDER_DISPLAY, Genders, UserModel, UserTable, gender_keys
 from .user import gender_pattern
 
@@ -12,5 +11,5 @@ __all__ = [
 
     'ShopModel', 'ShopTable', 'ItemType',
 
-    'ChargeCodeTable', 'ChargeCodeModel',
+    'ChargcTable', 'ChargcModel',
 ]
