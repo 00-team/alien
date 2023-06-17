@@ -18,7 +18,7 @@ Ctx = ContextTypes.DEFAULT_TYPE
 async def add_charge_codes(update: Update, ctx: Ctx):
     msg = update.effective_message
     usage = (
-        f'/charge <{"|".join(CHARGE_PTC.keys())}> 20\n'
+        f'/charge <{" - ".join(CHARGE_PTC.keys())}> 20\n'
         'code1\ncode2\n...'
     )
     if len(ctx.args) < 3:
@@ -67,8 +67,8 @@ async def add_charge_codes(update: Update, ctx: Ctx):
                 logging.exception(e)
 
     added = 0
-    for code in ctx.args[1:]:
-        if await chargc_add(amount=amount, code=code):
+    for code in ctx.args[2:]:
+        if await chargc_add(amount=amount, code=code, op=ptc):
             added += 1
 
     await msg.reply_text(

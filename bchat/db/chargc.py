@@ -20,7 +20,12 @@ async def chargc_update(*where, **values):
 
 
 async def chargc_add(**values) -> int:
-    if await sqlx.fetch_one(select(ChargcTable.code == values['code'])):
+    query = (
+        select(ChargcTable)
+        .where(ChargcTable.code == values['code'])
+    )
+
+    if await sqlx.fetch_one(query):
         return 0
 
     return await sqlx.execute(insert(ChargcTable), values)
