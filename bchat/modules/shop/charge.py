@@ -88,6 +88,7 @@ async def buy_phone_charge(update: Update, ctx: Ctx, state: UserModel):
         ChargcTable.op == ptc,
         ChargcTable.amount == charge,
         ChargcTable.used == False,
+        limit=1
     )
     if charge_code:
         await msg.edit_text(

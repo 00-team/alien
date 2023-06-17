@@ -103,6 +103,8 @@ async def help_cmd(update: Update, ctx: Ctx):
         '/stats -> user count\n'
         '/update_db -> only for developer\n'
         '/seen_all -> seen all of your directs\n'
+        '/charge_codes -> get unused codes\n'
+        '/shop -> show undone shop\n'
         '/charge <Toman> <code> <code> ...\n'
         '/user_score <code> -> get the user score\n'
         '/user_score <code> set 12 -> set the user used score\n'

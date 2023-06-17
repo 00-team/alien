@@ -5,17 +5,12 @@ from models import ItemType, ShopTable, UserModel
 from settings import KW_USESCOR
 from telegram import Update
 from telegram.ext import CallbackQueryHandler, MessageHandler, filters
-from utils import config
 
 from .common import CART_IKB, CHARGE_TEXT, MEMBER_TEXT, SHOP_IKB, Ctx
 
 
 @require_user_data
 async def shop(update: Update, ctx: Ctx, state: UserModel):
-    user = update.effective_user
-    if user.id not in config['ADMINS']:
-        return
-
     ava_score = state.total_score - state.used_score
 
     text = (

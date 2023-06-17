@@ -3,10 +3,10 @@
 import logging
 import time
 
-from db.chargc import chargc_add
+from db.chargc import chargc_add, chargc_get
 from db.shop import shop_get, shop_update
 from deps import require_admin
-from models import ItemType, ShopTable
+from models import ChargcTable, ItemType, ShopTable
 from modules.shop.common import CHARGE_PTC, CHARGE_RANGE
 from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes
@@ -92,7 +92,26 @@ async def show_shop(update: Update, ctx: Ctx):
 
     await update.effective_message.reply_text(text)
 
+
+@require_admin
+async def show_codes(update: Update, ctx: Ctx):
+    offset = 0
+    try:
+        offset = int(ctx.args[0]) * 10
+    except Exception:
+        pass
+
+    items = await chargc_get(ChargcTable.used == False, offset=offset)
+    text = 'unused codes:\n'
+
+    for i in items:
+        text += f'[{i.cc_id}] {i.op} {i.amount} {i.code}\n'
+
+    await update.effective_message.reply_text(text)
+
+
 H_SHOP = [
     CommandHandler(['charge'], add_charge_codes),
-    CommandHandler(['shop'], show_shop)
+    CommandHandler(['shop'], show_shop),
+    CommandHandler(['charge_codes'], show_codes),
 ]
