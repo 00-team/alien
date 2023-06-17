@@ -8,8 +8,11 @@ from sqlalchemy import insert, select, update
 async def chargc_get(*where) -> ChargcModel:
     query = select(ChargcTable).where(*where)
 
-    rows = await sqlx.fetch_one(query)
-    return ChargcModel(**rows)
+    row = await sqlx.fetch_one(query)
+    if not row:
+        return None
+
+    return ChargcModel(**row)
 
 
 async def chargc_update(*where, **values):
