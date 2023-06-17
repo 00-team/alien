@@ -84,7 +84,7 @@ async def buy_phone_charge(update: Update, ctx: Ctx, state: UserModel):
         user_id=user.id,
         score=price,
         reason=f'شارژ {charge} هزار تومانی ' + CHARGE_PTC[ptc],
-        item=ItemType.charge,
+        item_type=ItemType.charge,
         data={'charge': charge, 'ptc': ptc}
     )
     await user_update(
