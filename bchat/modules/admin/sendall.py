@@ -64,7 +64,7 @@ async def sendall_job(ctx: Ctx):
         target = UserModel(**U)
 
         try:
-            msg_id = await ctx.bot.copy_message(
+            await ctx.bot.copy_message(
                 target.user_id, ctx.job.user_id, msg_id,
             )
             data['success'] += 1
@@ -81,7 +81,8 @@ async def sendall_job(ctx: Ctx):
                 UserTable.user_id == target.user_id,
                 blocked_bot=True
             )
-        except NetworkError:
+        except NetworkError as e:
+            logging.error(str(e))
             data['error'] += 1
         except TelegramError as e:
             logging.exception(e)
@@ -115,7 +116,7 @@ async def sendall_message(update: Update, ctx: Ctx):
         chat_id=msg.chat.id,
         user_id=update.effective_user.id,
         data={
-            'msg_id': msg.message_id,
+            'msg_id': msg.id,
             'limit': limit
         },
         name=JOB_ID
