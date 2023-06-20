@@ -34,7 +34,7 @@ async def user_set_age(update: Update, ctx: Ctx, state: UserModel):
     msg = update.effective_message
 
     try:
-        age = int(msg.text)
+        age = int(msg.text or '0')
         if age < AGE_RANGE[0] or age > AGE_RANGE[1]:
             raise ValueError(
                 'خطا! پیام باید یک عدد بین '
