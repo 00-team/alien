@@ -160,12 +160,13 @@ async def get_phone_charge_code(update: Update, ctx: Ctx, state: UserModel):
         )
         return
 
-    await msg.edit_text(f'کد شارژ {CHARGE_PTC[code.op]} شما:\n{code.code}')
-    await msg.edit_reply_markup()
     await chargc_update(
         ChargcTable.cc_id == ccid,
-        used=True
+        used=True,
+        expires=0
     )
+    await msg.edit_text(f'کد شارژ {CHARGE_PTC[code.op]} شما:\n{code.code}')
+    await msg.edit_reply_markup()
 
 
 H_CHARGE = [

@@ -100,13 +100,13 @@ async def stats(update: Update, ctx: Ctx):
 async def help_cmd(update: Update, ctx: Ctx):
     await update.effective_message.reply_text(
         '/help -> for this message\n'
-        '/stats -> user count\n'
+        '/stats -> user count\n\n'
         '/update_db -> only for developer\n'
         '/sendall -> send a message to all users\n'
-        '/seen_all -> seen all of your directs\n'
+        '/seen_all -> seen all of your directs\n\n'
         '/charge_codes -> get unused codes\n'
         '/shop -> show undone shop\n'
-        '/charge <Toman> <code> <code> ...\n'
+        '/charge <op> <Toman> <code> <code> ...\n\n'
         '/user_score <code> -> get the user score\n'
         '/user_score <code> set 12 -> set the user used score\n'
         '/user_score <code> set 12 total -> set the user total score\n'
