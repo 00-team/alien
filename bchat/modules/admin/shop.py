@@ -58,7 +58,7 @@ async def add_charge_codes(update: Update, ctx: Ctx):
                     user_id=i.user_id,
                     op=ptc,
                     code=codes.pop(),
-                    expires=int(time.time()) + 3600 * 24
+                    expires=int(time.time()) + 30
                 )
                 await ctx.bot.send_message(
                     i.user_id,

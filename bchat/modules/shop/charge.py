@@ -139,7 +139,7 @@ async def get_phone_charge_code(update: Update, ctx: Ctx, state: UserModel):
         logging.exception(e)
         return
 
-    code = await chargc_get(ChargcTable.cc_id == ccid)
+    code = await chargc_get(ChargcTable.cc_id == ccid, limit=1)
     if not code:
         await msg.edit_text('خطا! کدی یافت نشد ❌')
         await msg.edit_reply_markup()
