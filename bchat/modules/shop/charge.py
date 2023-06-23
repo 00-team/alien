@@ -111,7 +111,7 @@ async def buy_phone_charge(update: Update, ctx: Ctx, state: UserModel):
             data={'charge': charge, 'ptc': ptc}
         )
         await msg.edit_text(
-            'تا 24 ساعت آیدنده شارژ برای شما ارسال خواهد شد. ✅',
+            'تا 24 ساعت آینده شارژ برای شما ارسال خواهد شد. ✅',
             reply_markup=SHOP_CART_IKB
         )
 
@@ -185,7 +185,7 @@ H_CHARGE = [
         block=False
     ),
     CallbackQueryHandler(
-        buy_phone_charge,
+        get_phone_charge_code,
         pattern='^shop_get_charge_code#[0-9]+$',
         block=False
     ),
