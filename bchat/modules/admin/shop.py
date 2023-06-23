@@ -8,7 +8,7 @@ from db.shop import shop_get, shop_update
 from deps import require_admin
 from models import ChargcTable, ItemType, ShopTable
 from modules.shop.common import CHARGE_PTC, CHARGE_RANGE
-from telegram import Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import CommandHandler, ContextTypes
 
 Ctx = ContextTypes.DEFAULT_TYPE
@@ -53,9 +53,23 @@ async def add_charge_codes(update: Update, ctx: Ctx):
     for i in items:
         if amount == i.data['charge'] and ptc == i.data['ptc']:
             try:
+                cc_id = await chargc_add(
+                    amount=amount,
+                    user_id=i.user_id,
+                    op=ptc,
+                    code=codes.pop(),
+                    expires=int(time.time()) + 3600 * 24
+                )
                 await ctx.bot.send_message(
                     i.user_id,
-                    f'کد شارژ {CHARGE_PTC[ptc]} شما:\n{codes.pop()}'
+                    (f'کد شارژ {CHARGE_PTC[ptc]} شما تا 24 ساعت '
+                     'آینده معتبر می باشد.'),
+                    reply_markup=InlineKeyboardMarkup([[
+                        InlineKeyboardButton(
+                            'دریافت کد شارژ 🔋',
+                            callback_data=f'shop_get_charge_code#{cc_id}'
+                        )
+                    ]])
                 )
                 await shop_update(
                     ShopTable.item_id == i.item_id,

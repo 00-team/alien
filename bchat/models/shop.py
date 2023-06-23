@@ -42,6 +42,7 @@ class ChargcTable(BaseTable):
     cc_id = Column(Integer, primary_key=True, autoincrement=True)
     amount = Column(Integer, nullable=False)
     user_id = Column(Integer)
+    expires = Column(Integer, server_default=text('0'))
     op = Column(String, nullable=False)
     code = Column(String, nullable=False, unique=True)
     used = Column(Boolean, server_default=text('0'))
@@ -51,6 +52,7 @@ class ChargcModel(BaseModel):
     cc_id: int
     amount: int
     user_id: int = None
+    expires: int = 0
     op: str
     code: str
     used: bool = False
