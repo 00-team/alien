@@ -15,12 +15,12 @@ Ctx = ContextTypes.DEFAULT_TYPE
 
 
 @require_user_data
-async def start(update: Update, ctx: Ctx, user_data: UserModel):
+async def start(update: Update, ctx: Ctx, state: UserModel):
     if ctx.args:
         codename = ctx.args[0]
         logging.info(f'user started with a code {codename}')
 
-        if codename == user_data.codename:
+        if codename == state.codename:
             await update.effective_message.reply_text(
                 'اینکه آدم گاهی با خودش حرف بزنه خوبه ، '
                 'ولی اینجا نمیتونی به خودت پیام ناشناس بفرستی ! :)\n\n'
@@ -37,10 +37,14 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
             )
             return
 
-        if user_data.new_user:
+        if state.new_user:
             await user_update(
                 UserTable.user_id == target.user_id,
                 total_score=target.total_score + 1
+            )
+            await user_update(
+                UserTable.user_id == state.user_id,
+                parent=target.user_id
             )
 
         text = (
@@ -52,7 +56,7 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
         trail_text = '\n\n👇 دکمه ارسال پیام رو بزن و بعدش پیامت رو ارسال کن.'
 
         keyboard = []
-        if str(target.user_id) in user_data.saved_list:
+        if str(target.user_id) in state.saved_list:
             keyboard.append(InlineKeyboardButton(
                 'حذف کاربر ❌',
                 callback_data=(
@@ -60,7 +64,7 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
                 )
             ))
         else:
-            if len(user_data.saved_list.keys()) < 10:
+            if len(state.saved_list.keys()) < 10:
                 keyboard.append(InlineKeyboardButton(
                     'ذخیر کاربر ⭐',
                     callback_data=(
@@ -68,7 +72,7 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
                     )
                 ))
 
-        if str(user_data.user_id) not in target.block_list:
+        if str(state.user_id) not in target.block_list:
             keyboard.append(InlineKeyboardButton(
                 'ارسال پیام ✉',
                 callback_data=(
@@ -99,7 +103,7 @@ async def start(update: Update, ctx: Ctx, user_data: UserModel):
         return
 
     await update.effective_message.reply_text(
-        f'سلام {user_data.name}\n\n'
+        f'سلام {state.name}\n\n'
         'چه کاری برات انجام بدم؟',
         reply_markup=ReplyKeyboardMarkup(MAIN_KEYBOARD)
     )

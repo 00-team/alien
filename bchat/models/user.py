@@ -23,6 +23,7 @@ class UserTable(BaseTable):
     username = Column(String)
     blocked_bot = Column(Boolean, server_default=text('0'))
     admin_blocked = Column(Boolean, server_default=text('0'))
+    parent = Column(Integer, server_default=text('0'))
 
 
 class Genders(int, Enum):
@@ -37,6 +38,7 @@ class UserModel(BaseModel):
     gender: Genders
     name: str
     age: int
+    parent: int = 0
     picture: str = None
     username: str = None
     direct_msg_id: int = None
