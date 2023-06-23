@@ -1,0 +1,5 @@
+
+
+TWITTER_UN_TABLE = {
+    '0x533fa4a37aaffdb02456d374237091520790383e': 'Biggartner1',
+}

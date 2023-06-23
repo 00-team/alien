@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from shared.common import TWITTER_UN_TABLE
 
 
 class User(BaseModel):
@@ -23,8 +24,12 @@ class User(BaseModel):
 
     @property
     def in_twt(self) -> str:
+        pk = self.public_key.lower()
+
         if self.twitter:
             return '@' + self.twitter
+        elif pk in TWITTER_UN_TABLE:
+            return '@' + TWITTER_UN_TABLE[pk]
         elif self.username:
             return self.username
         elif self.name:

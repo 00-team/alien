@@ -1,7 +1,8 @@
 
 import json
 import logging
-import time
+
+from shared.common import TWITTER_UN_TABLE
 
 from .query import get_display_raw, get_top_raw
 
@@ -134,10 +135,13 @@ def get_top_data(from_date: int) -> dict:
         username = user['actor'][0]['username']
         twitter = user['actor'][0]['twitter']
 
+        pk = pk.lower()
         display_name = pk[:10] + '...'
 
         if twitter:
             display_name = '@' + twitter[0]['username']
+        elif pk in TWITTER_UN_TABLE:
+            display_name = '@' + TWITTER_UN_TABLE[pk]
         elif username:
             display_name = username
         elif name:
