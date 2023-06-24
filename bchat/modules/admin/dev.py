@@ -16,7 +16,7 @@ MAX_FILE_SIZE = 50 * 1024 * 1024
 async def backup(update: Update, ctx: Ctx):
     msg = update.effective_message
 
-    if DATABASE_PATH.stat().st_size < 50 * 1024 * 10:
+    if DATABASE_PATH.stat().st_size < MAX_FILE_SIZE:
         await msg.reply_document(DATABASE_PATH, caption='main db')
         logging.info('a backup was made')
     else:
