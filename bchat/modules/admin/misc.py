@@ -102,6 +102,7 @@ async def help_cmd(update: Update, ctx: Ctx):
         '/help -> for this message\n'
         '/stats -> user count\n\n'
         '/update_db -> only for developer\n'
+        '/backup -> get backup of database\n\n'
         '/sendall -> send a message to all users\n'
         '/seen_all -> seen all of your directs\n\n'
         '/charge_codes -> get unused codes\n'
