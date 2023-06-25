@@ -117,9 +117,13 @@ async def show_codes(update: Update, ctx: Ctx):
 
     items = await chargc_get(ChargcTable.used == False, offset=offset)
     text = 'unused codes:\n'
+    now = int(time.time())
 
     for i in items:
-        text += f'[{i.cc_id}] {i.op} {i.amount} {i.code}\n'
+        text += (
+            f'[{i.cc_id}] {i.op} {i.amount} '
+            f'<code>{i.code}</code> {i.expires-now}s {i.user_id} \n'
+        )
 
     await update.effective_message.reply_text(text)
 
