@@ -116,7 +116,8 @@ class Event(ABC):
     def url(self):
         return (
             'https://foundation.app/collection/'
-            f'{self.art.collection_slug}/{self.token_id}'
+            f'{self.art.collection_slug}/{self.token_id}?ref='
+            '0x46bc7892BEef62875511E35BdD8d1CB4407E7C53'
         )
 
 
