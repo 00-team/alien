@@ -61,7 +61,10 @@ async def find_user(update: Update, ctx: Ctx, state: UserModel):
 
     if not target:
         await update.effective_message.reply_text(
-            'کاربر یافت نشد 😢',
+            'متاسفانه مخاطبت الان عضو ربات نیست! 🙁\n\n'
+            'چطوره یه جوری لینک ربات رو بهش برسونی تا بیاد '
+            'و عضو بشه؟ مثلا لینک خودت رو بهش بفرستی یا اگه '
+            'جزء دنبال کننده های اینستاگرامته لینکت رو در اینستاگرامت بذاری.',
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton(
                     'لغو ❌', callback_data='cancel_find_user'
