@@ -204,8 +204,8 @@ class Offer(Event):
 
     def offer_made_message(self):
         return (
-            f'🔔 New Offer by {self.actor.in_twt}'
-            f' for 💰 {self.price_eth} #eth (${self.usd} USD) \n'
+            f'🔔 New Offer by {self.actor.in_twt} for '
+            f'💰 {self.price_eth} #eth (${self.usd} USD) \n'
             f'🖼️ {self.art.name}\n\n'
             f'🎨 Artist {self.art.creator.in_twt}\n'
             'on the #foundation marketplace\n\n'
