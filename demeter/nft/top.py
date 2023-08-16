@@ -82,12 +82,12 @@ def get_top_data(from_date: int) -> dict:
 
     top = {
         'creators': {
-            'total': sorted(creators, reverse=True, key=total_sort)[:5],
-            'price': sorted(creators, reverse=True, key=price_sort)[:5]
+            'total': sorted(creators, reverse=True, key=total_sort)[:3],
+            'price': sorted(creators, reverse=True, key=price_sort)[:3]
         },
         'buyers': {
-            'total': sorted(buyers, reverse=True, key=total_sort)[:5],
-            'price': sorted(buyers, reverse=True, key=price_sort)[:5]
+            'total': sorted(buyers, reverse=True, key=total_sort)[:3],
+            'price': sorted(buyers, reverse=True, key=price_sort)[:3]
         }
     }
 
