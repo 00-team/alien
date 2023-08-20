@@ -31,9 +31,9 @@ class User(BaseModel):
         elif pk in TWITTER_UN_TABLE:
             return '@' + TWITTER_UN_TABLE[pk]
         elif self.username:
-            return self.username
+            return '@' + self.username
         elif self.name:
-            return self.name
+            return '@' + self.name
         else:
             return self.public_key[:10] + '...'
 

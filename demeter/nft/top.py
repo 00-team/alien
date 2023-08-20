@@ -137,19 +137,19 @@ def get_top_data(from_date: int) -> dict:
 
         pk = pk.lower()
         display_name = pk[:10] + '...'
-        twt_pfx = '@' if idx < 3 else ''
+        # twt_pfx = '@' if idx < 3 else ''
 
         if twitter:
-            display_name = twt_pfx + twitter[0]['username']
+            display_name = twitter[0]['username']
         elif pk in TWITTER_UN_TABLE:
-            display_name = twt_pfx + TWITTER_UN_TABLE[pk]
+            display_name = TWITTER_UN_TABLE[pk]
 
         elif username:
             display_name = username
         elif name:
             display_name = name
 
-        top['users'][pk] = display_name
+        top['users'][pk] = '@' + display_name
 
     return top
 
