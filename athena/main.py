@@ -27,6 +27,7 @@ STATE = {
 
 
 blocked_users = DbDict(path=DATA_DIR / 'blocked_users.json')
+blocked_channels = DbDict(path=DATA_DIR / 'blocked_channels.json')
 
 
 @require_joined
@@ -171,6 +172,39 @@ async def block(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     )
 
 
+@require_admin
+async def block_channel(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    if ctx.args:
+        try:
+            block_id = int(ctx.args[0])
+        except Exception:
+            await update.message.reply_text('invalid channel_id')
+            return
+
+        block_id = str(block_id)
+
+        if blocked_channels.pop(block_id, False):
+            await update.message.reply_text((
+                f'channel <{block_id}> was Unblocked 🔓\n\n'
+                'see all blocked channels with /block_channel 🧊'
+            ))
+        else:
+            blocked_channels[block_id] = 1
+            await update.message.reply_text((
+                f'channel <{block_id}> has been blocked 🔒\n\n'
+                'see all blocked channels with /block_channel 🐧'
+            ))
+
+        return
+
+    bc = blocked_channels.keys()
+
+    await update.message.reply_text(
+        '\n'.join((str(c) for c in bc)) +
+        f'\n\ntotal blocked: {len(bc)}'
+    )
+
+
 @require_joined
 async def send_message(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     total_users = len(get_users())
@@ -184,6 +218,9 @@ async def send_message(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         not msg.forward_from_chat or
         msg.forward_from_chat.type != 'channel'
     ):
+        return
+
+    if str(msg.forward_from_chat.id) in blocked_channels:
         return
 
     if STATE['FA'].pop(user.id, False):
@@ -297,6 +334,7 @@ def main(args: list[str]):
     application.add_handler(CommandHandler('users', users))
     application.add_handler(CommandHandler('send_all', send_all))
     application.add_handler(CommandHandler('block', block))
+    application.add_handler(CommandHandler('block_channel', block_channel))
 
     application.add_handler(ChatMemberHandler(
         chat_member_update, ChatMemberHandler.CHAT_MEMBER
