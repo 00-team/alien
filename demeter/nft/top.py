@@ -6,6 +6,8 @@ from shared.common import TWITTER_UN_TABLE
 
 from .query import get_display_raw, get_top_raw
 
+BOT_HASHTAG = '#FoundationSold'
+
 
 def get_top_data(from_date: int) -> dict:
     data = {
@@ -202,7 +204,7 @@ def get_top(from_date: int, date_name: str) -> tuple[str, dict]:
         text += data['users'][user[0]]
         text += ' Sold ' + str(user[1]['total']) + ' Nfts.\n'
 
-    text += '\n#FoundationSold'
+    text += '\n' + BOT_HASHTAG
     art = get_art(nft)
     yield text, art
 
@@ -215,7 +217,7 @@ def get_top(from_date: int, date_name: str) -> tuple[str, dict]:
         text += data['users'][user[0]]
         text += ' Bought ' + str(user[1]['total']) + ' Nfts.\n'
 
-    text += '\n#FoundationSold'
+    text += '\n' + BOT_HASHTAG
     art = get_art(nft)
     yield text, art
 
@@ -228,7 +230,7 @@ def get_top(from_date: int, date_name: str) -> tuple[str, dict]:
         text += data['users'][user[0]]
         text += ' Sold ' + str(user[1]['price']) + ' Eth worth of Nfts.\n'
 
-    text += '\n#FoundationSold'
+    text += '\n' + BOT_HASHTAG
     art = get_art(nft)
     yield text, art
 
@@ -241,6 +243,6 @@ def get_top(from_date: int, date_name: str) -> tuple[str, dict]:
         text += data['users'][user[0]]
         text += ' Bought ' + str(user[1]['price']) + ' Eth worth of Nfts.\n'
 
-    text += '\n#FoundationSold'
+    text += '\n' + BOT_HASHTAG
     art = get_art(nft)
     yield text, art
