@@ -35,7 +35,7 @@ MAX_FILE_SIZE = 50 * 1024 * 1024
 
 
 @require_admin
-async def backup(update: Update, ctx: Ctx):
+async def backup(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     msg = update.effective_message
 
     for p in [
