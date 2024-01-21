@@ -103,7 +103,7 @@ async def show_directs(update: Update, ctx: Ctx, user_data: UserModel):
         directs = await direct_get(
             DirectTable.user_id == user_id,
             DirectTable.seen == False,
-            limit=20 if is_admin else 10
+            limit=100 if is_admin else 10
         )
     else:
         directs = await direct_get(

@@ -85,6 +85,10 @@ async def toggle_saved_user(update: Update, ctx: Ctx, state: UserModel):
     for X in keyboard:
         row = []
         for Y in X:
+            if not Y.callback_data:
+                row.append(Y)
+                continue
+
             t, *_ = Y.callback_data.split('#')
             if t == 'remove_saved_user' or t == 'save_user':
                 row.append(InlineKeyboardButton(
