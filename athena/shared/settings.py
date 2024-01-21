@@ -12,6 +12,8 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 USER_DB_PATH = DATA_DIR / 'users.json'
 CHANNEL_DB_PATH = DATA_DIR / 'channels.json'
 GENERAL_DB_PATH = DATA_DIR / 'generals.json'
+BLOCKED_USERS_PATH = DATA_DIR / 'blocked_users.json'
+BLOCKED_CHANNELS_PATH = DATA_DIR / 'blocked_channels.json'
 
 
 EXPIRE_TIME = 15 * 60

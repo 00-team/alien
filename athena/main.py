@@ -4,7 +4,7 @@ import sys
 from time import sleep
 
 import shared.logger
-from modules.admin import error_handler, help_command, users
+from modules.admin import backup, error_handler, help_command, users
 from modules.chat import chat_member_update, my_chat_update
 from shared.database import channel_remove, channel_set_limit, channel_toggle
 from shared.database import check_user, get_keyboard_chats, get_users
@@ -12,7 +12,8 @@ from shared.database import is_forwards_enable, setup_databases
 from shared.database import toggle_forwards, user_remove
 from shared.db import DbDict
 from shared.dependencies import require_admin, require_joined
-from shared.settings import CONF, DATA_DIR, FORWARD_DELAY
+from shared.settings import BLOCKED_CHANNELS_PATH, BLOCKED_USERS_PATH, CONF
+from shared.settings import DATA_DIR, FORWARD_DELAY
 from telegram import Update
 from telegram.error import Forbidden, NetworkError, RetryAfter, TelegramError
 from telegram.ext import Application, CallbackQueryHandler, ChatMemberHandler
@@ -26,8 +27,8 @@ STATE = {
 }
 
 
-blocked_users = DbDict(path=DATA_DIR / 'blocked_users.json')
-blocked_channels = DbDict(path=DATA_DIR / 'blocked_channels.json')
+blocked_users = DbDict(path=BLOCKED_USERS_PATH)
+blocked_channels = DbDict(path=BLOCKED_CHANNELS_PATH)
 
 
 @require_joined
@@ -332,6 +333,7 @@ def main(args: list[str]):
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('help', help_command))
     application.add_handler(CommandHandler('users', users))
+    application.add_handler(CommandHandler('backup', backup))
     application.add_handler(CommandHandler('send_all', send_all))
     application.add_handler(CommandHandler('block', block))
     application.add_handler(CommandHandler('block_channel', block_channel))

@@ -7,7 +7,9 @@ from io import StringIO
 
 from shared.database import get_users
 from shared.dependencies import require_admin
-from shared.settings import CONF
+from shared.settings import BLOCKED_CHANNELS_PATH, BLOCKED_USERS_PATH
+from shared.settings import CHANNEL_DB_PATH, CONF, GENERAL_DB_PATH
+from shared.settings import USER_DB_PATH
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.error import Forbidden, NetworkError
@@ -17,6 +19,7 @@ from telegram.ext import ContextTypes
 @require_admin
 async def help_command(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text((
+        '/backup -> get backup\n\n'
         '/users -> get all the usernames\n'
         '/start -> get list of channels\n'
         '/send_all -> send a message to all users\n'
@@ -26,6 +29,25 @@ async def help_command(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         '/help -> for getting the message\n'
         '🐧'
     ))
+
+
+MAX_FILE_SIZE = 50 * 1024 * 1024
+
+
+@require_admin
+async def backup(update: Update, ctx: Ctx):
+    msg = update.effective_message
+
+    for p in [
+        USER_DB_PATH, CHANNEL_DB_PATH, GENERAL_DB_PATH,
+        BLOCKED_USERS_PATH, BLOCKED_CHANNELS_PATH
+    ]:
+        if p.stat().st_size >= MAX_FILE_SIZE:
+            await msg.reply_text(f'{p.name} is too big ❌')
+            continue
+
+        await msg.reply_document(p, caption=p.name)
+        logging.info(f'a backup for {p.name} was made')
 
 
 @require_admin
