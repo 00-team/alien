@@ -29,7 +29,7 @@ db = DbDict(
 
 def main():
     events = get_events(now() - DAY_TIME, min_price=0.42)
-    print(events)
+    print(list(events))
     return 
 
     while True:
