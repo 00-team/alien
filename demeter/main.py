@@ -1,5 +1,4 @@
 
-import json
 import logging
 import time
 
@@ -28,12 +27,7 @@ db = DbDict(
 
 
 def main():
-    events = get_events(now() - DAY_TIME, min_price=0.42)
-    print(list(events))
-    return 
-
     while True:
-
         if db['last_month'] + MONTH_TIME < now():
             for text, art in get_top(now() - MONTH_TIME, 'Month'):
                 media = None

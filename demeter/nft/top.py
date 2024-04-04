@@ -184,9 +184,8 @@ def get_art(nft):
         'asset': asset,
         'id': nft['pk'] + '-' + str(nft['id']),
         'url': (
-            'https://foundation.app/collection/'
-            f'{art["collection"]["slug"]}/{nft["id"]}?ref='
-            '0x46bc7892BEef62875511E35BdD8d1CB4407E7C53'
+            f'https://foundation.app/mint/eth/{nft["pk"]}/{nft["id"]}'
+            '?ref=0x46bc7892BEef62875511E35BdD8d1CB4407E7C53'
         )
     }
 
