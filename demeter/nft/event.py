@@ -115,8 +115,10 @@ class Event(ABC):
     @property
     def url(self):
         return (
-            f'https://foundation.app/mint/eth/{self.addr}/{self.token_id}'
-            '?ref=0x46bc7892BEef62875511E35BdD8d1CB4407E7C53'
+            f'https://foundation.app/collection/{self.art.collection_slug}'
+            '?ref=0x7aE0A149Ce992145078b6E44091fec5358E7AE9A'
+            # f'https://foundation.app/mint/eth/{self.addr}/{self.token_id}'
+            # '?ref=0x46bc7892BEef62875511E35BdD8d1CB4407E7C53'
         )
 
 
