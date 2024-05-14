@@ -1,4 +1,5 @@
 
+import copy
 import json
 import logging
 
@@ -84,12 +85,12 @@ def get_top_data(from_date: int) -> dict:
 
     top = {
         'creators': {
-            'total': sorted(creators, reverse=True, key=total_sort)[:3],
-            'price': sorted(creators, reverse=True, key=price_sort)[:3]
+            'total': copy.deepcopy(sorted(creators, reverse=True, key=total_sort)[:3]),
+            'price': copy.deepcopy(sorted(creators, reverse=True, key=price_sort)[:3])
         },
         'buyers': {
-            'total': sorted(buyers, reverse=True, key=total_sort)[:3],
-            'price': sorted(buyers, reverse=True, key=price_sort)[:3]
+            'total': copy.deepcopy(sorted(buyers, reverse=True, key=total_sort)[:3]),
+            'price': copy.deepcopy(sorted(buyers, reverse=True, key=price_sort)[:3])
         }
     }
 
