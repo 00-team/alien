@@ -99,6 +99,7 @@ def get_top_data(from_date: int) -> dict:
         top['buyers']['total'],
         top['buyers']['price']
     ):
+        logging.info(f'G[0]: {G[0]}')
         top_nft = max(list(G[0][1].pop('nfts')), key=nft_sort)
         logging.info(f'top nft: {top_nft}')
 
