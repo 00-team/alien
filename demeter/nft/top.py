@@ -19,6 +19,7 @@ def get_top_data(from_date: int) -> dict:
     }
 
     events = get_top_raw(from_date)
+    logging.info(f'events: {events}')
     for idx, e in enumerate(events):
         price = float(e.get('amountInETH', 0))
         nft_id = e['nft']['id'] + ':' + e.get('amountInETH')
@@ -68,6 +69,7 @@ def get_top_data(from_date: int) -> dict:
                     'nfts': {nft_id}
                 }
 
+    logging.info(f'data: {data}')
     def price_sort(item: dict):
         return item[1]['price']
 
