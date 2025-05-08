@@ -149,3 +149,4 @@ price.db.json
 
 bchat/migrations/versions/
 bchat/channels.json
+.pyenv
