@@ -32,7 +32,10 @@ def require_user_data(func):
         user_data = await user_get(UserTable.user_id == user.id)
 
         if user_data is None:
-            codename = await add_user(user.id, user.full_name)
+            un = None
+            if user.username:
+                un = user.username.lower()
+            codename = await add_user(user.id, user.full_name, un)
             user_data = UserModel(
                 user_id=user.id,
                 name=user.full_name,

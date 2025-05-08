@@ -11,7 +11,7 @@ def random_stirng(len=22):
     return ''.join(choices(ascii_letters + digits, k=len))
 
 
-async def add_user(user_id: int, name: str):
+async def add_user(user_id: int, name: str, username: str):
     while True:
         random_code = random_stirng(23)
         if not (await sqlx.fetch_one(select(UserTable).where(
@@ -22,7 +22,8 @@ async def add_user(user_id: int, name: str):
     query = insert(UserTable).values(
         user_id=user_id,
         name=name,
-        codename=random_code
+        codename=random_code,
+        username=username
     )
     await sqlx.execute(query)
     return random_code
